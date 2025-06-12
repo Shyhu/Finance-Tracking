@@ -10,17 +10,13 @@ class ProjectForm(forms.ModelForm):
             'end_date': forms.DateInput(attrs={'type': 'date'}),
         }
 
+
+
+# forms.py
 from django import forms
 from .models import Transaction
-
-class MultiFileInput(forms.ClearableFileInput):
-    allow_multiple_selected = True
 
 class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction
         fields = ['transaction_id', 'project', 'type', 'amount', 'vendor', 'status', 'category', 'description']
-
-class FileUploadForm(forms.Form):
-    bill_proofs = forms.FileField(widget=MultiFileInput(attrs={'multiple': True}), required=False)
-    payment_proofs = forms.FileField(widget=MultiFileInput(attrs={'multiple': True}), required=False)

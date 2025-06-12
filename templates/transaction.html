@@ -2,148 +2,231 @@
 {% load static %}
 {% block content %}
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center">
-        <h2>Transactions</h2>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTransactionModal">+ Add Transaction</button>
-    </div>
+<style>
+  .table th, .table td {
+    vertical-align: middle;
+  }
+  .modal-title {
+    font-weight: bold;
+  }
+  .btn-primary {
+    background: linear-gradient(to right, #4CAF50, #2E8B57);
+    border: none;
+  }
+  .btn-primary:hover {
+    background: linear-gradient(to right, #2E8B57, #4CAF50);
+  }
+  .form-control, .form-select {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+  }
+  .form-control:focus, .form-select:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.6);
+  }
+  .fade-in {
+    animation: fadeIn 0.6s ease-in-out both;
+  }
+  @keyframes fadeIn {
+    0% {opacity: 0; transform: translateY(10px);}
+    100% {opacity: 1; transform: translateY(0);}
+  }
+</style>
 
-    <table class="table mt-3">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Project</th>
-                <th>Description</th>
-                <th>Category</th>
-                <th>Amount</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Bill Proof</th>
-                <th>Payment Proof</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for txn in transactions %}
-                <tr>
-                    <td>{{ txn.created_at|date:"Y-m-d" }}</td>
-                    <td>{{ txn.project.name }}</td>
-                    <td>{{ txn.description }}</td>
-                    <td>{{ txn.category }}</td>
-                    <td>{{ txn.amount }}</td>
-                    <td>{{ txn.type }}</td>
-                    <td>{{ txn.status }}</td>
-                    <td>
-                        {% for file in txn.bill_proofs.all %}
-                            <a href="{{ file.file.url }}">{{ file.file.name }}</a><br>
-                        {% endfor %}
-                    </td>
-                    <td>
-                        {% for file in txn.payment_proofs.all %}
-                            <a href="{{ file.file.url }}">{{ file.file.name }}</a><br>
-                        {% endfor %}
-                    </td>
-                </tr>
+<div class="container mt-4 fade-in">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="text-success">Transactions</h2>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
+      <i class="bi bi-plus-circle me-1"></i> Add Transaction
+    </button>
+  </div>
+
+  <form method="get" class="card p-4 shadow-sm mb-4 fade-in">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-2">
+        <label class="form-label">Start Date</label>
+        <input type="date" name="start_date" value="{{ selected.start_date }}" class="form-control">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">End Date</label>
+        <input type="date" name="end_date" value="{{ selected.end_date }}" class="form-control">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Project</label>
+        <select name="project" class="form-select">
+          <option value="all">All Projects</option>
+          {% for project in projects %}
+            <option value="{{ project.id }}" {% if selected.project == project.id|stringformat:"s" %}selected{% endif %}>
+              {{ project.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Type</label>
+        <select name="type" class="form-select">
+          <option value="all">All Types</option>
+          <option value="Income" {% if selected.type == "Income" %}selected{% endif %}>Income</option>
+          <option value="Expense" {% if selected.type == "Expense" %}selected{% endif %}>Expense</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Category</label>
+        <input type="text" name="category" value="{{ selected.category }}" placeholder="e.g. Client Revenue" class="form-control">
+      </div>
+      <div class="col-md-1 text-end">
+        <button type="submit" class="btn btn-primary w-100">Filter</button>
+      </div>
+    </div>
+  </form>
+
+  <div class="table-responsive fade-in">
+    <table class="table table-bordered table-striped">
+      <thead class="table-light">
+        <tr>
+          <th>Date</th>
+          <th>Project</th>
+          <th>Description</th>
+          <th>Category</th>
+          <th>Amount</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Bill Proof</th>
+          <th>Payment Proof</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for txn in transactions %}
+        <tr>
+          <td>{{ txn.created_at|date:"Y-m-d" }}</td>
+          <td>{{ txn.project.name }}</td>
+          <td>{{ txn.description }}</td>
+          <td>{{ txn.category }}</td>
+          <td>{{ txn.amount }}</td>
+          <td>{{ txn.type }}</td>
+          <td>{{ txn.status }}</td>
+          <td>
+            {% for file in txn.bill_proofs.all %}
+              <a href="{{ file.file.url }}" target="_blank">{{ file.file.name }}</a><br>
             {% endfor %}
-        </tbody>
+          </td>
+          <td>
+            {% for file in txn.payment_proofs.all %}
+              <a href="{{ file.file.url }}" target="_blank">{{ file.file.name }}</a><br>
+            {% endfor %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
     </table>
+  </div>
 </div>
 
 <!-- Modal -->
 <div class="modal fade" id="addTransactionModal" tabindex="-1" aria-labelledby="addTransactionModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
-    <form id="transactionForm" enctype="multipart/form-data">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Add New Transaction</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <form id="transactionForm" enctype="multipart/form-data" class="fade-in">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title">Add New Transaction</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body row">
+          {% csrf_token %}
+          <div id="formErrors" class="alert alert-danger d-none"></div>
+
+          <div class="col-md-6 mb-3">
+            <label>Transaction ID</label>
+            <input type="text" name="transaction_id" class="form-control">
           </div>
-          <div class="modal-body row">
-            {% csrf_token %}
-            <div class="col-md-6 mb-3">
-                <label>Transaction ID</label>
-                <input type="text" name="transaction_id" class="form-control">
-            </div>
-            <div class="col-md-6 mb-3">
-                <label>Project</label>
-                <select name="project" class="form-select">
-                    {% for project in projects %}
-                        <option value="{{ project.id }}">{{ project.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label>Type</label>
-                <select name="type" class="form-select">
-                    <option value="Income">Income</option>
-                    <option value="Expense">Expense</option>
-                </select>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label>Amount</label>
-                <input type="number" step="0.01" name="amount" class="form-control">
-            </div>
-            <div class="col-md-6 mb-3">
-                <label>Vendor</label>
-                <input type="text" name="vendor" class="form-control">
-            </div>
-            <div class="col-md-6 mb-3">
-                <label>Status</label>
-                <select name="status" class="form-select">
-                    <option value="Approved">Approved</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Rejected">Rejected</option>
-                </select>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label>Category</label>
-                <select name="category" class="form-select">
-                    {% for cat in categories %}
-                        <option value="{{ cat.name }}">{{ cat.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label>Description</label>
-                <textarea name="description" class="form-control"></textarea>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label>Bill Proof(s)</label>
-                <input type="file" name="bill_proofs" class="form-control" multiple>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label>Payment Proof(s)</label>
-                <input type="file" name="payment_proofs" class="form-control" multiple>
-            </div>
+          <div class="col-md-6 mb-3">
+            <label>Project</label>
+            <select name="project" class="form-select">
+              {% for project in projects %}
+              <option value="{{ project.id }}">{{ project.name }}</option>
+              {% endfor %}
+            </select>
           </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-success">Save</button>
+          <div class="col-md-6 mb-3">
+            <label>Type</label>
+            <select name="type" class="form-select">
+              <option value="Income">Income</option>
+              <option value="Expense">Expense</option>
+            </select>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>Amount</label>
+            <input type="number" step="0.01" name="amount" class="form-control">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>Vendor</label>
+            <input type="text" name="vendor" class="form-control">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>Status</label>
+            <select name="status" class="form-select">
+              <option value="Approved">Approved</option>
+              <option value="Pending">Pending</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>Category</label>
+            <select name="category" class="form-select">
+              {% for cat in categories %}
+              <option value="{{ cat.name }}">{{ cat.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>Description</label>
+            <textarea name="description" class="form-control"></textarea>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>Bill Proof(s)</label>
+            <input type="file" name="bill_proofs" class="form-control" multiple>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>Payment Proof(s)</label>
+            <input type="file" name="payment_proofs" class="form-control" multiple>
           </div>
         </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Save</button>
+        </div>
+      </div>
     </form>
   </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $('#transactionForm').submit(function(e){
-        e.preventDefault();
-        let formData = new FormData(this);
-
-        $.ajax({
-            type: 'POST',
-            url: '{% url "add_transaction" %}',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(response){
-                if(response.success){
-                    location.reload();
-                } else {
-                    alert("Error saving transaction.");
-                }
-            }
-        });
+  $('#transactionForm').submit(function(e){
+    e.preventDefault();
+    let formData = new FormData(this);
+    $.ajax({
+      type: 'POST',
+      url: '{% url "add_transaction" %}',
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function(response){
+        if(response.success){
+          location.reload();
+        } else {
+          let errors = response.errors;
+          let errorHtml = '<ul>';
+          for (let field in errors) {
+            errors[field].forEach(msg => {
+              errorHtml += `<li><strong>${field}</strong>: ${msg}</li>`;
+            });
+          }
+          errorHtml += '</ul>';
+          $('#formErrors').html(errorHtml).removeClass('d-none');
+        }
+      }
     });
+  });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 

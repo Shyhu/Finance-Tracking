@@ -73,13 +73,10 @@ def project_update_ajax(request, pk):
 
 
 
-
-
-
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.http import JsonResponse
 from .models import Transaction, BillProof, PaymentProof, Category, Project
-from .forms import TransactionForm, FileUploadForm
+from .forms import TransactionForm
 
 def transaction_list(request):
     transactions = Transaction.objects.select_related('project').all()
@@ -90,14 +87,14 @@ def transaction_list(request):
         'projects': projects,
         'categories': categories,
         'transaction_form': TransactionForm(),
-        'file_form': FileUploadForm(),
+      
     })
 
 def add_transaction(request):
     if request.method == 'POST':
         form = TransactionForm(request.POST)
-        file_form = FileUploadForm(request.POST, request.FILES)
-        if form.is_valid() and file_form.is_valid():
+        # file_form = FileUploadForm(request.POST, request.FILES)
+        if form.is_valid():
             transaction = form.save()
 
             # Bill Proofs
@@ -110,5 +107,7 @@ def add_transaction(request):
 
             return JsonResponse({'success': True})
         else:
+            print(form.errors, request.POST, request.FILES)
             return JsonResponse({'success': False, 'errors': form.errors})
     return JsonResponse({'success': False, 'message': 'Invalid request'})
+
