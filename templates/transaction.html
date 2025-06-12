@@ -72,13 +72,26 @@
       </div>
       <div class="col-md-3">
         <label class="form-label">Category</label>
-        <input type="text" name="category" value="{{ selected.category }}" placeholder="e.g. Client Revenue" class="form-control">
+        <select name="category" class="form-select">
+          <option value="">All Categories</option>
+          {% for cat in categories %}
+            <option value="{{ cat.name }}" {% if selected.category == cat.name %}selected{% endif %}>
+              {{ cat.name }}
+            </option>
+          {% endfor %}
+        </select>
       </div>
       <div class="col-md-1 text-end">
         <button type="submit" class="btn btn-primary w-100">Filter</button>
       </div>
     </div>
   </form>
+
+  {% if transactions %}
+    <p class="text-muted">{{ transactions|length }} transaction(s) found.</p>
+  {% else %}
+    <div class="alert alert-warning text-center">No transactions match your filters.</div>
+  {% endif %}
 
   <div class="table-responsive fade-in">
     <table class="table table-bordered table-striped">

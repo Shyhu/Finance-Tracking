@@ -39,10 +39,10 @@
           <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="">Dashboard</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if request.resolver_match.url_name == 'project_list' %}active{% endif %}" href="">Projects</a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'project_list' %}active{% endif %}" href="{% url 'project_list' %}">Projects</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if request.resolver_match.url_name == 'transactions' %}active{% endif %}" href="">Transactions</a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'transactions' %}active{% endif %}" href="{% url 'transaction_list' %}">Transactions</a>
         </li>
         <li class="nav-item">
           <a class="nav-link {% if request.resolver_match.url_name == 'loans' %}active{% endif %}" href="">Loans</a>

@@ -56,7 +56,7 @@
       <li class="list-group-item"><strong>Notes:</strong> {{ project.notes|default:"None" }}</li>
     </ul>
 
-    <a href="" class="btn btn-outline-primary mt-4 px-4 py-2">
+    <a href="{% url 'project_list' %}" class="btn btn-outline-primary mt-4 px-4 py-2">
       ← Back to Projects
     </a>
   </div>

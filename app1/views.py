@@ -53,23 +53,38 @@ def project_detail_view(request, pk):
 
 
 
-from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
+from .models import Project
+from .forms import ProjectForm
 
-
-@csrf_exempt
-def project_update_ajax(request, pk):
+def edit_project(request, pk):
     project = get_object_or_404(Project, pk=pk)
     if request.method == 'POST':
-        project.name = request.POST.get('name')
-        project.location = request.POST.get('location')
-        project.total_budget = request.POST.get('total_budget')
-        project.start_date = request.POST.get('start_date')
-        project.end_date = request.POST.get('end_date')
-        project.notes = request.POST.get('notes')
-        project.save()
+        form = ProjectForm(request.POST, instance=project)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'success': False, 'errors': form.errors})
+    else:
+        form = ProjectForm(instance=project)
+        return render(request, 'project.html', {'edit_form': form, 'project_id': pk})
+    
+
+from django.http import JsonResponse, HttpResponseNotAllowed
+from django.views.decorators.http import require_POST
+from .models import Project
+
+@require_POST
+def delete_project(request, pk):
+    try:
+        project = Project.objects.get(pk=pk)
+        project.delete()
         return JsonResponse({'success': True})
-    return JsonResponse({'error': 'Invalid request'}, status=400)
+    except Project.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Project not found'})
+
 
 
 
@@ -77,18 +92,58 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from .models import Transaction, BillProof, PaymentProof, Category, Project
 from .forms import TransactionForm
+from django.shortcuts import render
+from .models import Transaction, Project, Category
+from django.utils.dateparse import parse_date
+from datetime import datetime
 
 def transaction_list(request):
-    transactions = Transaction.objects.select_related('project').all()
+    transactions = Transaction.objects.all().select_related('project')
     projects = Project.objects.all()
     categories = Category.objects.all()
+
+    # Get filter parameters from GET
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    project_id = request.GET.get('project')
+    txn_type = request.GET.get('type')
+    category = request.GET.get('category')
+
+    # Create a dictionary to retain selected filters in the template
+    selected = {
+        'start_date': start_date or '',
+        'end_date': end_date or '',
+        'project': project_id or 'all',
+        'type': txn_type or 'all',
+        'category': category or '',
+    }
+
+    # Apply filters
+    if start_date:
+        transactions = transactions.filter(created_at__date__gte=parse_date(start_date))
+
+    if end_date:
+        transactions = transactions.filter(created_at__date__lte=parse_date(end_date))
+
+    if project_id and project_id != 'all':
+        try:
+            transactions = transactions.filter(project__id=int(project_id))
+        except ValueError:
+            pass  # Ignore invalid project_id
+
+    if txn_type and txn_type != 'all':
+        transactions = transactions.filter(type=txn_type)
+
+    if category:
+        transactions = transactions.filter(category__icontains=category)
+
     return render(request, 'transaction.html', {
         'transactions': transactions,
         'projects': projects,
         'categories': categories,
-        'transaction_form': TransactionForm(),
-      
+        'selected': selected,
     })
+
 
 def add_transaction(request):
     if request.method == 'POST':
