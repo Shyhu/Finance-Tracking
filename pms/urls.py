@@ -27,4 +27,5 @@ urlpatterns = [
     path('transactions/', views.transaction_list, name='transaction_list'),
     path('add-transaction/', views.add_transaction, name='add_transaction'),
 
+    
 ]

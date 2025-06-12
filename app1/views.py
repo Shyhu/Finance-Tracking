@@ -74,44 +74,24 @@ def project_update_ajax(request, pk):
 
 
 
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .forms import TransactionForm, FileUploadForm
-from .models import BillProof, PaymentProof
-
-def add_transaction(request):
-    if request.method == 'POST':
-        t_form = TransactionForm(request.POST)
-        f_form = FileUploadForm(request.POST, request.FILES)
-
-        if t_form.is_valid() and f_form.is_valid():
-            transaction = t_form.save()
-
-            for file in request.FILES.getlist('bill_proofs'):
-                BillProof.objects.create(transaction=transaction, file=file)
-
-            for file in request.FILES.getlist('payment_proofs'):
-                PaymentProof.objects.create(transaction=transaction, file=file)
-
-            messages.success(request, 'Transaction added successfully!')
-            return redirect('transaction')
-    else:
-        t_form = TransactionForm()
-        f_form = FileUploadForm()
-
-    return render(request, 'transaction.html', {'t_form': t_form, 'f_form': f_form})
-
-
 
 
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
-from .models import Transaction, BillProof, PaymentProof
+from .models import Transaction, BillProof, PaymentProof, Category, Project
 from .forms import TransactionForm, FileUploadForm
 
 def transaction_list(request):
     transactions = Transaction.objects.select_related('project').all()
-    return render(request, 'transaction.html', {'transactions': transactions})
+    projects = Project.objects.all()
+    categories = Category.objects.all()
+    return render(request, 'transaction.html', {
+        'transactions': transactions,
+        'projects': projects,
+        'categories': categories,
+        'transaction_form': TransactionForm(),
+        'file_form': FileUploadForm(),
+    })
 
 def add_transaction(request):
     if request.method == 'POST':
