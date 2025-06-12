@@ -1,4 +1,6 @@
 from django.contrib import admin
-from app1.models import Project
+from app1.models import Project,Transaction,Category
 # Register your models here.
 admin.site.register(Project)
+admin.site.register(Transaction)
+admin.site.register(Category)

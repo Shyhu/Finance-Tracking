@@ -40,7 +40,8 @@
                      
                      <a href="{% url 'project-detail' project.pk %}" class="btn btn-sm btn-outline-secondary">⚙️</a>
 
-                    <a href="" class="btn btn-sm btn-outline-secondary">✏️</a>
+                   <a href="#" class="btn btn-sm btn-outline-secondary edit-project-btn" data-id="{{ project.id }}">✏️</a>
+
                     <a href="" class="btn btn-sm btn-outline-danger">🗑️</a>
                 </td>
             </tr>
@@ -70,6 +71,106 @@
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="editProjectModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="editProjectForm" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Project</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        {% csrf_token %}
+        <input type="hidden" id="edit-id" name="id">
+        <div class="mb-3">
+          <label>Project Name</label>
+          <input type="text" id="edit-name" name="name" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label>Location</label>
+          <input type="text" id="edit-location" name="location" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label>Budget</label>
+          <input type="number" id="edit-budget" name="total_budget" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label>Start Date</label>
+          <input type="date" id="edit-start-date" name="start_date" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label>End Date</label>
+          <input type="date" id="edit-end-date" name="end_date" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label>Notes</label>
+          <textarea id="edit-notes" name="notes" class="form-control"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">💾 Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const editForm = document.getElementById("editProjectForm");
+
+    // Open modal with project data
+    document.body.addEventListener("click", function (e) {
+        if (e.target.classList.contains("edit-project-btn")) {
+            e.preventDefault();
+            const projectId = e.target.dataset.id;
+
+            fetch(`/project/${projectId}/detail/`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("edit-id").value = projectId;
+                    document.getElementById("edit-name").value = data.name;
+                    document.getElementById("edit-location").value = data.location;
+                    document.getElementById("edit-budget").value = data.budget.replace(/[₹,]/g, '');
+                    document.getElementById("edit-start-date").value = data.start_date;
+                    document.getElementById("edit-end-date").value = data.end_date;
+                    document.getElementById("edit-notes").value = data.notes || "";
+
+                    const modal = new bootstrap.Modal(document.getElementById("editProjectModal"));
+                    modal.show();
+                });
+        }
+    });
+
+    // Submit form with AJAX
+    editForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const id = document.getElementById("edit-id").value;
+        const formData = new FormData(editForm);
+
+        fetch(`/project/${id}/update/`, {
+            method: "POST",
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: formData
+        })
+        .then(res => {
+            if (res.ok) {
+                alert("✅ Project updated!");
+                bootstrap.Modal.getInstance(document.getElementById("editProjectModal")).hide();
+                location.reload(); // Optional: reload or update row dynamically
+            } else {
+                alert("❌ Failed to update project.");
+            }
+        });
+    });
+});
+</script>
+
+
+
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.querySelector("#addProjectModal form");
@@ -104,7 +205,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         <td>${data.notes}</td>
                         <td>
                             <a href="#" class="btn btn-sm btn-outline-secondary">⚙️</a>
-                            <a href="#" class="btn btn-sm btn-outline-success">✏️</a>
+                             <a href="#" class="btn btn-sm btn-outline-secondary edit-project-btn" data-id="{{ project.id }}">✏️</a>
+
                             <a href="#" class="btn btn-sm btn-outline-danger">🗑️</a>
                         </td>
                     </tr>
