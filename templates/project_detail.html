@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
 {% block content %}
+
 <style>
+  body {
+    background: linear-gradient(to right, #e0eafc, #cfdef3);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
   .fade-in-up {
     animation: fadeInUp 0.6s ease-in-out both;
   }
@@ -18,47 +24,84 @@
 
   .project-card {
     border-radius: 1rem;
-    background: #ffffff;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-  }
-
-  .project-card:hover {
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
-    transform: scale(1.01);
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 2.5rem;
+    max-width: 750px;
+    margin: auto;
   }
 
   .project-heading {
-    font-weight: bold;
+    font-weight: 700;
     color: #0d6efd;
-    border-bottom: 2px solid #0d6efd;
+    font-size: 2rem;
+    border-bottom: 3px solid #0d6efd;
     display: inline-block;
-    padding-bottom: 4px;
-    margin-bottom: 20px;
+    padding-bottom: 6px;
+    margin-bottom: 25px;
+  }
+
+  .list-group-item {
+    background: transparent;
+    border: none;
+    padding: 0.75rem 0;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .list-group-item i {
+    color: #0d6efd;
+    margin-right: 10px;
+    font-size: 1.2rem;
+    width: 25px;
+    text-align: center;
   }
 
   .list-group-item strong {
-    width: 120px;
+    color: #333;
+    width: 140px;
     display: inline-block;
-    color: #495057;
   }
+
+  .back-button {
+    display: inline-block;
+    margin-top: 30px;
+    padding: 10px 20px;
+    font-weight: 600;
+    border-radius: 30px;
+    background-color: #0d6efd;
+    color: white;
+    border: none;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+
+  .back-button:hover {
+    background-color: #0b5ed7;
+    box-shadow: 0 6px 15px rgba(13, 110, 253, 0.3);
+  }
+
 </style>
 
 <div class="container mt-5 fade-in-up">
-  <div class="card project-card p-5">
+  <div class="project-card">
     <h2 class="project-heading">{{ project.name }}</h2>
     <ul class="list-group list-group-flush">
-      <li class="list-group-item"><strong>Code:</strong> {{ project.code }}</li>
-      <li class="list-group-item"><strong>Location:</strong> {{ project.location }}</li>
-      <li class="list-group-item"><strong>Budget:</strong> ₹{{ project.total_budget }}</li>
-      <li class="list-group-item"><strong>Start Date:</strong> {{ project.start_date }}</li>
-      <li class="list-group-item"><strong>End Date:</strong> {{ project.end_date }}</li>
-      <li class="list-group-item"><strong>Notes:</strong> {{ project.notes|default:"None" }}</li>
+      <li class="list-group-item"><i class="fas fa-hashtag"></i><strong>Code:</strong> {{ project.code }}</li>
+      <li class="list-group-item"><i class="fas fa-map-marker-alt"></i><strong>Location:</strong> {{ project.location }}</li>
+      <li class="list-group-item"><i class="fas fa-wallet"></i><strong>Budget:</strong> ₹{{ project.total_budget }}</li>
+      <li class="list-group-item"><i class="far fa-calendar-alt"></i><strong>Start Date:</strong> {{ project.start_date }}</li>
+      <li class="list-group-item"><i class="far fa-calendar-check"></i><strong>End Date:</strong> {{ project.end_date }}</li>
+      <li class="list-group-item"><i class="fas fa-sticky-note"></i><strong>Notes:</strong> {{ project.notes|default:"None" }}</li>
     </ul>
 
-    <a href="{% url 'project_list' %}" class="btn btn-outline-primary mt-4 px-4 py-2">
-      ← Back to Projects
-    </a>
+    <a href="{% url 'project_list' %}" class="back-button">← Back to Projects</a>
   </div>
 </div>
+
+<!-- FontAwesome Icons -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
 {% endblock %}
