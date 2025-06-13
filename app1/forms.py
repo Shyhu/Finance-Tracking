@@ -38,3 +38,34 @@ class LoanForm(forms.ModelForm):
         model = Loan
         fields = '__all__'
         exlude = ('created_at' , 'updated_at')
+
+
+
+# forms.py
+from django import forms
+from .models import Repayment
+
+class RepaymentForm(forms.ModelForm):
+    class Meta:
+        model = Repayment
+        fields = ['date', 'amount_paid']
+
+
+
+from django import forms
+from .models import Task
+
+class TaskForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ['task_id', 'date', 'staff', 'project', 'description']
+        widgets = {
+            'date': forms.DateInput(attrs={'type': 'date'}),
+            'description': forms.Textarea(attrs={'rows': 3}),
+        }
+
+# Just use a plain file input in HTML instead of this:
+# class TaskFileForm(forms.ModelForm):
+#     class Meta:
+#         model = TaskFile
+#         fields = ['file']

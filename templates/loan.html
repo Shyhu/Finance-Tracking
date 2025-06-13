@@ -1,6 +1,37 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
+<style>
+   
+  .table th, .table td {
+    vertical-align: middle;
+  }
+  .modal-title {
+    font-weight: bold;
+  }
+  .btn-primary {
+    background: linear-gradient(to right, #4CAF50, #2E8B57);
+    border: none;
+  }
+  .btn-primary:hover {
+    background: linear-gradient(to right, #2E8B57, #4CAF50);
+  }
+  .form-control, .form-select {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+  }
+  .form-control:focus, .form-select:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.6);
+  }
+  .fade-in {
+    animation: fadeIn 0.6s ease-in-out both;
+  }
+  @keyframes fadeIn {
+    0% {opacity: 0; transform: translateY(10px);}
+    100% {opacity: 1; transform: translateY(0);}
+  }
+</style>
 
 <div class="container my-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -56,7 +87,7 @@
             <tbody>
                 {% for loan in loans %}
                 <tr>
-                    <td><a href="#" class="text-primary" data-bs-toggle="modal" data-bs-target="#viewLoanModal{{ loan.id }}">{{ loan.project.borrower_name }}</a></td>
+                    <td><a href="#" class="text-primary" data-bs-toggle="modal" data-bs-target="#viewLoanModal{{ loan.id }}">{{ loan.project }}</a></td>
                     <td>{{ loan.loan_purpose }}</td>
                     <td>${{ loan.amount }}</td>
                     <td>{{ loan.interest_rate }}%</td>
@@ -67,9 +98,10 @@
                         <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editLoanModal{{ loan.id }}">
                             <i class="bi bi-gear"></i>
                         </button>
-                        <button class="btn btn-sm btn-outline-success">
-                            <i class="bi bi-check-circle-fill"></i>
-                        </button>
+                        <a href="{% url 'loan_detail' loan.id %}" class="btn btn-sm btn-outline-success">
+    <i class="bi bi-check-circle-fill"></i>
+</a>
+
                         <button class="btn btn-sm btn-outline-danger" onclick="deleteLoan({{ loan.id }})">
                             <i class="bi bi-trash"></i>
                         </button>

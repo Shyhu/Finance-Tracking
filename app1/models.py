@@ -72,6 +72,7 @@ class Staff(models.Model):
 
 class Loan(models.Model):
 
+    
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     loan_id = models.CharField(max_length=50)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -89,3 +90,38 @@ class Loan(models.Model):
         verbose_name_plural = 'Loans'
         ordering = ['-start_date']
 
+
+
+# models.py
+from decimal import Decimal
+from django.db import models
+
+class Repayment(models.Model):
+    loan = models.ForeignKey('Loan', on_delete=models.CASCADE, related_name='repayments')
+    date = models.DateField()
+    amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
+    interest_calculated = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+    interest_paid = models.DecimalField(max_digits=10, decimal_places=2)
+    principal_paid = models.DecimalField(max_digits=10, decimal_places=2)
+    balance_after_repayment = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.loan.project.name} - {self.date} - ₹{self.amount_paid}"
+
+
+
+
+
+class Task(models.Model):
+    task_id = models.CharField(max_length=50, unique=True)
+    date = models.DateField()
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    description = models.TextField()
+
+    def __str__(self):
+        return self.task_id
+
+class TaskFile(models.Model):
+    task = models.ForeignKey(Task, related_name='files', on_delete=models.CASCADE)
+    file = models.FileField(upload_to='task_files/')

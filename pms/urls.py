@@ -32,14 +32,18 @@ urlpatterns = [
     path('add-transaction/', views.add_transaction, name='add_transaction'),
 
     path('staff/', views.staff_list, name='staff_list'),
-    path('staff/delete/<int:pk>/', views.staff_delete, name='staff_delete'),
-    path('staff/edit/<int:pk>/', views.staff_edit, name='staff_edit'),  # opti
-
+    path('staff/delete/<int:staff_id>/', views.delete_staff, name='delete_staff'),
     
     path('loans/', views.loan_list, name='loan_list'),
     path('loans/create/', views.create_loan, name='create_loan'),
     path('loans/update/<int:pk>/', views.update_loan, name='update_loan'),
     path('loans/delete/', views.delete_loan, name='delete_loan'),
+    # urls.py
+    path('loans/<int:loan_id>/', views.loan_detail, name='loan_detail'),
+    # path('loans/<int:loan_id>/add_repayment/', views.add_repayment, name='add_repayment'),
+
+    path('tasks/', views.task_list, name='task_list'),
+
     
 ]
 
