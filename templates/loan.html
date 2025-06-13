@@ -40,34 +40,34 @@
             + Add New Loan
         </button>
     </div>
-
-    <!-- Summary Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="card shadow-sm p-3">
-                <h6>Total Loaned Amount</h6>
-                <h4 class="text-primary fw-bold">${{ total_loaned_amount|floatformat:2 }}</h4>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm p-3">
-                <h6>Total Principal Repaid</h6>
-                <h4 class="text-success fw-bold">${{ total_principal_repaid|floatformat:2 }}</h4>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm p-3">
-                <h6>Total Interest Collected</h6>
-                <h4 class="text-warning fw-bold">${{ total_interest_collected|floatformat:2 }}</h4>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm p-3">
-                <h6>Total Outstanding Principal</h6>
-                <h4 class="text-danger fw-bold">${{ total_outstanding|floatformat:2 }}</h4>
-            </div>
-        </div>
+<!-- Summary Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card shadow-sm p-3">
+      <h6>Total Loaned Amount</h6>
+      <h4 class="text-primary fw-bold">₹{{ total_loaned_amount|floatformat:2 }}</h4>
     </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm p-3">
+      <h6>Total Principal Repaid</h6>
+      <h4 class="text-success fw-bold">₹{{ total_principal_repaid|floatformat:2 }}</h4>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm p-3">
+      <h6>Total Interest Collected</h6>
+      <h4 class="text-warning fw-bold">₹{{ total_interest_collected|floatformat:2 }}</h4>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm p-3">
+      <h6>Total Outstanding Principal</h6>
+      <h4 class="text-danger fw-bold">₹{{ total_outstanding|floatformat:2 }}</h4>
+    </div>
+  </div>
+</div>
+
 
     <!-- Loan Table -->
     <div class="table-responsive">

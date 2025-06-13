@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: DejaVu Sans, sans-serif; line-height:1.4 }
+    h2 { color: #0d6efd }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #333; padding: 6px; text-align: center; }
+    .summary { margin-top: 20px; }
+    .summary td { text-align: left; }
+  </style>
+</head>
+<body>
+  <h2>Loan Summary – {{ loan.project.name }}</h2>
+  <table class="summary">
+    <tr><td><strong>Loan Amount:</strong></td><td>₹{{ loan.amount }}</td></tr>
+    <tr><td><strong>Interest Rate:</strong></td><td>{{ loan.interest_rate }}%</td></tr>
+    <tr><td><strong>Total Interest Paid:</strong></td><td>₹{{ total_interest_paid }}</td></tr>
+    <tr><td><strong>Total Principal Paid:</strong></td><td>₹{{ total_principal_paid }}</td></tr>
+    <tr><td><strong>Remaining Balance:</strong></td><td>₹{{ remaining_balance }}</td></tr>
+  </table>
+
+  <h3>Repayment History</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th><th>Paid</th><th>Interest</th><th>Principal</th><th>Balance</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in repayments %}
+      <tr>
+        <td>{{ r.date }}</td>
+        <td>₹{{ r.amount_paid }}</td>
+        <td>₹{{ r.interest_paid }}</td>
+        <td>₹{{ r.principal_paid }}</td>
+        <td>₹{{ r.balance_after_repayment }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>

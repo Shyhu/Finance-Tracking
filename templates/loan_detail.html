@@ -2,6 +2,10 @@
 {% load humanize %}
 
 {% block content %}
+{% comment %} <a href="{% url 'loan_pdf' loan.id %}" class="btn btn-sm btn-outline-primary float-end">
+  <i class="fas fa-file-pdf"></i> Download PDF
+</a> {% endcomment %}
+
 <div class="container mt-4">
     <h3 class="fw-bold">Loan Details</h3>
 
@@ -45,16 +49,14 @@
             {% for repayment in repayments %}
             <tr>
                 <td>{{ repayment.date }}</td>
-                <td><strong>${{ repayment.amount|floatformat:2 }}</strong></td>
+                <td><strong>${{ repayment.amount_paid|floatformat:2 }}</strong></td>
                 <td>${{ repayment.interest_calculated|floatformat:2 }}</td>
                 <td class="text-warning">${{ repayment.interest_paid|floatformat:2 }}</td>
                 <td class="text-success">${{ repayment.principal_paid|floatformat:2 }}</td>
                <td class="text-danger fw-bold">
-    {% if rep.balance_after %}
-        ${{ rep.balance_after|floatformat:2 }}
-    {% else %}
-        $0.00
-    {% endif %}
+
+        ${{ remaining_balance|floatformat:2 }}
+   
 </td>
 
             </tr>

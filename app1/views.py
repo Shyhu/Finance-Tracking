@@ -166,21 +166,7 @@ def add_transaction(request):
             return JsonResponse({'success': False, 'errors': form.errors})
     return JsonResponse({'success': False, 'message': 'Invalid request'})
 
-from django.shortcuts import render, get_object_or_404, redirect
-from django.db import IntegrityError
-from django.contrib import messages
-from .models import Staff, Project
-from .forms import StaffForm
 
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from .models import Staff, Project
-from .forms import StaffForm
-# views.py
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from .models import Staff, Project
-from .forms import StaffForm
 
 # app1/views.py
 
@@ -267,19 +253,25 @@ from .forms import LoanForm
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Sum, F, FloatField, ExpressionWrapper
 from decimal import Decimal
-# List view for Loan Management
+#from django.db.models import Sum
+from decimal import Decimal
+from .models import Loan, Repayment
+
 def loan_list(request):
     loans = Loan.objects.select_related('project').all()
     form = LoanForm()
 
-    # Example calculations (replace with actual fields if available)
-    total_loaned_amount = loans.aggregate(total=Sum('amount'))['total'] or 0
+    # 🟦 Total loaned amount
+    total_loaned_amount = loans.aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
 
-    # Placeholder logic: assuming total repaid and interest collected are stored separately
-    total_principal_repaid = 921.04  # Replace with actual logic or aggregate field
-    total_interest_collected = 78.96
-    total_outstanding = total_loaned_amount - Decimal(total_principal_repaid)
+    # 🟦 Total principal repaid
+    total_principal_repaid = Repayment.objects.aggregate(total=Sum('principal_paid'))['total'] or Decimal('0.00')
 
+    # 🟦 Total interest collected
+    total_interest_collected = Repayment.objects.aggregate(total=Sum('interest_paid'))['total'] or Decimal('0.00')
+
+    # 🟦 Total outstanding = loaned amount - total principal repaid
+    total_outstanding = total_loaned_amount - total_principal_repaid
 
     context = {
         'loans': loans,
@@ -331,23 +323,28 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Loan, Repayment
 from .forms import RepaymentForm
 from django.db.models import Sum
-
+from django.db.models import Sum, Q
+from django.utils.dateparse import parse_date
+from django.http import HttpResponse
+from .utils import generate_loan_pdf  # PDF generator utility
 def loan_detail(request, loan_id):
     loan = get_object_or_404(Loan, pk=loan_id)
     repayments = loan.repayments.all().order_by('date')
-
-    # Default empty form
     repayment_form = RepaymentForm()
+
     repayments_data = []
     remaining_balance = loan.amount
 
     for repayment in repayments:
         remaining_balance -= repayment.principal_paid or Decimal('0.00')
         repayments_data.append({
-        'repayment': repayment,
-        'balance_after': remaining_balance
-    })
+            'repayment': repayment,
+            'balance_after': remaining_balance
+        })
 
+    # 🟦 Set default values for GET requests
+    interest_paid = Decimal('0.00')
+    principal_paid = Decimal('0.00')
 
     if request.method == 'POST':
         repayment_form = RepaymentForm(request.POST)
@@ -355,12 +352,10 @@ def loan_detail(request, loan_id):
             repayment = repayment_form.save(commit=False)
             repayment.loan = loan
 
-            # Get totals
             total_interest_paid = loan.repayments.aggregate(total=Sum('interest_paid'))['total'] or Decimal('0.00')
             total_principal_paid = loan.repayments.aggregate(total=Sum('principal_paid'))['total'] or Decimal('0.00')
             current_balance = loan.amount - total_principal_paid
 
-            # Interest calculation
             interest_calculated = (loan.interest_rate / Decimal('100.00')) * current_balance
             repayment.interest_calculated = interest_calculated
 
@@ -373,11 +368,15 @@ def loan_detail(request, loan_id):
                 repayment.principal_paid = amt - interest_calculated
 
             repayment.balance_after_repayment = current_balance - repayment.principal_paid
-            repayment.save()
 
+            # 🟦 Set values for context after saving
+            interest_paid = repayment.interest_paid
+            principal_paid = repayment.principal_paid
+
+            repayment.save()
             return redirect('loan_detail', loan_id=loan.id)
 
-    # Summary totals
+    # Totals
     total_interest_paid = repayments.aggregate(total=Sum('interest_paid'))['total'] or Decimal('0.00')
     total_principal_paid = repayments.aggregate(total=Sum('principal_paid'))['total'] or Decimal('0.00')
     remaining_balance = loan.amount - total_principal_paid
@@ -389,5 +388,28 @@ def loan_detail(request, loan_id):
         'total_interest_paid': total_interest_paid,
         'total_principal_paid': total_principal_paid,
         'remaining_balance': remaining_balance,
+        'interest_paid': interest_paid,  # 🟦 These two are now always defined
+        'principal_paid': principal_paid,
     })
 
+
+
+# from django.http import HttpResponse
+# from .utils import generate_loan_pdf
+
+# def loan_pdf(request, loan_id):
+#     loan = get_object_or_404(Loan, pk=loan_id)
+#     repayments = loan.repayments.all().order_by('date')
+#     # Recalculate totals as in your view:
+#     total_interest_paid = repayments.aggregate(total=Sum('interest_paid'))['total'] or Decimal('0.00')
+#     total_principal_paid = repayments.aggregate(total=Sum('principal_paid'))['total'] or Decimal('0.00')
+#     remaining_balance = loan.amount - total_principal_paid
+
+#     pdf_content = generate_loan_pdf(loan, repayments, total_interest_paid, total_principal_paid, remaining_balance)
+#     if not pdf_content:
+#         return HttpResponse("Error generating PDF", status=500)
+
+#     response = HttpResponse(pdf_content, content_type='application/pdf')
+#     fname = f"Loan_{loan_id}_summary.pdf"
+#     response['Content-Disposition'] = f'attachment; filename="{fname}"'
+#     return response

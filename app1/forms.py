@@ -1,13 +1,29 @@
 from django import forms
 from .models import Project
 
+# class ProjectForm(forms.ModelForm):
+#     class Meta:
+#         model = Project
+#         fields = '__all__'
+#         widgets = {
+#             'start_date': forms.DateInput(attrs={'type': 'date'}),
+#             'end_date': forms.DateInput(attrs={'type': 'date'}),
+#         }
+from django import forms
+from .models import Project
+
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
-        fields = '__all__'
+        fields = ['code', 'name', 'location', 'total_budget', 'start_date', 'end_date', 'notes']
         widgets = {
-            'start_date': forms.DateInput(attrs={'type': 'date'}),
-            'end_date': forms.DateInput(attrs={'type': 'date'}),
+            'code': forms.TextInput(attrs={'class': 'form-control'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'location': forms.TextInput(attrs={'class': 'form-control'}),
+            'total_budget': forms.NumberInput(attrs={'class': 'form-control'}),
+            'start_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'end_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
 
 
@@ -32,13 +48,22 @@ class StaffForm(forms.ModelForm):
         fields = ['staff_id', 'name', 'photo', 'designation', 'department', 'project', 'salary', 'date_of_join']
 
 
+from django import forms
+from .models import Loan
 
 class LoanForm(forms.ModelForm):
     class Meta:
         model = Loan
-        fields = '__all__'
-        exlude = ('created_at' , 'updated_at')
-
+        exclude = ('created_at', 'updated_at')  # fixed spelling
+        widgets = {
+            'loan_id': forms.TextInput(attrs={'class': 'form-control'}),
+            'project': forms.Select(attrs={'class': 'form-select'}),
+            'amount': forms.NumberInput(attrs={'class': 'form-control'}),
+            'interest_rate': forms.NumberInput(attrs={'class': 'form-control'}),
+            'purpose': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'repayment_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        }
 
 
 # forms.py

@@ -3,39 +3,126 @@
 {% block content %}
 
 <style>
-  .table th, .table td {
-    vertical-align: middle;
+    body {
+    background-color: #f8f9fa;
   }
-  .modal-title {
-    font-weight: bold;
-  }
+
   .btn-primary {
-    background: linear-gradient(to right, #4CAF50, #2E8B57);
+    background: linear-gradient(to right, #0d6efd, #0b5ed7);
     border: none;
+    color: #fff;
   }
+
   .btn-primary:hover {
-    background: linear-gradient(to right, #2E8B57, #4CAF50);
+    background: linear-gradient(to right, #0b5ed7, #0a58ca);
   }
+
   .form-control, .form-select {
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease-in-out;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.3s ease-in-out;
   }
+
   .form-control:focus, .form-select:focus {
-    border-color: #4CAF50;
-    box-shadow: 0 0 5px rgba(76, 175, 80, 0.6);
+    border-color: #0d6efd;
+    box-shadow: 0 0 5px rgba(13, 110, 253, 0.4);
   }
+
+  .table-responsive {
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  }
+
+  .table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .table thead th {
+    background-color: #e9f0ff;
+    color: #0d6efd;
+    text-align: center;
+    vertical-align: middle;
+    padding: 0.7rem;
+    border-bottom: 2px solid #dee2e6;
+    font-size: 0.875rem;
+  }
+
+  .table tbody td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 0.65rem;
+    border: 1px solid #dee2e6;
+    background-color: #fff;
+    word-wrap: break-word;
+    font-size: 0.87rem;
+  }
+
+  .table td a {
+    color: #0d6efd;
+    text-decoration: underline;
+    font-size: 0.8rem;
+    display: block;
+    word-break: break-all;
+  }
+
+  .table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f8f9fa;
+  }
+
+  /* Optional: Limit max width of columns */
+  .table th:nth-child(3),
+  .table td:nth-child(3) {
+    max-width: 150px;
+  }
+
+  .table th:nth-child(8),
+  .table th:nth-child(9),
+  .table td:nth-child(8),
+  .table td:nth-child(9) {
+    max-width: 140px;
+  }
+
+  .modal-header {
+    background-color: #0d6efd;
+    color: white;
+  }
+
   .fade-in {
     animation: fadeIn 0.6s ease-in-out both;
   }
+
   @keyframes fadeIn {
     0% {opacity: 0; transform: translateY(10px);}
     100% {opacity: 1; transform: translateY(0);}
+  }
+
+  .card {
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+  }
+
+  .alert-warning {
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    color: #856404;
   }
 </style>
 
 <div class="container mt-4 fade-in">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="text-success">Transactions</h2>
+ <div class="d-flex align-items-center gap-2 px-4 py-2">
+  <i class="bi bi-cash-stack fs-3 text-success"></i>
+  <h2 class="mb-0 fw-semibold">Transaction Dashboard</h2>
+</div>
+<hr class="mt-2 mb-4" style="border: none; height: 2px; background: linear-gradient(to right, #0d6efd, #7c3aed); width: 140px;">
+
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
       <i class="bi bi-plus-circle me-1"></i> Add Transaction
     </button>

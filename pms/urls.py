@@ -41,6 +41,7 @@ urlpatterns = [
     # urls.py
     path('loans/<int:loan_id>/', views.loan_detail, name='loan_detail'),
     # path('loans/<int:loan_id>/add_repayment/', views.add_repayment, name='add_repayment'),
+    #  path('loan/<int:loan_id>/pdf/', views.generate_loan_pdf, name='loan_pdf'),
 
     path('tasks/', views.task_list, name='task_list'),
 
