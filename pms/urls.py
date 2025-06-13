@@ -17,6 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from app1 import views
+from django.conf import settings
+from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.base, name='base'),
@@ -29,5 +31,17 @@ urlpatterns = [
     path('transactions/', views.transaction_list, name='transaction_list'),
     path('add-transaction/', views.add_transaction, name='add_transaction'),
 
+    path('staff/', views.staff_list, name='staff_list'),
+    path('staff/delete/<int:pk>/', views.staff_delete, name='staff_delete'),
+    path('staff/edit/<int:pk>/', views.staff_edit, name='staff_edit'),  # opti
+
+    
+    path('loans/', views.loan_list, name='loan_list'),
+    path('loans/create/', views.create_loan, name='create_loan'),
+    path('loans/update/<int:pk>/', views.update_loan, name='update_loan'),
+    path('loans/delete/', views.delete_loan, name='delete_loan'),
     
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

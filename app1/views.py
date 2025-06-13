@@ -166,3 +166,124 @@ def add_transaction(request):
             return JsonResponse({'success': False, 'errors': form.errors})
     return JsonResponse({'success': False, 'message': 'Invalid request'})
 
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from .models import Staff, Project,Loan
+from .forms import StaffForm,LoanForm
+
+# List & Add Staff View
+def staff_list(request):
+    staff_list = Staff.objects.all()
+    project_list = Project.objects.all()
+
+    if request.method == 'POST':
+        form = StaffForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Staff member added successfully.")
+            return redirect('staff_list')
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = StaffForm()
+
+    context = {
+        'staff_list': staff_list,
+        'project_list': project_list,
+        'form': form,
+    }
+    return render(request, 'staff_list.html', context)
+
+
+# Delete View
+def staff_delete(request, pk):
+    staff = get_object_or_404(Staff, pk=pk)
+    staff.delete()
+    messages.success(request, "Staff member deleted successfully.")
+    return redirect('staff_list')
+
+
+# Optional: Edit View
+def staff_edit(request, pk):
+    staff = get_object_or_404(Staff, pk=pk)
+    if request.method == 'POST':
+        form = StaffForm(request.POST, request.FILES, instance=staff)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Staff member updated successfully.")
+            return redirect('staff_list')
+        else:
+            messages.error(request, "Please correct the errors.")
+    else:
+        form = StaffForm(instance=staff)
+
+    context = {
+        'form': form,
+        'staff': staff,
+    }
+    return render(request, 'staff_edit.html', context)
+
+
+
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import JsonResponse
+from .models import Loan
+from .forms import LoanForm
+from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Sum, F, FloatField, ExpressionWrapper
+from decimal import Decimal
+# List view for Loan Management
+def loan_list(request):
+    loans = Loan.objects.select_related('project').all()
+    form = LoanForm()
+
+    # Example calculations (replace with actual fields if available)
+    total_loaned_amount = loans.aggregate(total=Sum('amount'))['total'] or 0
+
+    # Placeholder logic: assuming total repaid and interest collected are stored separately
+    total_principal_repaid = 921.04  # Replace with actual logic or aggregate field
+    total_interest_collected = 78.96
+    total_outstanding = total_loaned_amount - Decimal(total_principal_repaid)
+
+
+    context = {
+        'loans': loans,
+        'form': form,
+        'total_loaned_amount': total_loaned_amount,
+        'total_principal_repaid': total_principal_repaid,
+        'total_interest_collected': total_interest_collected,
+        'total_outstanding': total_outstanding,
+    }
+    return render(request, 'loan.html', context)
+
+# Create Loan
+def create_loan(request):
+    if request.method == 'POST':
+        form = LoanForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('loan_list')
+    return redirect('loan_list')
+
+# Update Loan
+def update_loan(request, pk):
+    loan = get_object_or_404(Loan, pk=pk)
+    if request.method == 'POST':
+        form = LoanForm(request.POST, instance=loan)
+        if form.is_valid():
+            form.save()
+            return redirect('loan_list')
+    return redirect('loan_list')
+
+# Delete Loan (via AJAX)
+@csrf_exempt
+def delete_loan(request):
+    if request.method == 'POST':
+        loan_id = request.POST.get('loan_id')
+        loan = get_object_or_404(Loan, id=loan_id)
+        loan.delete()
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)

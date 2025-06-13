@@ -20,3 +20,21 @@ class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction
         fields = ['transaction_id', 'project', 'type', 'amount', 'vendor', 'status', 'category', 'description']
+
+
+
+from django import forms
+from .models import Staff,Loan
+
+class StaffForm(forms.ModelForm):
+    class Meta:
+        model = Staff
+        fields = ['staff_id', 'name', 'photo', 'designation', 'department', 'project', 'salary', 'date_of_join']
+
+
+
+class LoanForm(forms.ModelForm):
+    class Meta:
+        model = Loan
+        fields = '__all__'
+        exlude = ('created_at' , 'updated_at')
