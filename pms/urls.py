@@ -21,7 +21,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.base, name='base'),
+    # path('', views.base, name='base'),
     path('projects/', views.project_list, name='project_list'),
     path('projects/<int:pk>/', views.project_detail_view, name='project-detail'),
     # path('project/<int:pk>/update/', views.project_update_ajax, name='project-update-ajax'),
@@ -49,7 +49,7 @@ urlpatterns = [
     path('delete/<int:pk>/', views.delete_task, name='delete_task'),
     path('view/<int:pk>/', views.view_task, name='view_task'),
 
-    path('dashboard/', views.dashboard_view, name='dashboard'),
+    path('', views.dashboard_view, name='dashboard'),
 
     
 ]

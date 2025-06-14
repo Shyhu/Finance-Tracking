@@ -315,6 +315,8 @@ from django.db.models import Sum, Q
 from django.utils.dateparse import parse_date
 from django.http import HttpResponse
 from .utils import generate_loan_pdf  # PDF generator utility
+
+
 def loan_detail(request, loan_id):
     loan = get_object_or_404(Loan, pk=loan_id)
     repayments = loan.repayments.all().order_by('date')
@@ -452,21 +454,37 @@ def view_task(request, pk):
 
 
 
+
+from django.shortcuts import render
+from .models import Project, Transaction, Staff, Loan, Repayment
+from django.db.models import Sum
+
 from django.shortcuts import render
 from .models import Project, Transaction, Staff, Loan, Repayment
 from django.db.models import Sum
 
 def dashboard_view(request):
     total_projects = Project.objects.count()
-
     total_income = Transaction.objects.filter(type='Income').aggregate(Sum('amount'))['amount__sum'] or 0
     total_expense = Transaction.objects.filter(type='Expense').aggregate(Sum('amount'))['amount__sum'] or 0
-
     total_staff = Staff.objects.count()
-    
     total_loan_amount = Loan.objects.aggregate(Sum('amount'))['amount__sum'] or 0
     total_loan_repaid = Repayment.objects.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
     total_outstanding_loan = total_loan_amount - total_loan_repaid
+
+    # Bar chart data
+    chart_labels = []
+    chart_data = []
+    projects = Project.objects.all()
+    for project in projects:
+        income = Transaction.objects.filter(project=project, type='Income').aggregate(Sum('amount'))['amount__sum'] or 0
+        expense = Transaction.objects.filter(project=project, type='Expense').aggregate(Sum('amount'))['amount__sum'] or 0
+        profit = income - expense
+        chart_labels.append(project.name)
+        chart_data.append(profit)
+
+    # Zip the labels and data to avoid using `zip` in template
+    project_chart_data = list(zip(chart_labels, chart_data))
 
     context = {
         'total_projects': total_projects,
@@ -476,7 +494,6 @@ def dashboard_view(request):
         'total_loan_amount': total_loan_amount,
         'total_loan_repaid': total_loan_repaid,
         'total_outstanding_loan': total_outstanding_loan,
+        'project_chart_data': project_chart_data,
     }
-
     return render(request, 'dashboard_view.html', context)
-

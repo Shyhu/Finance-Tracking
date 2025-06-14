@@ -1,90 +1,247 @@
 {% extends 'base.html' %}
-
-{% load static %}
-
 {% block content %}
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Dashboard Overview</h2>
 
-    <!-- Summary Cards -->
-    <div class="row text-white">
-        <div class="col-md-3 mb-4">
-            <div class="card bg-primary shadow rounded-4 p-3">
-                <h5>Total Projects</h5>
-                <h3>{{ total_projects }}</h3>
-            </div>
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+<style>
+  body {
+    background: #f8fafc;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  .dashboard-container {
+    padding: 40px 30px;
+    max-width: 1300px;
+    margin: auto;
+  }
+
+  h2 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 35px;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  h2 i {
+    color: #3b82f6;
+    font-size: 28px;
+  }
+
+  .grid-two {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    margin-bottom: 50px;
+  }
+
+  .card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.06);
+    transition: 0.3s;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+  }
+
+  .bar-chart-container {
+    height: 340px;
+  }
+
+  .bars {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-evenly;
+    height: 100%;
+    gap: 24px;
+    padding: 10px 10px 0;
+  }
+
+  .bar-group {
+    text-align: center;
+    flex: 1;
+    height:228px;
+  }
+
+  .bar {
+    width: 40px;
+    margin: 0 auto;
+    border-radius: 8px 8px 0 0;
+    background: linear-gradient(to top, #3b82f6, #60a5fa);
+    animation: grow-bar 1s ease-out forwards;
+    height: 0;
+  }
+
+  .bar span {
+    display: block;
+    margin-top: 6px;
+    font-size: 13px;
+    color: #334155;
+    font-weight: 600;
+  }
+
+  .x-label {
+    margin-top: 12px;
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  @keyframes grow-bar {
+    to {
+      height: var(--bar-height);
+    }
+  }
+
+  .overview {
+    color: white;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    border-radius: 20px;
+    padding: 25px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  }
+
+  .overview h3 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .overview p {
+    font-size: 15px;
+    opacity: 0.95;
+  }
+
+  .overview-item {
+    font-size: 16px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .overview-item span {
+    font-weight: bold;
+    color: #ffffff;
+  }
+
+  .net-profit {
+    color: #4ade80;
+  }
+
+  .grid-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+  }
+
+  .stat-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
+    position: relative;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .stat-card i {
+    font-size: 22px;
+    color: #2563eb;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+  }
+
+  .stat-card h4 {
+    font-size: 15px;
+    color: #64748b;
+    margin-bottom: 10px;
+  }
+
+  .stat-card p {
+    font-size: 24px;
+    font-weight: bold;
+    color: #0f172a;
+  }
+</style>
+
+<div class="dashboard-container">
+  <h2><i class="ri-dashboard-line"></i> Financial Dashboard</h2>
+
+  <div class="grid-two">
+    <!-- Left: Bar Chart -->
+    <div class="card bar-chart-container">
+      <h3 style="margin-bottom: 20px;">📊 Project Profitability</h3>
+      <div class="bars">
+        {% for label, value in project_chart_data %}
+        <div class="bar-group">
+          <div class="bar" style="--bar-height: 216px;"></div>
+          <span>${{ value|floatformat:0 }}</span>
+          <div class="x-label">{{ label }}</div>
         </div>
-        <div class="col-md-3 mb-4">
-            <div class="card bg-success shadow rounded-4 p-3">
-                <h5>Total Income</h5>
-                <h3>&#8377;{{ total_income }}</h3>
-            </div>
-        </div>
-        <div class="col-md-3 mb-4">
-            <div class="card bg-danger shadow rounded-4 p-3">
-                <h5>Total Expenses</h5>
-                <h3>&#8377;{{ total_expense }}</h3>
-            </div>
-        </div>
-        <div class="col-md-3 mb-4">
-            <div class="card bg-warning shadow rounded-4 p-3">
-                <h5>Total Staff</h5>
-                <h3>{{ total_staff }}</h3>
-            </div>
-        </div>
+        {% endfor %}
+      </div>
     </div>
 
-    <!-- Charts Section -->
-    <div class="row">
-        <div class="col-md-6">
-            <canvas id="transactionChart" class="bg-light p-3 rounded shadow"></canvas>
-        </div>
-        <div class="col-md-6">
-            <canvas id="loanChart" class="bg-light p-3 rounded shadow"></canvas>
-        </div>
+    <!-- Right: Overview Card -->
+    <div class="overview">
+      <h3>💼 Financial Overview</h3>
+      <p>Key financial metrics at a glance</p>
+      <div class="overview-item">Total Income: <span>${{ total_income|floatformat:2 }}</span></div>
+      <div class="overview-item">Total Expenses: <span>${{ total_expense|floatformat:2 }}</span></div>
+      <div class="overview-item net-profit">
+        Net Profit:
+        <span>${{ total_income|floatformat:2|add:"-" }}{{ total_expense|floatformat:2 }}</span>
+      </div>
     </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="grid-cards">
+    <div class="stat-card">
+      <i class="ri-folder-open-line"></i>
+      <h4>Total Projects</h4>
+      <p>{{ total_projects }}</p>
+    </div>
+    {% comment %} <div class="stat-card">
+      <i class="ri-coins-line"></i>
+      <h4>Total Budget Sum</h4>
+      <p>${{ total_budget_sum|default:"0" }}</p>
+    </div> {% endcomment %}
+    <div class="stat-card">
+      <i class="ri-team-line"></i>
+      <h4>Total Staff</h4>
+      <p>{{ total_staff }}</p>
+    </div>
+    <div class="stat-card">
+      <i class="ri-bank-card-line"></i>
+      <h4>Active Loans</h4>
+      <p>${{ total_loan_amount|floatformat:2 }}</p>
+    </div>
+    <div class="stat-card">
+      <i class="ri-check-double-line"></i>
+      <h4>Total Repaid</h4>
+      <p>${{ total_loan_repaid|floatformat:2 }}</p>
+    </div>
+    <div class="stat-card">
+      <i class="ri-error-warning-line"></i>
+      <h4>Outstanding Loan</h4>
+      <p>${{ total_outstanding_loan|floatformat:2 }}</p>
+    </div>
+  </div>
 </div>
-
-<!-- Chart.js Library -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    // Transaction chart
-    const transactionCtx = document.getElementById('transactionChart').getContext('2d');
-    const transactionChart = new Chart(transactionCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Income', 'Expense'],
-            datasets: [{
-                label: 'Transactions',
-                data: [{{ total_income }}, {{ total_expense }}],
-                backgroundColor: ['#28a745', '#dc3545'],
-                borderWidth: 1
-            }]
-        }
-    });
-
-    // Loan chart
-    const loanCtx = document.getElementById('loanChart').getContext('2d');
-    const loanChart = new Chart(loanCtx, {
-        type: 'bar',
-        data: {
-            labels: {{ loan_labels|safe }},
-            datasets: [{
-                label: 'Loan Amounts',
-                data: {{ loan_data|safe }},
-                backgroundColor: '#007bff',
-                borderColor: '#0056b3',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-</script>
 
 {% endblock %}
