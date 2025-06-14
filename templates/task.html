@@ -12,7 +12,13 @@
     <table class="table table-bordered align-middle">
       <thead class="table-light">
         <tr>
-          <th>TASK ID</th><th>DATE</th><th>STAFF</th><th>PROJECT</th><th>DESCRIPTION</th><th>WORK PHOTOS</th><th>ACTIONS</th>
+          <th>TASK ID</th>
+          <th>DATE</th>
+          <th>STAFF</th>
+          <th>PROJECT</th>
+          <th>DESCRIPTION</th>
+          <th>WORK PHOTOS</th>
+          <th>ACTIONS</th>
         </tr>
       </thead>
       <tbody>
@@ -31,11 +37,51 @@
             {% endfor %}
           </td>
           <td>
-            <button class="btn btn-sm btn-outline-primary"><i class="bi bi-gear"></i></button>
-            <button class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></button>
-            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+            <a href="{% url 'view_task' task.pk %}" class="btn btn-sm btn-info text-white">👁</a>
+            <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editTaskModal{{ task.id }}">✏️</button>
+            <a href="{% url 'delete_task' task.pk %}" onclick="return confirm('Are you sure?')" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
           </td>
         </tr>
+
+        <!-- Edit Task Modal -->
+        <div class="modal fade" id="editTaskModal{{ task.id }}" tabindex="-1">
+          <div class="modal-dialog modal-lg">
+            <form method="POST">
+              {% csrf_token %}
+              <input type="hidden" name="edit_task" value="1">
+              <input type="hidden" name="task_id_hidden" value="{{ task.id }}">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Edit Task</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      {{ task.get_form.task_id.label_tag }} {{ task.get_form.task_id }}
+                    </div>
+                    <div class="col-md-6">
+                      {{ task.get_form.date.label_tag }} {{ task.get_form.date }}
+                    </div>
+                    <div class="col-md-6">
+                      {{ task.get_form.staff.label_tag }} {{ task.get_form.staff }}
+                    </div>
+                    <div class="col-md-6">
+                      {{ task.get_form.project.label_tag }} {{ task.get_form.project }}
+                    </div>
+                    <div class="col-12">
+                      {{ task.get_form.description.label_tag }} {{ task.get_form.description }}
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                  <button type="submit" class="btn btn-warning">Update Task</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
         {% endfor %}
       </tbody>
     </table>
@@ -71,13 +117,10 @@
               {{ form.description.label_tag }} {{ form.description }}
             </div>
             <div class="col-12">
-             
-  <label for="file">Work Photos (Multiple)</label>
-  <input type="file" name="file" multiple class="form-control">
-  <small class="text-muted">PNG, JPG, PDF up to 10MB</small>
-</div>
-
-            
+              <label for="file">Work Photos (Multiple)</label>
+              <input type="file" name="file" multiple class="form-control">
+              <small class="text-muted">PNG, JPG, PDF up to 10MB</small>
+            </div>
           </div>
         </div>
         <div class="modal-footer">

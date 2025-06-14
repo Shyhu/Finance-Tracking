@@ -33,6 +33,8 @@ urlpatterns = [
 
     path('staff/', views.staff_list, name='staff_list'),
     path('staff/delete/<int:staff_id>/', views.delete_staff, name='delete_staff'),
+    path('view/<int:pk>/', views.view_staff, name='view_staff'),
+
     
     path('loans/', views.loan_list, name='loan_list'),
     path('loans/create/', views.create_loan, name='create_loan'),
@@ -43,7 +45,11 @@ urlpatterns = [
     # path('loans/<int:loan_id>/add_repayment/', views.add_repayment, name='add_repayment'),
     #  path('loan/<int:loan_id>/pdf/', views.generate_loan_pdf, name='loan_pdf'),
 
-    path('tasks/', views.task_list, name='task_list'),
+    path('task_list', views.task_list, name='task_list'),
+    path('delete/<int:pk>/', views.delete_task, name='delete_task'),
+    path('view/<int:pk>/', views.view_task, name='view_task'),
+
+    path('dashboard/', views.dashboard_view, name='dashboard'),
 
     
 ]

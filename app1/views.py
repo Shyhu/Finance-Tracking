@@ -210,27 +210,11 @@ def staff_list(request):
 
 
 
-from django.shortcuts import render, redirect
-from .models import Task, TaskFile
-from .forms import TaskForm
 
-def task_list(request):
-    tasks = Task.objects.all().order_by('-date')
-
-    if request.method == 'POST' and 'add_task' in request.POST:
-        form = TaskForm(request.POST)
-        files = request.FILES.getlist('file')  # manually get multiple files
-        if form.is_valid():
-            task = form.save()
-            for f in files:
-                TaskFile.objects.create(task=task, file=f)
-            return redirect('task_list')
-    else:
-        form = TaskForm()
-
-    return render(request, 'task.html', {'tasks': tasks, 'form': form})
-
-
+def view_staff(request, pk):
+    staff = get_object_or_404(Staff, pk=pk)
+    files = staff.files.all()
+    return render(request, 'staff_detail.html', {'staff': staff, 'files': files})
 
 
 
@@ -256,22 +240,29 @@ from decimal import Decimal
 #from django.db.models import Sum
 from decimal import Decimal
 from .models import Loan, Repayment
+from django.shortcuts import get_object_or_404, redirect, render
+from decimal import Decimal
+from django.db.models import Sum
+from .models import Loan, Repayment
+from .forms import LoanForm
+from django.shortcuts import render, get_object_or_404, redirect
+from decimal import Decimal
+from .models import Loan, Repayment
+from .forms import LoanForm
+from django.db.models import Sum
+from django.http import JsonResponse
 
 def loan_list(request):
     loans = Loan.objects.select_related('project').all()
     form = LoanForm()
 
-    # 🟦 Total loaned amount
     total_loaned_amount = loans.aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
-
-    # 🟦 Total principal repaid
     total_principal_repaid = Repayment.objects.aggregate(total=Sum('principal_paid'))['total'] or Decimal('0.00')
-
-    # 🟦 Total interest collected
     total_interest_collected = Repayment.objects.aggregate(total=Sum('interest_paid'))['total'] or Decimal('0.00')
-
-    # 🟦 Total outstanding = loaned amount - total principal repaid
     total_outstanding = total_loaned_amount - total_principal_repaid
+
+    for loan in loans:
+        loan.get_form = LoanForm(instance=loan)
 
     context = {
         'loans': loans,
@@ -283,34 +274,31 @@ def loan_list(request):
     }
     return render(request, 'loan.html', context)
 
-# Create Loan
 def create_loan(request):
     if request.method == 'POST':
         form = LoanForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('loan_list')
     return redirect('loan_list')
 
-# Update Loan
 def update_loan(request, pk):
     loan = get_object_or_404(Loan, pk=pk)
     if request.method == 'POST':
         form = LoanForm(request.POST, instance=loan)
         if form.is_valid():
             form.save()
-            return redirect('loan_list')
     return redirect('loan_list')
 
-# Delete Loan (via AJAX)
-@csrf_exempt
 def delete_loan(request):
     if request.method == 'POST':
         loan_id = request.POST.get('loan_id')
-        loan = get_object_or_404(Loan, id=loan_id)
-        loan.delete()
-        return JsonResponse({'success': True})
-    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
+        try:
+            loan = Loan.objects.get(id=loan_id)
+            loan.delete()
+            return JsonResponse({'success': True})
+        except Loan.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Loan not found'})
+    return JsonResponse({'success': False, 'message': 'Invalid request'})
 
 
 
@@ -413,3 +401,82 @@ def loan_detail(request, loan_id):
 #     fname = f"Loan_{loan_id}_summary.pdf"
 #     response['Content-Disposition'] = f'attachment; filename="{fname}"'
 #     return response
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Task, TaskFile
+from .forms import TaskForm
+from django.forms.models import model_to_dict
+def task_list(request):
+    tasks = Task.objects.all().order_by('-date')
+
+    if request.method == 'POST':
+        # Add Task
+        if 'add_task' in request.POST:
+            form = TaskForm(request.POST)
+            files = request.FILES.getlist('file')
+            if form.is_valid():
+                task = form.save()
+                for f in files:
+                    TaskFile.objects.create(task=task, file=f)
+                return redirect('task_list')
+
+        # Edit Task
+        elif 'edit_task' in request.POST:
+            task_id = request.POST.get('task_id_hidden')
+            task = get_object_or_404(Task, id=task_id)
+            prefix = f"task_{task.id}"
+            form = TaskForm(request.POST, instance=task, prefix=prefix)
+            if form.is_valid():
+                form.save()
+                return redirect('task_list')
+
+    # Prepare form for Add Task
+    form = TaskForm()
+
+    # Create prefixed forms for edit modals
+    for task in tasks:
+        task.get_form = TaskForm(instance=task, prefix=f"task_{task.id}")
+
+    return render(request, 'task.html', {'tasks': tasks, 'form': form})
+
+def delete_task(request, pk):
+    task = get_object_or_404(Task, pk=pk)
+    task.delete()
+    return redirect('task_list')
+
+def view_task(request, pk):
+    task = get_object_or_404(Task, pk=pk)
+    files = task.files.all()
+    return render(request, 'task_detail.html', {'task': task, 'files': files})
+
+
+
+from django.shortcuts import render
+from .models import Project, Transaction, Staff, Loan, Repayment
+from django.db.models import Sum
+
+def dashboard_view(request):
+    total_projects = Project.objects.count()
+
+    total_income = Transaction.objects.filter(type='Income').aggregate(Sum('amount'))['amount__sum'] or 0
+    total_expense = Transaction.objects.filter(type='Expense').aggregate(Sum('amount'))['amount__sum'] or 0
+
+    total_staff = Staff.objects.count()
+    
+    total_loan_amount = Loan.objects.aggregate(Sum('amount'))['amount__sum'] or 0
+    total_loan_repaid = Repayment.objects.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+    total_outstanding_loan = total_loan_amount - total_loan_repaid
+
+    context = {
+        'total_projects': total_projects,
+        'total_income': total_income,
+        'total_expense': total_expense,
+        'total_staff': total_staff,
+        'total_loan_amount': total_loan_amount,
+        'total_loan_repaid': total_loan_repaid,
+        'total_outstanding_loan': total_outstanding_loan,
+    }
+
+    return render(request, 'dashboard_view.html', context)
+

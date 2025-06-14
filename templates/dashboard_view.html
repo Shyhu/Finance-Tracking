@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Dashboard Overview</h2>
+
+    <!-- Summary Cards -->
+    <div class="row text-white">
+        <div class="col-md-3 mb-4">
+            <div class="card bg-primary shadow rounded-4 p-3">
+                <h5>Total Projects</h5>
+                <h3>{{ total_projects }}</h3>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card bg-success shadow rounded-4 p-3">
+                <h5>Total Income</h5>
+                <h3>&#8377;{{ total_income }}</h3>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card bg-danger shadow rounded-4 p-3">
+                <h5>Total Expenses</h5>
+                <h3>&#8377;{{ total_expense }}</h3>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card bg-warning shadow rounded-4 p-3">
+                <h5>Total Staff</h5>
+                <h3>{{ total_staff }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row">
+        <div class="col-md-6">
+            <canvas id="transactionChart" class="bg-light p-3 rounded shadow"></canvas>
+        </div>
+        <div class="col-md-6">
+            <canvas id="loanChart" class="bg-light p-3 rounded shadow"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Transaction chart
+    const transactionCtx = document.getElementById('transactionChart').getContext('2d');
+    const transactionChart = new Chart(transactionCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Income', 'Expense'],
+            datasets: [{
+                label: 'Transactions',
+                data: [{{ total_income }}, {{ total_expense }}],
+                backgroundColor: ['#28a745', '#dc3545'],
+                borderWidth: 1
+            }]
+        }
+    });
+
+    // Loan chart
+    const loanCtx = document.getElementById('loanChart').getContext('2d');
+    const loanChart = new Chart(loanCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ loan_labels|safe }},
+            datasets: [{
+                label: 'Loan Amounts',
+                data: {{ loan_data|safe }},
+                backgroundColor: '#007bff',
+                borderColor: '#0056b3',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+
+{% endblock %}
