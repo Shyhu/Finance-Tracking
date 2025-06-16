@@ -422,22 +422,53 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Task, TaskFile
 from .forms import TaskForm
 from django.forms.models import model_to_dict
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Task, TaskFile, Staff, Project
+from .forms import TaskForm
+from django.db.models import Q
+
 def task_list(request):
     tasks = Task.objects.all().order_by('-date')
 
+    # --- Filtering ---
+    task_id = request.GET.get('task_id')
+    status = request.GET.get('status')
+    staff = request.GET.get('staff')
+    project = request.GET.get('project')
+    due_date_from = request.GET.get('due_date_from')
+    due_date_to = request.GET.get('due_date_to')
+    created_from = request.GET.get('created_from')
+    created_to = request.GET.get('created_to')
+
+    if task_id:
+        tasks = tasks.filter(task_id__icontains=task_id)
+    if status and status != 'all':
+        tasks = tasks.filter(status=status)
+    if staff and staff != 'all':
+        tasks = tasks.filter(staff_id=staff)
+    if project and project != 'all':
+        tasks = tasks.filter(project_id=project)
+    if due_date_from:
+        tasks = tasks.filter(due_date__gte=due_date_from)
+    if due_date_to:
+        tasks = tasks.filter(due_date__lte=due_date_to)
+    if created_from:
+        tasks = tasks.filter(date__gte=created_from)
+    if created_to:
+        tasks = tasks.filter(date__lte=created_to)
+
+    # --- POST Handling ---
     if request.method == 'POST':
         # Add Task
         if 'add_task' in request.POST:
-            form = TaskForm(request.POST, request.FILES)  # include request.FILES
-            files = request.FILES.getlist('file')  # work photos
-            voice_memo = request.FILES.get('voice_memo')  # voice memo
+            form = TaskForm(request.POST, request.FILES)
+            files = request.FILES.getlist('file')
+            voice_memo = request.FILES.get('voice_memo')
 
             if form.is_valid():
                 task = form.save(commit=False)
-
                 if voice_memo:
                     task.voice_memo = voice_memo
-
                 task.save()
 
                 for f in files:
@@ -458,14 +489,23 @@ def task_list(request):
                 form.save()
                 return redirect('task_list')
 
-    # Prepare form for Add Task
+    # Form for Add Task
     form = TaskForm()
 
-    # Create prefixed forms for edit modals
+    # Forms for Edit Modals
     for task in tasks:
         task.get_form = TaskForm(instance=task, prefix=f"task_{task.id}")
 
-    return render(request, 'task.html', {'tasks': tasks, 'form': form})
+    context = {
+        'tasks': tasks,
+        'form': form,
+        'staffs': Staff.objects.all(),
+        'projects': Project.objects.all(),
+        # Include current GET values to retain filter state
+        'get': request.GET,
+    }
+
+    return render(request, 'task.html', context)
 
 
 def delete_task(request, pk):

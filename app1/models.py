@@ -112,17 +112,27 @@ class Repayment(models.Model):
 
 
 
+from django.db import models
+
 class Task(models.Model):
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('In Progress', 'In Progress'),
+        ('Completed', 'Completed'),
+    ]
+
     task_id = models.CharField(max_length=50, unique=True)
     date = models.DateField()
-    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    due_date = models.DateField(null=True, blank=True)  # ✅ New
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')  # ✅ New
+    staff = models.ForeignKey('Staff', on_delete=models.CASCADE)
+    project = models.ForeignKey('Project', on_delete=models.CASCADE)
     description = models.TextField()
     voice_memo = models.FileField(upload_to='voice_memos/', blank=True, null=True)
 
-
     def __str__(self):
         return self.task_id
+
 
 class TaskFile(models.Model):
     task = models.ForeignKey(Task, related_name='files', on_delete=models.CASCADE)

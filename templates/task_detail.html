@@ -18,7 +18,7 @@
     </div>
   </div>
 
-  <div class="card shadow-sm">
+  <div class="card shadow-sm mb-4">
     <div class="card-header">
       <h5 class="mb-0">Work Files</h5>
     </div>
@@ -51,5 +51,21 @@
       {% endif %}
     </div>
   </div>
+
+  {% if task.voice_memo %}
+  <div class="card shadow-sm">
+    <div class="card-header">
+      <h5 class="mb-0">Voice Memo</h5>
+    </div>
+    <div class="card-body">
+      <audio controls>
+        <source src="{{ task.voice_memo.url }}" type="audio/webm">
+        Your browser does not support the audio element.
+      </audio>
+      {% comment %} <a href="{{ task.voice_memo.url }}" download class="btn btn-sm btn-outline-secondary mt-2">⬇️ Download Memo</a> {% endcomment %}
+    </div>
+  </div>
+  {% endif %}
+
 </div>
 {% endblock %}

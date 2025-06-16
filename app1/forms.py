@@ -150,7 +150,7 @@ from .models import Task
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ['task_id', 'date', 'staff', 'project', 'description','voice_memo']
+        fields = ['task_id', 'date', 'staff', 'project', 'description','voice_memo','due_date']
         labels = {
             'task_id': 'Task ID',
             'date': 'Task Date',
@@ -165,6 +165,10 @@ class TaskForm(forms.ModelForm):
                 'placeholder': 'Enter unique task ID'
             }),
             'date': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-control'
+            }),
+            'due_date': forms.DateInput(attrs={
                 'type': 'date',
                 'class': 'form-control'
             }),
