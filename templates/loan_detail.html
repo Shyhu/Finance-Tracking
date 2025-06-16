@@ -19,7 +19,7 @@
                 <div class="col-md-4"><strong>Original Loan Amount:</strong><br> ${{ loan.amount|intcomma }}</div>
                 <div class="col-md-4"><strong>Annual Interest Rate:</strong><br> {{ loan.interest_rate }}%</div>
                 <div class="col-md-4"><strong>Loan Start Date:</strong><br> {{ loan.start_date }}</div>
-                <div class="col-md-4 mt-3"><strong>Total Principal Paid:</strong><br> ${{ total_principal_paid|floatformat:2 }}</div>
+                {% comment %} <div class="col-md-4 mt-3"><strong>Total Principal Paid:</strong><br> ${{ total_principal_paid|floatformat:2 }}</div> {% endcomment %}
                 <div class="col-md-4 mt-3"><strong>Total Interest Paid:</strong><br> ${{ total_interest_paid|floatformat:2 }}</div>
                 <div class="col-md-4 mt-3"><strong>Remaining Balance:</strong><br> <strong class="text-dark">${{ remaining_balance|floatformat:2 }}</strong></div>
             </div>
@@ -41,7 +41,7 @@
                 <th>Amount Paid</th>
                 <th>Interest Calculated</th>
                 <th>Interest Paid</th>
-                <th>Principal Paid</th>
+                {% comment %} <th>Principal Paid</th> {% endcomment %}
                 <th>Balance After Repayment</th>
             </tr>
         </thead>
@@ -52,7 +52,7 @@
                 <td><strong>${{ repayment.amount_paid|floatformat:2 }}</strong></td>
                 <td>${{ repayment.interest_calculated|floatformat:2 }}</td>
                 <td class="text-warning">${{ repayment.interest_paid|floatformat:2 }}</td>
-                <td class="text-success">${{ repayment.principal_paid|floatformat:2 }}</td>
+                {% comment %} <td class="text-success">${{ repayment.principal_paid|floatformat:2 }}</td> {% endcomment %}
                <td class="text-danger fw-bold">
 
         ${{ remaining_balance|floatformat:2 }}

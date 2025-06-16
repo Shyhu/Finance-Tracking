@@ -33,7 +33,9 @@ urlpatterns = [
 
     path('staff/', views.staff_list, name='staff_list'),
     path('staff/delete/<int:staff_id>/', views.delete_staff, name='delete_staff'),
-    path('view/<int:pk>/', views.view_staff, name='view_staff'),
+    # path('view/<int:pk>/', views.view_staff, name='view_staff'),
+    path('add-category/', views.add_category, name='add_category'),
+
 
     
     path('loans/', views.loan_list, name='loan_list'),
