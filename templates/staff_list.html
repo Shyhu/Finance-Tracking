@@ -86,9 +86,9 @@
           <td>${{ staff.salary|floatformat:0 }}</td>
           <td>{{ staff.date_of_join }}</td>
           <td>
-             <a href="" class="btn btn-sm btn-outline-secondary" title="View">
+             {% comment %} <a href="" class="btn btn-sm btn-outline-secondary" title="View">
                             👁
-                        </a>
+                        </a> {% endcomment %}
             <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editStaffModal{{ staff.id }}">
               <i class="bi bi-pencil-square"></i>
             </button>
