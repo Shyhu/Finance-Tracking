@@ -40,6 +40,8 @@
           <th>PROJECT</th>
           <th>DESCRIPTION</th>
           <th>WORK PHOTOS</th>
+          <th>VOICE MEMO</th>
+
           <th>ACTIONS</th>
         </tr>
       </thead>
@@ -58,6 +60,17 @@
               <span class="text-muted">None</span>
             {% endfor %}
           </td>
+          <td>
+  {% if task.voice_memo %}
+    <audio controls>
+      <source src="{{ task.voice_memo.url }}" type="audio/mpeg">
+      Your browser does not support the audio tag.
+    </audio>
+  {% else %}
+    <span class="text-muted">None</span>
+  {% endif %}
+</td>
+
           <td>
             <a href="{% url 'view_task' task.pk %}" class="btn btn-sm btn-info text-white">👁</a>
             <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editTaskModal{{ task.id }}">✏️</button>
@@ -94,6 +107,13 @@
                     <div class="col-12">
                       {{ task.get_form.description.label_tag }} {{ task.get_form.description }}
                     </div>
+                    <div class="col-12">
+  {{ task.get_form.voice_memo.label_tag }} {{ task.get_form.voice_memo }}
+  {% if task.voice_memo %}
+    <small class="d-block">Current File: <a href="{{ task.voice_memo.url }}" target="_blank">Play</a></small>
+  {% endif %}
+</div>
+
                   </div>
                 </div>
                 <div class="modal-footer">
@@ -143,6 +163,16 @@
               <input type="file" name="file" multiple class="form-control">
               <small class="text-muted">PNG, JPG, PDF up to 10MB</small>
             </div>
+        <div class="col-12">
+  <label>Voice Memo</label>
+  <div class="mb-2">
+    <button type="button" id="startRecord" class="btn btn-sm btn-danger">🎙 Start Recording</button>
+    <button type="button" id="stopRecord" class="btn btn-sm btn-secondary" disabled>⏹ Stop</button>
+  </div>
+  <audio id="audioPreview" controls style="display:none;"></audio>
+  <input type="hidden" name="voice_memo" id="voiceMemoInput">
+</div>
+
           </div>
         </div>
         <div class="modal-footer">
@@ -153,4 +183,54 @@
     </form>
   </div>
 </div>
+<script>
+  let mediaRecorder;
+  let audioChunks = [];
+
+  document.getElementById('startRecord').onclick = async () => {
+    audioChunks = [];
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+
+    mediaRecorder.ondataavailable = e => {
+      if (e.data.size > 0) audioChunks.push(e.data);
+    };
+
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(audioChunks, { type: 'audio/webm' });
+      const url = URL.createObjectURL(blob);
+
+      // Show audio preview
+      const audioPreview = document.getElementById('audioPreview');
+      audioPreview.src = url;
+      audioPreview.style.display = 'block';
+
+      // Convert blob to file-like object and send to hidden input
+      const file = new File([blob], 'voice_memo.webm', { type: 'audio/webm' });
+
+      // Use DataTransfer to simulate file input (advanced)
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.name = 'voice_memo';
+      input.files = dt.files;
+      input.style.display = 'none';
+
+      document.getElementById('voiceMemoInput').replaceWith(input);
+      input.id = 'voiceMemoInput';
+    };
+
+    mediaRecorder.start();
+    document.getElementById('startRecord').disabled = true;
+    document.getElementById('stopRecord').disabled = false;
+  };
+
+  document.getElementById('stopRecord').onclick = () => {
+    mediaRecorder.stop();
+    document.getElementById('startRecord').disabled = false;
+    document.getElementById('stopRecord').disabled = true;
+  };
+</script>
+
 {% endblock %}

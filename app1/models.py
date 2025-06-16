@@ -118,6 +118,8 @@ class Task(models.Model):
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     description = models.TextField()
+    voice_memo = models.FileField(upload_to='voice_memos/', blank=True, null=True)
+
 
     def __str__(self):
         return self.task_id

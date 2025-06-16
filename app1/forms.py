@@ -74,9 +74,11 @@ class StaffForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Enter designation (e.g., Manager)'
             }),
-            'department': forms.Select(attrs={
-                'class': 'form-select'
-            }),
+            'department': forms.TextInput(attrs={  # ✅ This is a text field
+    'class': 'form-control',
+    'placeholder': 'Enter department name'
+}),
+
             'project': forms.Select(attrs={
                 'class': 'form-select'
             }),
@@ -145,13 +147,14 @@ from .models import Task
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ['task_id', 'date', 'staff', 'project', 'description']
+        fields = ['task_id', 'date', 'staff', 'project', 'description','voice_memo']
         labels = {
             'task_id': 'Task ID',
             'date': 'Task Date',
             'staff': 'Assigned Staff',
             'project': 'Related Project',
             'description': 'Task Description',
+            'voice_memo': 'Voice Memo (optional)',
         }
         widgets = {
             'task_id': forms.TextInput(attrs={
@@ -172,6 +175,10 @@ class TaskForm(forms.ModelForm):
                 'class': 'form-control',
                 'rows': 4,
                 'placeholder': 'Enter task details or instructions'
+            }),
+             'voice_memo': forms.ClearableFileInput(attrs={
+                'class': 'form-control',
+                'accept': 'audio/*'
             }),
         }
 

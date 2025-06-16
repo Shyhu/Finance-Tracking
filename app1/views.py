@@ -428,12 +428,21 @@ def task_list(request):
     if request.method == 'POST':
         # Add Task
         if 'add_task' in request.POST:
-            form = TaskForm(request.POST)
-            files = request.FILES.getlist('file')
+            form = TaskForm(request.POST, request.FILES)  # include request.FILES
+            files = request.FILES.getlist('file')  # work photos
+            voice_memo = request.FILES.get('voice_memo')  # voice memo
+
             if form.is_valid():
-                task = form.save()
+                task = form.save(commit=False)
+
+                if voice_memo:
+                    task.voice_memo = voice_memo
+
+                task.save()
+
                 for f in files:
                     TaskFile.objects.create(task=task, file=f)
+
                 return redirect('task_list')
 
         # Edit Task
@@ -441,8 +450,11 @@ def task_list(request):
             task_id = request.POST.get('task_id_hidden')
             task = get_object_or_404(Task, id=task_id)
             prefix = f"task_{task.id}"
-            form = TaskForm(request.POST, instance=task, prefix=prefix)
+            form = TaskForm(request.POST, request.FILES, instance=task, prefix=prefix)
+
             if form.is_valid():
+                if 'voice_memo' in request.FILES:
+                    task.voice_memo = request.FILES['voice_memo']
                 form.save()
                 return redirect('task_list')
 
@@ -454,6 +466,7 @@ def task_list(request):
         task.get_form = TaskForm(instance=task, prefix=f"task_{task.id}")
 
     return render(request, 'task.html', {'tasks': tasks, 'form': form})
+
 
 def delete_task(request, pk):
     task = get_object_or_404(Task, pk=pk)
