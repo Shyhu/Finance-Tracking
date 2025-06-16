@@ -175,8 +175,9 @@
           {% csrf_token %}
           <div id="formErrors" class="alert alert-danger d-none"></div>
           <div class="col-md-6 mb-3">
-            <label>Transaction ID</label>
-            <input type="text" name="transaction_id" class="form-control">
+            <label for="id_transaction_id">Transaction ID</label>
+<input type="text" name="transaction_id" id="id_transaction_id" class="form-control" readonly>
+
           </div>
           <div class="col-md-6 mb-3">
             <label>Project</label>
@@ -336,6 +337,21 @@
         filterForm.submit();
       });
     });
+  });
+</script>
+
+<script>
+  // Auto-generate a task ID like TASK32741
+  function generateTransactionID() {
+    const randomNum = Math.floor(10000 + Math.random() * 90000); // 5-digit number
+    return 'TRAN' + randomNum;
+  }
+
+  // When modal opens, auto-fill task ID
+  const addTransactionModal = document.getElementById('addTransactionModal');
+  addTransactionModal.addEventListener('shown.bs.modal', function () {
+    const transactionIDInput = document.getElementById('id_transaction_id');
+    transactionIDInput.value = generateTransactionID();
   });
 </script>
 

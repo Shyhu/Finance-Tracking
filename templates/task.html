@@ -53,13 +53,28 @@
           <td>{{ task.staff.name }}</td>
           <td>{{ task.project.name }}</td>
           <td>{{ task.description }}</td>
-          <td>
-            {% for file in task.files.all %}
-              <span class="badge bg-secondary">{{ file.file.name|cut:"task_files/" }}</span>
-            {% empty %}
-              <span class="text-muted">None</span>
-            {% endfor %}
-          </td>
+         <td class="d-flex flex-wrap gap-2">
+  {% for file in task.files.all %}
+    {% with file.file.url|lower as file_url %}
+      {% if ".pdf" in file_url %}
+        <a href="{{ file.file.url }}" target="_blank" class="text-danger" title="View PDF">
+          <i class="bi bi-file-earmark-pdf-fill fs-4"></i>
+        </a>
+      {% elif ".jpg" in file_url or ".jpeg" in file_url or ".png" in file_url %}
+        <a href="{{ file.file.url }}" target="_blank" title="View Image">
+          <img src="{{ file.file.url }}" alt="Work Photo" class="img-thumbnail" style="width: 40px; height: 40px; object-fit: cover;">
+        </a>
+      {% else %}
+        <a href="{{ file.file.url }}" target="_blank" class="text-primary" title="Download File">
+          <i class="bi bi-file-earmark-fill fs-4"></i>
+        </a>
+      {% endif %}
+    {% endwith %}
+  {% empty %}
+    <span class="text-muted">None</span>
+  {% endfor %}
+</td>
+
           <td>
   {% if task.voice_memo %}
     <audio controls>
@@ -143,9 +158,9 @@
         </div>
         <div class="modal-body">
           <div class="row g-3">
-            <div class="col-md-6">
-              {{ form.task_id.label_tag }} {{ form.task_id }}
-            </div>
+          <label for="id_task_id">Task ID</label>
+<input type="text" name="task_id" id="id_task_id" class="form-control" readonly>
+
             <div class="col-md-6">
               {{ form.date.label_tag }} {{ form.date }}
             </div>
@@ -232,5 +247,20 @@
     document.getElementById('stopRecord').disabled = true;
   };
 </script>
+<script>
+  // Auto-generate a task ID like TASK32741
+  function generateTaskID() {
+    const randomNum = Math.floor(10000 + Math.random() * 90000); // 5-digit number
+    return 'TASK' + randomNum;
+  }
+
+  // When modal opens, auto-fill task ID
+  const addTaskModal = document.getElementById('addTaskModal');
+  addTaskModal.addEventListener('shown.bs.modal', function () {
+    const taskIDInput = document.getElementById('id_task_id');
+    taskIDInput.value = generateTaskID();
+  });
+</script>
+
 
 {% endblock %}

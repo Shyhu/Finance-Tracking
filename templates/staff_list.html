@@ -185,4 +185,25 @@
     </div>
   </div>
 </div>
+
+<script>
+  function generateStaffID() {
+    const prefix = "STF-";
+    const randomDigits = Math.floor(100000 + Math.random() * 900000);
+    document.getElementById("staff_id").value = prefix + randomDigits;
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const addStaffModal = document.getElementById('addStaffModal');
+    if (addStaffModal) {
+      addStaffModal.addEventListener('shown.bs.modal', function () {
+        const staffIdInput = document.getElementById("staff_id");
+        if (staffIdInput && !staffIdInput.value) {
+          generateStaffID();
+        }
+      });
+    }
+  });
+</script>
+
 {% endblock %}
