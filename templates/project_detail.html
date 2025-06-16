@@ -1,107 +1,123 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
   body {
-    background: linear-gradient(to right, #e0eafc, #cfdef3);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: #212529;
   }
 
-  .fade-in-up {
-    animation: fadeInUp 0.6s ease-in-out both;
+  .project-wrapper {
+    max-width: 900px;
+    margin: 50px auto;
+    padding: 30px 40px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.05);
   }
 
-  @keyframes fadeInUp {
-    0% {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .project-card {
-    border-radius: 1rem;
-    background: rgba(255, 255, 255, 0.85);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px);
-    padding: 2.5rem;
-    max-width: 750px;
-    margin: auto;
-  }
-
-  .project-heading {
-    font-weight: 700;
-    color: #0d6efd;
-    font-size: 2rem;
-    border-bottom: 3px solid #0d6efd;
-    display: inline-block;
-    padding-bottom: 6px;
-    margin-bottom: 25px;
-  }
-
-  .list-group-item {
-    background: transparent;
-    border: none;
-    padding: 0.75rem 0;
-    font-size: 1.05rem;
-    display: flex;
-    align-items: center;
-  }
-
-  .list-group-item i {
-    color: #0d6efd;
-    margin-right: 10px;
-    font-size: 1.2rem;
-    width: 25px;
-    text-align: center;
-  }
-
-  .list-group-item strong {
-    color: #333;
-    width: 140px;
-    display: inline-block;
-  }
-
-  .back-button {
-    display: inline-block;
-    margin-top: 30px;
-    padding: 10px 20px;
+  .project-title {
+    font-size: 24px;
     font-weight: 600;
-    border-radius: 30px;
+    margin-bottom: 30px;
+    border-left: 4px solid #0d6efd;
+    padding-left: 15px;
+    color: #0d6efd;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+  }
+
+  .info-item {
+    margin-bottom: 15px;
+  }
+
+  .label {
+    font-weight: 500;
+    color: #6c757d;
+    font-size: 13px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .value {
+    font-size: 16px;
+    font-weight: 500;
+    color: #212529;
+  }
+
+  .back-btn {
+    margin-top: 40px;
+    display: inline-block;
     background-color: #0d6efd;
-    color: white;
-    border: none;
-    transition: all 0.3s ease;
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.3s;
+  }
+
+  .back-btn:hover {
+    background-color: #0b5ed7;
     text-decoration: none;
   }
 
-  .back-button:hover {
-    background-color: #0b5ed7;
-    box-shadow: 0 6px 15px rgba(13, 110, 253, 0.3);
-  }
+  @media (max-width: 768px) {
+    .info-grid {
+      grid-template-columns: 1fr;
+    }
 
+    .project-wrapper {
+      padding: 25px 20px;
+    }
+
+    .project-title {
+      font-size: 20px;
+    }
+  }
 </style>
 
-<div class="container mt-5 fade-in-up">
-  <div class="project-card">
-    <h2 class="project-heading">{{ project.name }}</h2>
-    <ul class="list-group list-group-flush">
-      <li class="list-group-item"><i class="fas fa-hashtag"></i><strong>Code:</strong> {{ project.code }}</li>
-      <li class="list-group-item"><i class="fas fa-map-marker-alt"></i><strong>Location:</strong> {{ project.location }}</li>
-      <li class="list-group-item"><i class="fas fa-wallet"></i><strong>Budget:</strong> ₹{{ project.total_budget }}</li>
-      <li class="list-group-item"><i class="far fa-calendar-alt"></i><strong>Start Date:</strong> {{ project.start_date }}</li>
-      <li class="list-group-item"><i class="far fa-calendar-check"></i><strong>End Date:</strong> {{ project.end_date }}</li>
-      <li class="list-group-item"><i class="fas fa-sticky-note"></i><strong>Notes:</strong> {{ project.notes|default:"None" }}</li>
-    </ul>
+<div class="project-wrapper">
+  <div class="project-title">{{ project.name }}</div>
 
-    <a href="{% url 'project_list' %}" class="back-button">← Back to Projects</a>
+  <div class="info-grid">
+    <div class="info-item">
+      <div class="label">Project Code</div>
+      <div class="value">{{ project.code }}</div>
+    </div>
+    <div class="info-item">
+      <div class="label">Location</div>
+      <div class="value">{{ project.location }}</div>
+    </div>
+    <div class="info-item">
+      <div class="label">Total Budget</div>
+      <div class="value">₹{{ project.total_budget|floatformat:2 }}</div>
+    </div>
+    <div class="info-item">
+      <div class="label">Start Date</div>
+      <div class="value">{{ project.start_date }}</div>
+    </div>
+    <div class="info-item">
+      <div class="label">End Date</div>
+      <div class="value">{{ project.end_date }}</div>
+    </div>
+    <div class="info-item" style="grid-column: span 2;">
+      <div class="label">Notes</div>
+      <div class="value">{{ project.notes|default:"N/A" }}</div>
+    </div>
   </div>
-</div>
 
-<!-- FontAwesome Icons -->
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <a href="{% url 'project_list' %}" class="back-btn">← Back to Projects</a>
+</div>
 
 {% endblock %}

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 12px; }
+    h2 { text-align: center; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #444; padding: 6px; text-align: left; }
+    th { background-color: #f0f0f0; }
+  </style>
+</head>
+<body>
+  <h2>Transaction Report</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Project</th>
+        <th>Description</th>
+        <th>Category</th>
+        <th>Amount</th>
+        <th>Type</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for txn in transactions %}
+      <tr>
+        <td>{{ txn.created_at|date:"Y-m-d" }}</td>
+        <td>{{ txn.project.name }}</td>
+        <td>{{ txn.description }}</td>
+        <td>{{ txn.category }}</td>
+        <td>{{ txn.amount }}</td>
+        <td>{{ txn.type }}</td>
+        <td>{{ txn.status }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7">No transactions found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>

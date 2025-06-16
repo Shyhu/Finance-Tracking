@@ -2,77 +2,88 @@
 {% load humanize %}
 
 {% block content %}
-{% comment %} <a href="{% url 'loan_pdf' loan.id %}" class="btn btn-sm btn-outline-primary float-end">
-  <i class="fas fa-file-pdf"></i> Download PDF
-</a> {% endcomment %}
+
 
 <div class="container mt-4">
-    <h3 class="fw-bold">Loan Details</h3>
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="fw-bold mb-0">Loan Details</h3>
+        <div class="d-flex gap-2">
+            <a href="{% url 'loan_pdf' loan.id %}" class="btn btn-outline-danger">
+                <i class="fas fa-file-pdf"></i> Download PDF
+            </a>
+            <a href="{% url 'loan_list' %}" class="btn btn-outline-secondary">
+                ← Back to Loans
+            </a>
+        </div>
+    </div>
+</div>
 
-    <div class="card shadow-sm my-3">
+
+    <!-- Loan Summary -->
+    <div class="card shadow-sm mb-4">
         <div class="card-body">
             <h5 class="text-primary">{{ loan.project.name }}</h5>
-            <p><strong>Project/Purpose:</strong> {{ loan.project }}<br>
-               <strong>Loan Purpose:</strong> {{ loan.loan_purpose }}</p>
+            <p class="mb-2"><strong>Project/Purpose:</strong> {{ loan.project }}</p>
+            <p class="mb-4"><strong>Loan Purpose:</strong> {{ loan.loan_purpose }}</p>
 
             <div class="row text-muted">
-                <div class="col-md-4"><strong>Original Loan Amount:</strong><br> ${{ loan.amount|intcomma }}</div>
-                <div class="col-md-4"><strong>Annual Interest Rate:</strong><br> {{ loan.interest_rate }}%</div>
-                <div class="col-md-4"><strong>Loan Start Date:</strong><br> {{ loan.start_date }}</div>
-                {% comment %} <div class="col-md-4 mt-3"><strong>Total Principal Paid:</strong><br> ${{ total_principal_paid|floatformat:2 }}</div> {% endcomment %}
-                <div class="col-md-4 mt-3"><strong>Total Interest Paid:</strong><br> ${{ total_interest_paid|floatformat:2 }}</div>
-                <div class="col-md-4 mt-3"><strong>Remaining Balance:</strong><br> <strong class="text-dark">${{ remaining_balance|floatformat:2 }}</strong></div>
+                <div class="col-md-4 mb-3"><strong>Original Loan Amount:</strong><br> ${{ loan.amount|intcomma }}</div>
+                <div class="col-md-4 mb-3"><strong>Annual Interest Rate:</strong><br> {{ loan.interest_rate }}%</div>
+                <div class="col-md-4 mb-3"><strong>Loan Start Date:</strong><br> {{ loan.start_date }}</div>
+                <div class="col-md-4 mb-3"><strong>Total Interest Paid:</strong><br> ${{ total_interest_paid|floatformat:2 }}</div>
+                <div class="col-md-4 mb-3"><strong>Remaining Balance:</strong><br>
+                    <strong class="text-dark">${{ remaining_balance|floatformat:2 }}</strong>
+                </div>
             </div>
 
-            <div class="text-end mt-4">
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRepaymentModal">
-  + Add Repayment
-</button>
-
+            <div class="text-end mt-3">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRepaymentModal">
+                    + Add Repayment
+                </button>
             </div>
         </div>
     </div>
 
-    <h5 class="fw-bold mb-2">Repayment History</h5>
-    <table class="table table-bordered table-hover bg-white shadow-sm">
-        <thead class="table-light">
-            <tr>
-                <th>Date</th>
-                <th>Amount Paid</th>
-                <th>Interest Calculated</th>
-                <th>Interest Paid</th>
-                {% comment %} <th>Principal Paid</th> {% endcomment %}
-                <th>Balance After Repayment</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for repayment in repayments %}
-            <tr>
-                <td>{{ repayment.date }}</td>
-                <td><strong>${{ repayment.amount_paid|floatformat:2 }}</strong></td>
-                <td>${{ repayment.interest_calculated|floatformat:2 }}</td>
-                <td class="text-warning">${{ repayment.interest_paid|floatformat:2 }}</td>
-                {% comment %} <td class="text-success">${{ repayment.principal_paid|floatformat:2 }}</td> {% endcomment %}
-               <td class="text-danger fw-bold">
-
-        ${{ remaining_balance|floatformat:2 }}
-   
-</td>
-
-            </tr>
-            {% empty %}
-            <tr><td colspan="6" class="text-center">No repayments made yet.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <!-- Repayment History Table -->
+    <h5 class="fw-bold mb-3">Repayment History</h5>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle bg-white shadow-sm">
+            <thead class="table-light">
+                <tr class="text-center">
+                    <th>Date</th>
+                    <th>Amount Paid</th>
+                    <th>Interest Calculated</th>
+                    <th>Interest Paid</th>
+                    <th>Principal Paid</th>
+                    <th>Balance After Repayment</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in repayments %}
+                <tr class="text-center">
+                    <td>{{ row.repayment.date }}</td>
+                    <td><strong>${{ row.repayment.amount_paid|floatformat:2 }}</strong></td>
+                    <td>${{ row.repayment.interest_calculated|floatformat:2 }}</td>
+                    <td class="text-warning">${{ row.repayment.interest_paid|floatformat:2 }}</td>
+                    <td class="text-success">${{ row.repayment.principal_paid|floatformat:2 }}</td>
+                    <td class="text-danger fw-bold">${{ row.balance_after|floatformat:2 }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted">No repayments made yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <!-- Add Repayment Modal -->
 <div class="modal fade" id="addRepaymentModal" tabindex="-1" aria-labelledby="addRepaymentModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-     <form method="POST" action="{% url 'loan_detail' loan.id %}">
-
+      <form method="POST" action="{% url 'loan_detail' loan.id %}">
         {% csrf_token %}
         <div class="modal-header">
           <h5 class="modal-title">Add Repayment</h5>
@@ -88,6 +99,4 @@
     </div>
   </div>
 </div>
-
-
 {% endblock %}

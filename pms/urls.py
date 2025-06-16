@@ -52,6 +52,8 @@ urlpatterns = [
     path('view/<int:pk>/', views.view_task, name='view_task'),
 
     path('', views.dashboard_view, name='dashboard'),
+    path('loan/<int:loan_id>/pdf/', views.loan_pdf, name='loan_pdf'),
+    path('transactions_pdf/', views.transaction_pdf, name='transaction_pdf'),
 
     
 ]

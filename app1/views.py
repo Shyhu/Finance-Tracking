@@ -329,12 +329,20 @@ from django.http import HttpResponse
 from .utils import generate_loan_pdf  # PDF generator utility
 
 
+from datetime import date
+from decimal import Decimal
+from django.db.models import Sum
+from django.shortcuts import get_object_or_404, render, redirect
+from .models import Loan, Repayment
+from .forms import RepaymentForm
+
 
 def loan_detail(request, loan_id):
     loan = get_object_or_404(Loan, pk=loan_id)
     repayments = loan.repayments.all().order_by('date')
     repayment_form = RepaymentForm()
 
+    # Set up for loop display with balances
     repayments_data = []
     remaining_balance = loan.amount
 
@@ -345,7 +353,7 @@ def loan_detail(request, loan_id):
             'balance_after': remaining_balance
         })
 
-    # 🟦 Set default values for GET requests
+    # Default values for GET request context
     interest_paid = Decimal('0.00')
     principal_paid = Decimal('0.00')
 
@@ -355,11 +363,25 @@ def loan_detail(request, loan_id):
             repayment = repayment_form.save(commit=False)
             repayment.loan = loan
 
-            total_interest_paid = loan.repayments.aggregate(total=Sum('interest_paid'))['total'] or Decimal('0.00')
-            total_principal_paid = loan.repayments.aggregate(total=Sum('principal_paid'))['total'] or Decimal('0.00')
+            # Determine date range for interest calculation
+            if repayments.exists():
+                last_repayment_date = repayments.last().date
+            else:
+                last_repayment_date = loan.start_date
+
+            new_payment_date = repayment.date
+            days_elapsed = (new_payment_date - last_repayment_date).days or 1
+
+            # Current balance before this repayment
+            total_principal_paid = repayments.aggregate(total=Sum('principal_paid'))['total'] or Decimal('0.00')
             current_balance = loan.amount - total_principal_paid
 
-            interest_calculated = (loan.interest_rate / Decimal('100.00')) * current_balance
+            # Interest calculation based on time
+            interest_calculated = (
+                loan.interest_rate / Decimal('100.00')
+            ) * current_balance * Decimal(days_elapsed) / Decimal('365.00')
+            interest_calculated = round(interest_calculated, 2)
+
             repayment.interest_calculated = interest_calculated
 
             amt = repayment.amount_paid
@@ -372,29 +394,27 @@ def loan_detail(request, loan_id):
 
             repayment.balance_after_repayment = current_balance - repayment.principal_paid
 
-            # 🟦 Set values for context after saving
             interest_paid = repayment.interest_paid
             principal_paid = repayment.principal_paid
 
             repayment.save()
             return redirect('loan_detail', loan_id=loan.id)
 
-    # Totals
+    # Final Totals
     total_interest_paid = repayments.aggregate(total=Sum('interest_paid'))['total'] or Decimal('0.00')
     total_principal_paid = repayments.aggregate(total=Sum('principal_paid'))['total'] or Decimal('0.00')
     remaining_balance = loan.amount - total_principal_paid
 
     return render(request, 'loan_detail.html', {
         'loan': loan,
-        'repayments': repayments,
+        'repayments': repayments_data,
         'repayment_form': repayment_form,
         'total_interest_paid': total_interest_paid,
         'total_principal_paid': total_principal_paid,
         'remaining_balance': remaining_balance,
-        'interest_paid': interest_paid,  # 🟦 These two are now always defined
+        'interest_paid': interest_paid,
         'principal_paid': principal_paid,
     })
-
 
 
 # from django.http import HttpResponse
@@ -575,3 +595,93 @@ def add_category(request):
         if name:
             Category.objects.get_or_create(name=name)
     return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
+
+
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from decimal import Decimal
+from .models import Loan
+from django.shortcuts import get_object_or_404
+from django.db.models import Sum
+
+def loan_pdf(request, loan_id):
+    loan = get_object_or_404(Loan, pk=loan_id)
+    repayments = loan.repayments.all().order_by('date')
+
+    remaining_balance = loan.amount
+    repayments_data = []
+    for repayment in repayments:
+        remaining_balance -= repayment.principal_paid or Decimal('0.00')
+        repayments_data.append({
+            'repayment': repayment,
+            'balance_after': remaining_balance
+        })
+
+    total_interest_paid = repayments.aggregate(total=Sum('interest_paid'))['total'] or Decimal('0.00')
+    total_principal_paid = repayments.aggregate(total=Sum('principal_paid'))['total'] or Decimal('0.00')
+    remaining_balance = loan.amount - total_principal_paid
+
+    template = get_template('loan_pdf.html')
+    html = template.render({
+        'loan': loan,
+        'repayments': repayments_data,
+        'total_interest_paid': total_interest_paid,
+        'total_principal_paid': total_principal_paid,
+        'remaining_balance': remaining_balance,
+    })
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="Loan_{loan.id}_Details.pdf"'
+    pisa_status = pisa.CreatePDF(html, dest=response)
+
+    if pisa_status.err:
+        return HttpResponse('PDF generation failed')
+    return response
+
+
+
+
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from .models import Transaction
+from django.db.models import Q
+
+def transaction_pdf(request):
+    # Filters from query parameters
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    project = request.GET.get('project')
+    tx_type = request.GET.get('type')
+    category = request.GET.get('category')
+
+    transactions = Transaction.objects.all()
+
+    if start_date:
+        transactions = transactions.filter(created_at__date__gte=start_date)
+    if end_date:
+        transactions = transactions.filter(created_at__date__lte=end_date)
+    if project and project != 'all':
+        transactions = transactions.filter(project__id=project)
+    if tx_type and tx_type != 'all':
+        transactions = transactions.filter(type=tx_type)
+    if category and category != 'all':
+        transactions = transactions.filter(category=category)
+
+    # Render template
+    template = get_template('transaction_pdf.html')
+    html = template.render({'transactions': transactions})
+    
+    # Generate PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="transactions.pdf"'
+    pisa_status = pisa.CreatePDF(html, dest=response)
+
+    if pisa_status.err:
+        return HttpResponse('Error generating PDF', status=500)
+    return response
+
+
