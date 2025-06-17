@@ -1,0 +1,20 @@
+<div class="modal-header">
+  <h5 class="modal-title">Transaction Details</h5>
+  {% comment %} <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> {% endcomment %}
+</div>
+
+<div class="modal-body">
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item"><strong>ID:</strong> {{ txn.id }}</li>
+    <li class="list-group-item"><strong>Project:</strong> {{ txn.project.name }}</li>
+    <li class="list-group-item"><strong>Type:</strong> {{ txn.get_type_display }}</li>
+    <li class="list-group-item"><strong>Amount:</strong> ₹{{ txn.amount }}</li>
+    <li class="list-group-item"><strong>Category:</strong> {{ txn.category }}</li>
+    <li class="list-group-item"><strong>Description:</strong><br>{{ txn.description|default:"N/A" }}</li>
+    <li class="list-group-item"><strong>Date:</strong> {{ txn.created_at|date:"d M Y, h:i A" }}</li>
+  </ul>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+</div>

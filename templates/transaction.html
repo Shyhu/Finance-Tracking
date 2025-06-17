@@ -141,6 +141,8 @@
           <th>Status</th>
           <th>Bill Proof</th>
           <th>Payment Proof</th>
+          <th>Actions</th>
+
         </tr>
       </thead>
       <tbody>
@@ -167,6 +169,19 @@
     </a><br>
   {% endfor %}
 </td>
+
+<td class="text-nowrap">
+  <button class="btn btn-sm btn-info mb-1 view-btn" data-id="{{ txn.id }}">
+    <i class="bi bi-eye"></i>
+  </button>
+  <button class="btn btn-sm btn-warning mb-1 edit-btn" data-id="{{ txn.id }}">
+    <i class="bi bi-pencil-square"></i>
+  </button>
+  <button class="btn btn-sm btn-danger mb-1 delete-btn" data-id="{{ txn.id }}">
+    <i class="bi bi-trash"></i>
+  </button>
+</td>
+
 
         </tr>
         {% endfor %}
@@ -277,6 +292,38 @@
   </div>
 </div>
 
+<div class="modal fade" id="deleteTransactionModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="POST" id="deleteTransactionForm">{% csrf_token %}
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title">Delete Transaction</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete this transaction?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal fade" id="viewTransactionModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title">Transaction Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="viewTransactionBody"></div>
+    </div>
+  </div>
+</div>
+
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
   $('#transactionForm').submit(function(e){
@@ -367,6 +414,48 @@
     transactionIDInput.value = generateTransactionID();
   });
 </script>
+
+
+
+<script>
+  $(function() {
+  // VIEW transaction
+  $(document).on('click', '.view-btn', function() {
+    const id = $(this).data('id');
+    $.get(`/transactions/${id}/view/`, function(res) {
+      $('#viewTransactionBody').html(res.html);
+      new bootstrap.Modal($('#viewTransactionModal')).show();
+    });
+  });
+
+  // EDIT transaction
+  $(document).on('click', '.edit-btn', function() {
+    const id = $(this).data('id');
+    $.get(`/transactions/${id}/edit/`, function(data) {
+      $('#addTransactionModal .modal-title').text('Edit Transaction');
+      $('#transactionForm').attr('action', `/transactions/${id}/edit/`);
+      $('#id_transaction_id').val(data.transaction_id);
+      $('select[name="project"]').val(data.project);
+      $('select[name="type"]').val(data.type);
+      $('input[name="amount"]').val(data.amount);
+      $('input[name="vendor"]').val(data.vendor);
+      $('select[name="status"]').val(data.status);
+      $('select[name="category"]').val(data.category);
+      $('textarea[name="description"]').val(data.description);
+      new bootstrap.Modal($('#addTransactionModal')).show();
+    });
+  });
+
+  // DELETE confirmation
+  $(document).on('click', '.delete-btn', function() {
+    const id = $(this).data('id');
+    $('#deleteTransactionForm').attr('action', `/transactions/${id}/delete/`);
+    new bootstrap.Modal($('#deleteTransactionModal')).show();
+  });
+});
+</script>
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 {% endblock %}

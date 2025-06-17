@@ -168,6 +168,48 @@ def add_transaction(request):
 
 
 
+def view_transaction(request, pk):
+    txn = get_object_or_404(Transaction.objects.select_related('project'), pk=pk)
+    html = render_to_string('view_transaction_detail.html', {'txn': txn})
+    return JsonResponse({'html': html})
+
+def edit_transaction(request, pk):
+    txn = get_object_or_404(Transaction, pk=pk)
+    if request.method == 'POST':
+        txn.project_id = request.POST.get('project')
+        txn.type = request.POST.get('type')
+        txn.amount = request.POST.get('amount')
+        txn.vendor = request.POST.get('vendor')
+        txn.status = request.POST.get('status')
+        txn.category = request.POST.get('category')
+        txn.description = request.POST.get('description')
+        txn.save()
+        return JsonResponse({'success': True})
+    else:
+        data = {
+            'transaction_id': txn.transaction_id,
+            'project': txn.project_id,
+            'type': txn.type,
+            'amount': txn.amount,
+            'vendor': txn.vendor,
+            'status': txn.status,
+            'category': txn.category,
+            'description': txn.description,
+        }
+        return JsonResponse(data)
+from django.template.loader import render_to_string
+
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Transaction
+
+def delete_transaction(request, pk):
+    txn = get_object_or_404(Transaction, pk=pk)
+
+    if request.method == 'POST':
+        txn.delete()
+        return redirect('transaction_list') 
+
+
 # app1/views.py
 
 from django.shortcuts import render, get_object_or_404, redirect
@@ -548,7 +590,9 @@ from django.db.models import Sum
 from django.shortcuts import render
 from .models import Project, Transaction, Staff, Loan, Repayment
 from django.db.models import Sum
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def dashboard_view(request):
     total_projects = Project.objects.count()
     total_income = Transaction.objects.filter(type='Income').aggregate(Sum('amount'))['amount__sum'] or 0
