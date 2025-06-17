@@ -1,0 +1,15 @@
+<!-- admin_messages.html -->
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Messages from Staff</h2>
+  <ul class="list-group">
+    {% for msg in messages %}
+      <li class="list-group-item">
+        <strong>{{ msg.staff.name }}:</strong> {{ msg.message }} <br>
+        <small class="text-muted">{{ msg.timestamp }}</small>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

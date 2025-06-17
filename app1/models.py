@@ -1,6 +1,7 @@
 from django.db import models
 
 # Create your models here.
+from django.contrib.auth.models import User
 
 from django.db import models
 
@@ -56,6 +57,7 @@ class PaymentProof(models.Model):
 
 
 class Staff(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE,null=True, blank=True)
     staff_id = models.CharField(max_length=20, unique=True)
     name = models.CharField(max_length=100)
     photo = models.ImageField(upload_to='staff_photos/', blank=True, null=True)
@@ -137,3 +139,37 @@ class Task(models.Model):
 class TaskFile(models.Model):
     task = models.ForeignKey(Task, related_name='files', on_delete=models.CASCADE)
     file = models.FileField(upload_to='task_files/')
+
+
+# models.py
+
+class StaffMessage(models.Model):
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Message from {self.staff.name}"
+    
+
+
+
+from django.db import models
+from django.contrib.auth import get_user_model
+from app1.models import Staff, Project
+
+User = get_user_model()
+
+class Target(models.Model):
+    date = models.DateField()
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+    target_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    achieved_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    status = models.CharField(max_length=50, default="PENDING STAFF UPDATE")
+    notes = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.staff.name} - {self.date}"
+

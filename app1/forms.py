@@ -192,3 +192,31 @@ class TaskForm(forms.ModelForm):
 #     class Meta:
 #         model = TaskFile
 #         fields = ['file']
+
+
+
+# forms.py
+
+from django import forms
+from .models import StaffMessage
+
+class StaffMessageForm(forms.ModelForm):
+    class Meta:
+        model = StaffMessage
+        fields = ['message']
+        widgets = {
+            'message': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Enter your message here...', 'rows': 4}),
+        }
+
+
+
+from django import forms
+from .models import Target
+
+class TargetForm(forms.ModelForm):
+    class Meta:
+        model = Target
+        fields = ['date', 'project', 'staff', 'target_amount', 'notes']
+        widgets = {
+            'date': forms.DateInput(attrs={'type': 'date'}),
+        }

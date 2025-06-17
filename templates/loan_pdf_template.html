@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .summary-table {
+      width: 100%;
+      margin-bottom: 30px;
+    }
+
+    .summary-table td {
+      padding: 8px 12px;
+      border: 1px solid #333;
+      font-size: 14px;
+    }
+
+    .summary-table td.label {
+      font-weight: bold;
+      background-color: #f2f2f2;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    th, td {
+      border: 1px solid #333;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+  <h2>Loan Report</h2>
+
+  <!-- Summary Section -->
+  <table class="summary-table">
+    <tr>
+      <td class="label">Total Loaned Amount</td>
+      <td>{{ total_loaned_amount|floatformat:2 }}</td>
+    </tr>
+    <tr>
+      <td class="label">Total Principal Repaid</td>
+      <td>{{ total_principal_repaid|floatformat:2 }}</td>
+    </tr>
+    <tr>
+      <td class="label">Total Interest Collected</td>
+      <td>{{ total_interest_collected|floatformat:2 }}</td>
+    </tr>
+    <tr>
+      <td class="label">Total Outstanding Principal</td>
+      <td>{{ total_outstanding|floatformat:2 }}</td>
+    </tr>
+  </table>
+
+  <!-- Loan Details Table -->
+  <table>
+    <thead>
+      <tr>
+        <th>Borrower</th>
+        <th>Purpose</th>
+        <th>Loan Amount</th>
+        <th>Interest Rate</th>
+        <th>Start Date</th>
+        <th>Total Interest Paid</th>
+        <th>Remaining Balance</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for loan in loans %}
+      <tr>
+        <td>{{ loan.project }}</td>
+        <td>{{ loan.loan_purpose }}</td>
+        <td>{{ loan.amount|floatformat:2 }}</td>
+        <td>{{ loan.interest_rate }}%</td>
+        <td>{{ loan.start_date }}</td>
+        <td>{{ loan.total_interest_paid|default:"0.00"|floatformat:2 }}</td>
+        <td>{{ loan.remaining_balance|default:"0.00"|floatformat:2 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>

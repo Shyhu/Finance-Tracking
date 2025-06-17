@@ -51,6 +51,8 @@ urlpatterns = [
     path('loans/<int:loan_id>/', views.loan_detail, name='loan_detail'),
     # path('loans/<int:loan_id>/add_repayment/', views.add_repayment, name='add_repayment'),
     #  path('loan/<int:loan_id>/pdf/', views.generate_loan_pdf, name='loan_pdf'),
+    path('loans/download-pdf/', views.download_loan_pdf, name='download_loan_pdf'),
+
 
     path('task_list', views.task_list, name='task_list'),
     path('delete/<int:pk>/', views.delete_task, name='delete_task'),
@@ -63,6 +65,12 @@ urlpatterns = [
 
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
+
+    # path('staff/dashboard/', views.staff_dashboard, name='staff_dashboard'),
+    path('admin/messages/', views.admin_messages, name='admin_messages'),
+    path('staff/dashboard/', views.staff_dashboard, name='staff_dashboard'),
+    # path('staff/send-message/', views.send_message_to_admin, name='send_message'),
+    
 
     
 ]

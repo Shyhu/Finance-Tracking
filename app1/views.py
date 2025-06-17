@@ -729,3 +729,74 @@ def transaction_pdf(request):
     return response
 
 
+
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from .models import Loan, Repayment
+from decimal import Decimal
+from django.db.models import Sum
+
+def download_loan_pdf(request):
+    loans = Loan.objects.select_related('project').all()
+
+    total_loaned_amount = loans.aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
+    total_principal_repaid = Repayment.objects.aggregate(total=Sum('principal_paid'))['total'] or Decimal('0.00')
+    total_interest_collected = Repayment.objects.aggregate(total=Sum('interest_paid'))['total'] or Decimal('0.00')
+    total_outstanding = total_loaned_amount - total_principal_repaid
+
+    # Attach computed fields like in the main view
+    for loan in loans:
+        loan.total_interest_paid = loan.repayments.aggregate(total=Sum('interest_paid'))['total'] or Decimal('0.00')
+        total_principal = loan.repayments.aggregate(total=Sum('principal_paid'))['total'] or Decimal('0.00')
+        loan.remaining_balance = loan.amount - total_principal
+
+    template = get_template('loan_pdf_template.html')
+    html = template.render({
+        'loans': loans,
+        'total_loaned_amount': total_loaned_amount,
+        'total_principal_repaid': total_principal_repaid,
+        'total_interest_collected': total_interest_collected,
+        'total_outstanding': total_outstanding,
+    })
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="loan_report.pdf"'
+    pisa.CreatePDF(html, dest=response)
+    return response
+
+
+
+
+# views.py
+
+from django.shortcuts import render, redirect
+from .models import Task, Staff, StaffMessage
+from .forms import StaffMessageForm
+
+def staff_dashboard(request):
+    staff = Staff.objects.get(id=request.user.id)  # adapt this if your login is using Django’s default User
+    tasks = Task.objects.filter(staff=staff)
+
+    if request.method == 'POST':
+        form = StaffMessageForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.staff = staff
+            message.save()
+            return redirect('staff_dashboard')
+    else:
+        form = StaffMessageForm()
+
+    return render(request, 'staff_dashboard.html', {
+        'staff': staff,
+        'tasks': tasks,
+        'form': form,
+    })
+
+
+# views.py
+
+def admin_messages(request):
+    messages = StaffMessage.objects.select_related('staff').order_by('-timestamp')
+    return render(request, 'admin_messages.html', {'messages': messages})
