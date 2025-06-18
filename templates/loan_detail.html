@@ -3,100 +3,173 @@
 
 {% block content %}
 
+<style>
+  .fade-in {
+    animation: fadeIn 0.6s ease-in-out;
+  }
 
-<div class="container mt-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="fw-bold mb-0">Loan Details</h3>
-        <div class="d-flex gap-2">
-            <a href="{% url 'loan_pdf' loan.id %}" class="btn btn-outline-danger">
-                <i class="fas fa-file-pdf"></i> Download PDF
-            </a>
-            <a href="{% url 'loan_list' %}" class="btn btn-outline-secondary">
-                ← Back to Loans
-            </a>
-        </div>
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fancy-form {
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.form-left {
+  background-color:rgb(92, 186, 249);
+  color: white;
+  width: 35%;
+  padding: 30px;
+  text-align: center;
+}
+
+.form-right {
+  background-color:rgb(255, 255, 255);
+}
+
+.form-right label {
+  font-weight: 600;
+}
+
+.form-control {
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  height: 40px;
+}
+
+</style>
+
+<div class="container mt-4 fade-in">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold text-primary">Loan Details</h3>
+    <div class="d-flex gap-2">
+      <a href="{% url 'loan_pdf' loan.id %}" class="btn btn-outline-danger">
+        <i class="fas fa-file-pdf"></i> Download PDF
+      </a>
+      <a href="{% url 'loan_list' %}" class="btn btn-outline-secondary">
+        ← Back to Loans
+      </a>
     </div>
-</div>
+  </div>
 
+  <!-- Loan Summary -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+      <h5 class="text-primary fw-semibold mb-3">{{ loan.project.name }}</h5>
+      <p class="mb-2"><i class="bi bi-diagram-3"></i> <strong>Project/Purpose:</strong> {{ loan.project }}</p>
+      <p class="mb-3"><i class="bi bi-flag"></i> <strong>Loan Purpose:</strong> {{ loan.loan_purpose }}</p>
 
-    <!-- Loan Summary -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <h5 class="text-primary">{{ loan.project.name }}</h5>
-            <p class="mb-2"><strong>Project/Purpose:</strong> {{ loan.project }}</p>
-            <p class="mb-4"><strong>Loan Purpose:</strong> {{ loan.loan_purpose }}</p>
-
-            <div class="row text-muted">
-                <div class="col-md-4 mb-3"><strong>Original Loan Amount:</strong><br> ${{ loan.amount|intcomma }}</div>
-                <div class="col-md-4 mb-3"><strong>Annual Interest Rate:</strong><br> {{ loan.interest_rate }}%</div>
-                <div class="col-md-4 mb-3"><strong>Loan Start Date:</strong><br> {{ loan.start_date }}</div>
-                <div class="col-md-4 mb-3"><strong>Total Interest Paid:</strong><br> ${{ total_interest_paid|floatformat:2 }}</div>
-                <div class="col-md-4 mb-3"><strong>Remaining Balance:</strong><br>
-                    <strong class="text-dark">${{ remaining_balance|floatformat:2 }}</strong>
-                </div>
-            </div>
-
-            <div class="text-end mt-3">
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRepaymentModal">
-                    + Add Repayment
-                </button>
-            </div>
+      <div class="row text-muted">
+        <div class="col-md-4 mb-3">
+          <i class="bi bi-cash-coin"></i> <strong>Original Loan Amount:</strong><br>
+          ₹{{ loan.amount|intcomma }}
         </div>
-    </div>
+        <div class="col-md-4 mb-3">
+          <i class="bi bi-percent"></i> <strong>Annual Interest Rate:</strong><br>
+          {{ loan.interest_rate }}%
+        </div>
+        <div class="col-md-4 mb-3">
+          <i class="bi bi-calendar-event"></i> <strong>Loan Start Date:</strong><br>
+          {{ loan.start_date }}
+        </div>
+        <div class="col-md-4 mb-3">
+          <i class="bi bi-currency-exchange"></i> <strong>Total Interest Paid:</strong><br>
+          ₹{{ total_interest_paid|floatformat:2 }}
+        </div>
+        <div class="col-md-4 mb-3">
+          <i class="bi bi-wallet"></i> <strong>Remaining Balance:</strong><br>
+          <strong class="text-dark">₹{{ remaining_balance|floatformat:2 }}</strong>
+        </div>
+      </div>
 
-    <!-- Repayment History Table -->
+      <div class="text-end mt-4">
+        <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#addRepaymentModal">
+          <i class="bi bi-plus-circle me-1"></i> Add Repayment
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Repayment History Table -->
+  <div class="fade-in">
     <h5 class="fw-bold mb-3">Repayment History</h5>
     <div class="table-responsive">
-        <table class="table table-bordered table-hover align-middle bg-white shadow-sm">
-            <thead class="table-light">
-                <tr class="text-center">
-                    <th>Date</th>
-                    <th>Amount Paid</th>
-                    <th>Interest Calculated</th>
-                    <th>Interest Paid</th>
-                    <th>Principal Paid</th>
-                    <th>Balance After Repayment</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in repayments %}
-                <tr class="text-center">
-                    <td>{{ row.repayment.date }}</td>
-                    <td><strong>${{ row.repayment.amount_paid|floatformat:2 }}</strong></td>
-                    <td>${{ row.repayment.interest_calculated|floatformat:2 }}</td>
-                    <td class="text-warning">${{ row.repayment.interest_paid|floatformat:2 }}</td>
-                    <td class="text-success">${{ row.repayment.principal_paid|floatformat:2 }}</td>
-                    <td class="text-danger fw-bold">${{ row.balance_after|floatformat:2 }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="6" class="text-center text-muted">No repayments made yet.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+      <table class="table table-bordered table-hover align-middle bg-white shadow-sm">
+        <thead class="table-light">
+          <tr class="text-center">
+            <th>Date</th>
+            <th>Amount Paid</th>
+            <th>Interest Calculated</th>
+            <th>Interest Paid</th>
+            <th>Principal Paid</th>
+            <th>Balance After Repayment</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in repayments %}
+          <tr class="text-center">
+            <td>{{ row.repayment.date }}</td>
+            <td><strong>₹{{ row.repayment.amount_paid|floatformat:2 }}</strong></td>
+            <td>₹{{ row.repayment.interest_calculated|floatformat:2 }}</td>
+            <td class="text-warning">₹{{ row.repayment.interest_paid|floatformat:2 }}</td>
+            <td class="text-success">₹{{ row.repayment.principal_paid|floatformat:2 }}</td>
+            <td class="text-danger fw-bold">₹{{ row.balance_after|floatformat:2 }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-muted">No repayments made yet.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
+  </div>
 </div>
 
 <!-- Add Repayment Modal -->
+<!-- Add Repayment Modal -->
 <div class="modal fade" id="addRepaymentModal" tabindex="-1" aria-labelledby="addRepaymentModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content fancy-form">
       <form method="POST" action="{% url 'loan_detail' loan.id %}">
         {% csrf_token %}
-        <div class="modal-header">
-          <h5 class="modal-title">Add Repayment</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          {{ repayment_form.as_p }}
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">Add Repayment</button>
+        <div class="modal-body p-0 d-flex">
+          <!-- Left side: Image/branding -->
+          <div class="form-left d-flex flex-column justify-content-center align-items-center text-white">
+            <i class="fas fa-coins fa-3x mb-3"></i>
+            <h2 class="mb-0">Repayment</h2>
+            <p class="mb-0">Keep your loans clear!</p>
+            <img src="https://www.tataaia.com/content/dam/tataaialifeinsurancecompanylimited/blogs/investment-planning/how-to-do-financial-planning-with-a-loan-repayment/shutterstock_577080490.jpg" alt="Illustration" class="img-fluid mt-4" style="max-height: 150px;">
+          </div>
+
+          <!-- Right side: Form fields -->
+          <div class="form-right p-4 w-100">
+            <h4 class="mb-3">Add a New Repayment</h4>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="{{ repayment_form.date.id_for_label }}" class="form-label">Date</label>
+                {{ repayment_form.date }}
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="{{ repayment_form.amount_paid.id_for_label }}" class="form-label">Amount Paid</label>
+                {{ repayment_form.amount_paid }}
+              </div>
+            </div>
+
+            <div class="text-end">
+              <button type="submit" class="btn btn-primary rounded-pill px-4">Submit</button>
+              <button type="button" class="btn btn-outline-secondary ms-2 rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+            </div>
+          </div>
         </div>
       </form>
     </div>
   </div>
 </div>
+
+
 {% endblock %}

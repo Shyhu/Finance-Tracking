@@ -29,6 +29,7 @@ urlpatterns = [
     # path('project/<int:pk>/update/', views.project_update_ajax, name='project-update-ajax'),
     path('projects/<int:pk>/edit/', views.edit_project, name='edit_project'),
     path('projects/<int:pk>/delete/', views.delete_project, name='project-delete'),
+    path('projects/pdf/', views.generate_project_pdf, name='project-pdf'),
 
     path('transactions/', views.transaction_list, name='transaction_list'),
     path('add-transaction/', views.add_transaction, name='add_transaction'),
@@ -63,13 +64,21 @@ urlpatterns = [
     path('transactions_pdf/', views.transaction_pdf, name='transaction_pdf'),
 
 
-    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
+    # path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+    # path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
 
     # path('staff/dashboard/', views.staff_dashboard, name='staff_dashboard'),
     path('admin/messages/', views.admin_messages, name='admin_messages'),
     path('staff/dashboard/', views.staff_dashboard, name='staff_dashboard'),
     # path('staff/send-message/', views.send_message_to_admin, name='send_message'),
+
+
+
+
+    path('target/', views.target_dashboard, name='target_dashboard'),
+    path('target/add/', views.add_target, name='add_target'),
+    path('target/<int:pk>/edit/', views.edit_target, name='edit_target'),
+    path('target/<int:pk>/delete/', views.delete_target, name='delete_target'),
     
 
     

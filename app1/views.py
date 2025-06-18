@@ -97,19 +97,20 @@ from .models import Transaction, Project, Category
 from django.utils.dateparse import parse_date
 from datetime import datetime
 
+from django.db.models import Sum, Count
+
 def transaction_list(request):
     transactions = Transaction.objects.all().select_related('project')
     projects = Project.objects.all()
     categories = Category.objects.all()
 
-    # Get filter parameters from GET
+    # Filters
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
     project_id = request.GET.get('project')
     txn_type = request.GET.get('type')
     category = request.GET.get('category')
 
-    # Create a dictionary to retain selected filters in the template
     selected = {
         'start_date': start_date or '',
         'end_date': end_date or '',
@@ -118,31 +119,46 @@ def transaction_list(request):
         'category': category or '',
     }
 
-    # Apply filters
     if start_date:
         transactions = transactions.filter(created_at__date__gte=parse_date(start_date))
-
     if end_date:
         transactions = transactions.filter(created_at__date__lte=parse_date(end_date))
-
     if project_id and project_id != 'all':
         try:
             transactions = transactions.filter(project__id=int(project_id))
         except ValueError:
-            pass  # Ignore invalid project_id
-
+            pass
     if txn_type and txn_type != 'all':
         transactions = transactions.filter(type=txn_type)
-
     if category:
         transactions = transactions.filter(category__icontains=category)
+
+    # Summary stats
+    # total_income = transactions.filter(type='Income').aggregate(Sum('amount'))['amount__sum'] or 0
+    # total_expense = transactions.filter(type='Expense').aggregate(Sum('amount'))['amount__sum'] or 0
+    total_amount = transactions.aggregate(Sum('amount'))['amount__sum'] or 0
+    total_transactions = transactions.count()
+    total_pending = transactions.filter(status__iexact='Pending').count()     # case-insensitive
+    total_approved = transactions.filter(status__iexact='Approved').count()   # case-insensitive
+
 
     return render(request, 'transaction.html', {
         'transactions': transactions,
         'projects': projects,
         'categories': categories,
         'selected': selected,
+        'summary': {
+            # 'total_income': total_income,
+            # 'total_expense': total_expense,
+            'total_transactions': total_transactions,
+            'total_pending': total_pending,
+            'total_approved': total_approved,
+            'total_amount':total_amount,
+            'income_count': transactions.filter(type__iexact='Income').count(),
+    'expense_count': transactions.filter(type__iexact='Expense').count(),
+        }
     })
+
 
 
 def add_transaction(request):
@@ -590,9 +606,7 @@ from django.db.models import Sum
 from django.shortcuts import render
 from .models import Project, Transaction, Staff, Loan, Repayment
 from django.db.models import Sum
-from django.contrib.auth.decorators import login_required
 
-@login_required
 def dashboard_view(request):
     total_projects = Project.objects.count()
     total_income = Transaction.objects.filter(type='Income').aggregate(Sum('amount'))['amount__sum'] or 0
@@ -774,9 +788,13 @@ from django.shortcuts import render, redirect
 from .models import Task, Staff, StaffMessage
 from .forms import StaffMessageForm
 
+from datetime import date
+from .models import Target  # make sure it's imported
+
 def staff_dashboard(request):
-    staff = Staff.objects.get(id=request.user.id)  # adapt this if your login is using Django’s default User
+    staff = Staff.objects.get(id=request.user.id)  # Adjust if needed
     tasks = Task.objects.filter(staff=staff)
+    targets = Target.objects.filter(staff=staff, date=date.today())  # today's targets
 
     if request.method == 'POST':
         form = StaffMessageForm(request.POST)
@@ -792,6 +810,8 @@ def staff_dashboard(request):
         'staff': staff,
         'tasks': tasks,
         'form': form,
+        'targets': targets,
+        'today': date.today(),  # so that {{ today }} in template works
     })
 
 
@@ -800,3 +820,66 @@ def staff_dashboard(request):
 def admin_messages(request):
     messages = StaffMessage.objects.select_related('staff').order_by('-timestamp')
     return render(request, 'admin_messages.html', {'messages': messages})
+
+
+
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from .models import Project
+
+def generate_project_pdf(request):
+    projects = Project.objects.all()
+    template_path = 'project_pdf_template.html'
+    context = {'projects': projects}
+    
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="projects.pdf"'
+
+    template = get_template(template_path)
+    html = template.render(context)
+
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+        return HttpResponse('PDF generation failed <pre>' + html + '</pre>')
+    return response
+
+
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Target, Project, Staff
+from .forms import TargetForm
+from django.views.decorators.csrf import csrf_exempt
+
+def target_dashboard(request):
+    targets = Target.objects.all().order_by('-date')
+    form = TargetForm()
+    projects = Project.objects.all()
+    staff_list = Staff.objects.all()
+    return render(request, 'target_list.html', {
+        'targets': targets, 'form': form, 'projects': projects, 'staff_list': staff_list
+    })
+
+def add_target(request):
+    if request.method == 'POST':
+        form = TargetForm(request.POST)
+        if form.is_valid():
+            form.save()
+    return redirect('target_dashboard')
+
+@csrf_exempt
+def edit_target(request, pk):
+    target = get_object_or_404(Target, pk=pk)
+    if request.method == 'POST':
+        form = TargetForm(request.POST, instance=target)
+        if form.is_valid():
+            form.save()
+    return redirect('target_dashboard')
+
+def delete_target(request, pk):
+    target = get_object_or_404(Target, pk=pk)
+    if request.method == 'POST':
+        target.delete()
+    return redirect('target_dashboard')
+

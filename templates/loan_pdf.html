@@ -11,14 +11,14 @@
     </style>
 </head>
 <body>
-    <h2>Loan Details - {{ loan.project.name }}</h2>
+    <h1>Loan Details - {{ loan.project.name }}</h1>
     <p><strong>Loan Purpose:</strong> {{ loan.loan_purpose }}</p>
-    <p><strong>Amount:</strong> ${{ loan.amount }}<br>
+    <p><strong>Amount:</strong> ${{ loan.amount|floatformat:2 }}<br>
        <strong>Interest Rate:</strong> {{ loan.interest_rate }}%<br>
        <strong>Start Date:</strong> {{ loan.start_date }}</p>
-    <p><strong>Total Interest Paid:</strong> ${{ total_interest_paid }}<br>
-       <strong>Total Principal Paid:</strong> ${{ total_principal_paid }}<br>
-       <strong>Remaining Balance:</strong> ${{ remaining_balance }}</p>
+    <p><strong>Total Interest Paid:</strong> ${{ total_interest_paid|floatformat:2 }}<br>
+       <strong>Total Principal Paid:</strong> ${{ total_principal_paid|floatformat:2 }}<br>
+       <strong>Remaining Balance:</strong> ${{ remaining_balance|floatformat:2 }}</p>
 
     <h3>Repayment History</h3>
     <table>

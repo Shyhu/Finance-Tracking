@@ -76,7 +76,7 @@ class Loan(models.Model):
 
     
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    loan_id = models.CharField(max_length=50)
+    loan_id = models.CharField(max_length=50,unique=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     interest_rate = models.DecimalField(max_digits=5, decimal_places=2, help_text='annual Interest in %')
     loan_purpose = models.CharField(max_length=100)
@@ -166,8 +166,6 @@ class Target(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     target_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    achieved_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    status = models.CharField(max_length=50, default="PENDING STAFF UPDATE")
     notes = models.TextField(blank=True)
 
     def __str__(self):

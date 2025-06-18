@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="page-title">Target Management</h2>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTargetModal">
+      + Add Target
+    </button>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <thead class="table-light">
+        <tr>
+          <th>Date</th>
+          <th>Project</th>
+          <th>Staff</th>
+          <th>Target Amount</th>
+        
+         
+          <th>Notes</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="targetTableBody">
+        {% for target in targets %}
+        <tr data-id="{{ target.id }}">
+          <td>{{ target.date }}</td>
+          <td>{{ target.project.name }}</td>
+          <td>{{ target.staff.name }}</td>
+          <td>{{ target.target_amount }}</td>
+     
+          <td>{{ target.notes }}</td>
+          <td>
+            <button class="btn btn-sm btn-primary edit-btn" 
+                    data-id="{{ target.id }}" 
+                    data-date="{{ target.date }}"
+                    data-project="{{ target.project.id }}"
+                    data-staff="{{ target.staff.id }}"
+                    data-target_amount="{{ target.target_amount }}"
+                   
+                    data-notes="{{ target.notes }}">
+              Edit
+            </button>
+            <form method="post" action="{% url 'delete_target' target.id %}" style="display:inline">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Add Target Modal -->
+<div class="modal fade" id="addTargetModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="post" action="{% url 'add_target' %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Add Target</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          {{ form.as_p }}
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Target Modal -->
+<div class="modal fade" id="editTargetModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="post" id="editTargetForm">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Target</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Fields inserted via JS -->
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const editModal = new bootstrap.Modal(document.getElementById('editTargetModal'));
+  const editForm = document.getElementById('editTargetForm');
+  const modalBody = editForm.querySelector('.modal-body');
+
+  document.querySelectorAll('.edit-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const data = btn.dataset;
+      const fields = `
+        <input type="hidden" name="id" value="${data.id}" />
+        <div class="mb-3">
+          <label>Date</label>
+          <input type="date" name="date" class="form-control" value="${data.date}" required />
+        </div>
+        <div class="mb-3">
+          <label>Project</label>
+          <select name="project" class="form-control">{% for project in projects %}<option value="{{ project.id }}" ${data.project == '{{ project.id }}' ? 'selected' : ''}>{{ project.name }}</option>{% endfor %}</select>
+        </div>
+        <div class="mb-3">
+          <label>Staff</label>
+          <select name="staff" class="form-control">{% for staff in staff_list %}<option value="{{ staff.id }}" ${data.staff == '{{ staff.id }}' ? 'selected' : ''}>{{ staff.name }}</option>{% endfor %}</select>
+        </div>
+        <div class="mb-3">
+          <label>Target Amount</label>
+          <input type="number" step="0.01" name="target_amount" class="form-control" value="${data.target_amount}" required />
+        </div>
+       
+       
+        <div class="mb-3">
+          <label>Notes</label>
+          <textarea name="notes" class="form-control">${data.notes}</textarea>
+        </div>`;
+
+      modalBody.innerHTML = fields;
+      editForm.action = `/target/${data.id}/edit/`;
+      editModal.show();
+    });
+  });
+});
+</script>
+{% endblock %}

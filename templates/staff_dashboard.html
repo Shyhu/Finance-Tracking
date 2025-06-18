@@ -43,7 +43,37 @@
     <div class="mt-4 card">
         <div class="card-header">My Daily Targets ({{ today }})</div>
         <div class="card-body">
-            <p>No targets assigned for today.</p>
+            {% if targets %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Project</th>
+                <th>Target Amount</th>
+                <th>Achieved Amount</th>
+                <th>Status</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for target in targets %}
+            <tr>
+                <td>{{ target.project }}</td>
+                <td>{{ target.target_amount }}</td>
+                <td>{{ target.achieved_amount|default:"-" }}</td>
+                <td>
+                    <span class="badge {% if target.status == 'COMPLETED' %}bg-success{% elif target.status == 'PENDING STAFF UPDATE' %}bg-warning{% else %}bg-secondary{% endif %}">
+                        {{ target.status }}
+                    </span>
+                </td>
+                <td>{{ target.notes|default:"-" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No targets assigned for today.</p>
+{% endif %}
+
         </div>
     </div>
 

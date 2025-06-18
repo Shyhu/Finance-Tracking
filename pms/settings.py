@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app1',
     'django.contrib.humanize',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -114,9 +115,9 @@ USE_I18N = True
 USE_TZ = True
 
 
-LOGIN_REDIRECT_URL = 'dashboard'      # or whatever your dashboard URL name is
-LOGOUT_REDIRECT_URL = 'login'
-LOGIN_URL = 'login'
+# LOGIN_REDIRECT_URL = 'dashboard'      # or whatever your dashboard URL name is
+# LOGOUT_REDIRECT_URL = 'login'
+# LOGIN_URL = 'login'
 
 
 
