@@ -151,6 +151,8 @@ def transaction_list(request):
     # Summary stats
     # total_income = transactions.filter(type='Income').aggregate(Sum('amount'))['amount__sum'] or 0
     # total_expense = transactions.filter(type='Expense').aggregate(Sum('amount'))['amount__sum'] or 0
+    total_income = transactions.filter(type__iexact='Income').aggregate(Sum('amount'))['amount__sum'] or 0
+    total_expense = transactions.filter(type__iexact='Expense').aggregate(Sum('amount'))['amount__sum'] or 0
     total_amount = transactions.aggregate(Sum('amount'))['amount__sum'] or 0
     total_transactions = transactions.count()
     total_pending = transactions.filter(status__iexact='Pending').count()     # case-insensitive
@@ -163,8 +165,8 @@ def transaction_list(request):
         'categories': categories,
         'selected': selected,
         'summary': {
-            # 'total_income': total_income,
-            # 'total_expense': total_expense,
+            'total_income': total_income,
+            'total_expense': total_expense,
             'total_transactions': total_transactions,
             'total_pending': total_pending,
             'total_approved': total_approved,
