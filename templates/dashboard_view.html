@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% block content %}
-
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 
 <style>
@@ -50,7 +49,7 @@
   }
 
   .bar-chart-container {
-    height: 340px;
+    height: 300px;
   }
 
   .bars {
@@ -65,11 +64,11 @@
   .bar-group {
     text-align: center;
     flex: 1;
-    height:228px;
+    height: 100%;
   }
 
   .bar {
-    width: 40px;
+    width: 50px;
     margin: 0 auto;
     border-radius: 8px 8px 0 0;
     background: linear-gradient(to top, #3b82f6, #60a5fa);
@@ -182,29 +181,33 @@
   <h2><i class="ri-dashboard-line"></i> Financial Dashboard</h2>
 
   <div class="grid-two">
-    <!-- Left: Bar Chart -->
-    <div class="card bar-chart-container">
-      <h3 style="margin-bottom: 20px;">📊 Project Profitability</h3>
-      <div class="bars">
-        {% for label, value in project_chart_data %}
-        <div class="bar-group">
-          <div class="bar" style="--bar-height: 216px;"></div>
-          <span>${{ value|floatformat:0 }}</span>
-          <div class="x-label">{{ label }}</div>
+    <!-- Bar Chart Card -->
+    <div class="card">
+      <h3 style="margin-bottom: 20px;">📊 Income vs Expense</h3>
+      <div class="bar-chart-container">
+        <div class="bars">
+          <div class="bar-group">
+            <div class="bar" style="--bar-height: {{ income_bar_height }}px;"></div>
+            <span>${{ total_income|floatformat:0 }}</span>
+            <div class="x-label">Income</div>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="--bar-height: {{ expense_bar_height }}px; background: linear-gradient(to top, #f43f5e, #fb7185);"></div>
+            <span>${{ total_expense|floatformat:0 }}</span>
+            <div class="x-label">Expense</div>
+          </div>
         </div>
-        {% endfor %}
       </div>
     </div>
 
-    <!-- Right: Overview Card -->
+    <!-- Overview Card -->
     <div class="overview">
       <h3>💼 Financial Overview</h3>
       <p>Key financial metrics at a glance</p>
       <div class="overview-item">Total Income: <span>${{ total_income|floatformat:2 }}</span></div>
       <div class="overview-item">Total Expenses: <span>${{ total_expense|floatformat:2 }}</span></div>
       <div class="overview-item net-profit">
-        Net Profit:
-        <span>${{ total_income|floatformat:2|add:"-" }}{{ total_expense|floatformat:2 }}</span>
+        Net Profit: <span>${{ net_profit|floatformat:2 }}</span>
       </div>
     </div>
   </div>
@@ -216,11 +219,6 @@
       <h4>Total Projects</h4>
       <p>{{ total_projects }}</p>
     </div>
-    {% comment %} <div class="stat-card">
-      <i class="ri-coins-line"></i>
-      <h4>Total Budget Sum</h4>
-      <p>${{ total_budget_sum|default:"0" }}</p>
-    </div> {% endcomment %}
     <div class="stat-card">
       <i class="ri-team-line"></i>
       <h4>Total Staff</h4>
@@ -243,5 +241,4 @@
     </div>
   </div>
 </div>
-
 {% endblock %}

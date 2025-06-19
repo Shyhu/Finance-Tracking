@@ -197,7 +197,7 @@
                     <td>{{ project.notes }}</td>
                     <td>
                         <a href="{% url 'project-detail' project.pk %}" class="btn btn-sm btn-outline-secondary" title="View">
-                            👁
+                            <i class="bi bi-eye"></i>
                         </a>
                         <a href="#" class="btn btn-sm btn-outline-primary edit-project-btn"
                             data-id="{{ project.id }}"
@@ -208,10 +208,10 @@
                             data-start="{{ project.start_date }}"
                             data-end="{{ project.end_date }}"
                             data-notes="{{ project.notes|default_if_none:'' }}">
-                            ✏️
+                            <i class="bi bi-pencil-square"></i>
                         </a>
                         <a href="#" class="btn btn-sm btn-outline-danger delete-project-btn" data-id="{{ project.id }}">
-                            🗑️
+                             <i class="bi bi-trash"></i>
                         </a>
                     </td>
                 </tr>
@@ -487,6 +487,19 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("addProjectModal");
+    modal.addEventListener('shown.bs.modal', function () {
+      fetch('/get-next-project-code/')  // new view needed
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById("id_code").value = data.next_code;
+        });
+    });
+  });
 </script>
 
 

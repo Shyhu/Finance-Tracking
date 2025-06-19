@@ -79,6 +79,9 @@ urlpatterns = [
     path('target/add/', views.add_target, name='add_target'),
     path('target/<int:pk>/edit/', views.edit_target, name='edit_target'),
     path('target/<int:pk>/delete/', views.delete_target, name='delete_target'),
+    path('get-next-project-code/', views.get_next_project_code, name='get_next_project_code'),
+    
+
     
 
     

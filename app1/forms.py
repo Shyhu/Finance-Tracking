@@ -17,7 +17,8 @@ class ProjectForm(forms.ModelForm):
         model = Project
         fields = ['code', 'name', 'location', 'total_budget', 'start_date', 'end_date', 'notes']
         widgets = {
-            'code': forms.TextInput(attrs={'class': 'form-control'}),
+            # 'code': forms.TextInput(attrs={'class': 'form-control'}),
+            'code': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'location': forms.TextInput(attrs={'class': 'form-control'}),
             'total_budget': forms.NumberInput(attrs={'class': 'form-control'}),
@@ -25,6 +26,9 @@ class ProjectForm(forms.ModelForm):
             'end_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['code'].required = False  # Let view handle it
 
 
 
@@ -107,10 +111,13 @@ class LoanForm(forms.ModelForm):
             'project': forms.Select(attrs={'class': 'form-select'}),
             'amount': forms.NumberInput(attrs={'class': 'form-control'}),
             'interest_rate': forms.NumberInput(attrs={'class': 'form-control'}),
-            'purpose': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'purpose': forms.Textarea(attrs={'class': 'form-control'}),
             'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'repayment_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
         }
+    def __init__(self, *args, **kwargs):
+        super(LoanForm, self).__init__(*args, **kwargs)
+        self.fields['project'].empty_label = "Select Project"
 
 
 # forms.py

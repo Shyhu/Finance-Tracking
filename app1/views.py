@@ -16,6 +16,10 @@ from .models import Project
 from .forms import ProjectForm
 
 from django.http import JsonResponse
+from django.http import JsonResponse
+from .models import Project
+from .forms import ProjectForm
+from django.shortcuts import render
 
 def project_list(request):
     projects = Project.objects.order_by('-id')
@@ -24,8 +28,18 @@ def project_list(request):
     if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
         form = ProjectForm(request.POST)
         if form.is_valid():
-            project = form.save()
-            # Send new row data as JSON
+            # Auto-generate the code
+            last_project = Project.objects.order_by('-id').first()
+            if last_project and last_project.code.startswith('PRJ'):
+                last_num = int(last_project.code.replace('PRJ', ''))
+            else:
+                last_num = 0
+            new_code = f"PRJ{last_num + 1:03d}"
+
+            project = form.save(commit=False)
+            project.code = new_code
+            project.save()
+
             return JsonResponse({
                 'id': project.id,
                 'code': project.code,
@@ -40,6 +54,7 @@ def project_list(request):
         return JsonResponse({'errors': form.errors}, status=400)
 
     return render(request, 'project.html', {'projects': projects, 'form': form})
+
 
 
 
@@ -154,8 +169,8 @@ def transaction_list(request):
             'total_pending': total_pending,
             'total_approved': total_approved,
             'total_amount':total_amount,
-            'income_count': transactions.filter(type__iexact='Income').count(),
-    'expense_count': transactions.filter(type__iexact='Expense').count(),
+            # 'income_count': transactions.filter(type__iexact='Income').count(),
+    # 'expense_count': transactions.filter(type__iexact='Expense').count(),
         }
     })
 
@@ -607,6 +622,14 @@ from django.shortcuts import render
 from .models import Project, Transaction, Staff, Loan, Repayment
 from django.db.models import Sum
 
+from django.shortcuts import render
+from django.db.models import Sum
+from .models import Project, Transaction, Staff, Loan, Repayment
+
+from django.shortcuts import render
+from django.db.models import Sum
+from .models import Project, Transaction, Staff, Loan, Repayment
+
 def dashboard_view(request):
     total_projects = Project.objects.count()
     total_income = Transaction.objects.filter(type='Income').aggregate(Sum('amount'))['amount__sum'] or 0
@@ -615,20 +638,13 @@ def dashboard_view(request):
     total_loan_amount = Loan.objects.aggregate(Sum('amount'))['amount__sum'] or 0
     total_loan_repaid = Repayment.objects.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
     total_outstanding_loan = total_loan_amount - total_loan_repaid
+    net_profit = total_income - total_expense
 
-    # Bar chart data
-    chart_labels = []
-    chart_data = []
-    projects = Project.objects.all()
-    for project in projects:
-        income = Transaction.objects.filter(project=project, type='Income').aggregate(Sum('amount'))['amount__sum'] or 0
-        expense = Transaction.objects.filter(project=project, type='Expense').aggregate(Sum('amount'))['amount__sum'] or 0
-        profit = income - expense
-        chart_labels.append(project.name)
-        chart_data.append(profit)
-
-    # Zip the labels and data to avoid using `zip` in template
-    project_chart_data = list(zip(chart_labels, chart_data))
+    # Calculate bar heights (max 200px)
+    max_height = 200
+    max_value = max(total_income, total_expense, 1)  # Avoid division by 0
+    income_bar_height = int((total_income / max_value) * max_height)
+    expense_bar_height = int((total_expense / max_value) * max_height)
 
     context = {
         'total_projects': total_projects,
@@ -638,9 +654,12 @@ def dashboard_view(request):
         'total_loan_amount': total_loan_amount,
         'total_loan_repaid': total_loan_repaid,
         'total_outstanding_loan': total_outstanding_loan,
-        'project_chart_data': project_chart_data,
+        'net_profit': net_profit,
+        'income_bar_height': income_bar_height,
+        'expense_bar_height': expense_bar_height,
     }
     return render(request, 'dashboard_view.html', context)
+
 
 
 
@@ -882,4 +901,19 @@ def delete_target(request, pk):
     if request.method == 'POST':
         target.delete()
     return redirect('target_dashboard')
+
+
+
+
+from django.http import JsonResponse
+
+def get_next_project_code(request):
+    last_project = Project.objects.order_by('-id').first()
+    if last_project and last_project.code.startswith("PRJ"):
+        last_num = int(last_project.code.replace("PRJ", ""))
+    else:
+        last_num = 0
+    next_code = f"PRJ{last_num + 1:03d}"
+    return JsonResponse({'next_code': next_code})
+
 

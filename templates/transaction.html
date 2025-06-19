@@ -75,7 +75,7 @@
 
     <!-- Left side: Title + Icon -->
     <div class="d-flex align-items-center gap-2 px-4 py-2">
-      <i class="bi bi-cash-stack fs-3 text-success"></i>
+      <i class="bi bi-cash-stack fs-3 text-dark"></i>
       <h2 class="page-title mb-3 mb-md-0">Transaction Dashboard</h2>
     </div>
 
@@ -97,7 +97,7 @@
 
   <!-- Total Amount -->
   <div class="col">
-    <div class="card border-primary shadow-sm h-100">
+    <div class="card border-primary border-4 shadow-sm h-100">
       <div class="card-body d-flex align-items-center">
         <i class="bi bi-wallet2 text-primary fs-1 me-3"></i>
         <div>
@@ -110,7 +110,7 @@
 
   <!-- Total Income -->
   <div class="col">
-    <div class="card border-success shadow-sm h-100">
+    <div class="card border-success border-4 shadow-sm h-100">
       <div class="card-body d-flex align-items-center">
         <i class="bi bi-arrow-down-circle-fill text-success fs-1 me-3"></i>
         <div>
@@ -123,7 +123,7 @@
 
   <!-- Total Expense -->
   <div class="col">
-    <div class="card border-danger shadow-sm h-100">
+    <div class="card border-danger border-4 shadow-sm h-100">
       <div class="card-body d-flex align-items-center">
         <i class="bi bi-arrow-up-circle-fill text-danger fs-1 me-3"></i>
         <div>
@@ -136,7 +136,7 @@
 
   <!-- Total Transactions -->
   <div class="col">
-    <div class="card border-dark shadow-sm h-100">
+    <div class="card border-dark border-4 shadow-sm h-100">
       <div class="card-body d-flex align-items-center">
         <i class="bi bi-list-ul text-dark fs-1 me-3"></i>
         <div>
@@ -149,7 +149,7 @@
 
   <!-- Pending Transactions -->
   <div class="col">
-    <div class="card border-warning shadow-sm h-100">
+    <div class="card border-warning border-4 shadow-sm h-100">
       <div class="card-body d-flex align-items-center">
         <i class="bi bi-hourglass-split text-warning fs-1 me-3"></i>
         <div>
@@ -162,7 +162,7 @@
 
   <!-- Approved Transactions -->
   <div class="col">
-    <div class="card border-success shadow-sm h-100">
+    <div class="card border-success border-4 shadow-sm h-100">
       <div class="card-body d-flex align-items-center">
         <i class="bi bi-check-circle-fill text-success fs-1 me-3"></i>
         <div>
@@ -270,13 +270,13 @@
 </td>
 
 <td class="text-nowrap">
-  <button class="btn btn-sm btn-info mb-1 view-btn" data-id="{{ txn.id }}">
+  <button class="btn btn-sm btn-outline-secondary view-btn" data-id="{{ txn.id }}">
     <i class="bi bi-eye"></i>
   </button>
-  <button class="btn btn-sm btn-warning mb-1 edit-btn" data-id="{{ txn.id }}">
+  <button class="btn btn-sm btn-outline-primary edit-btn" data-id="{{ txn.id }}">
     <i class="bi bi-pencil-square"></i>
   </button>
-  <button class="btn btn-sm btn-danger mb-1 delete-btn" data-id="{{ txn.id }}">
+  <button class="btn btn-sm btn-outline-danger delete-btn" data-id="{{ txn.id }}">
     <i class="bi bi-trash"></i>
   </button>
 </td>
@@ -297,9 +297,9 @@
       <div class="modal-body p-0 d-flex" style="min-height: 460px;">
 
         <!-- Left Panel (Branding) -->
-        <div class="bg-success text-white d-flex flex-column justify-content-center align-items-center p-4" style="width: 35%;">
+        <div class="bg-info text-white d-flex flex-column justify-content-center align-items-center p-4" style="width: 35%;">
           <div class="bg-white rounded-circle p-3 mb-3">
-            <i class="fas fa-exchange-alt fa-2x text-success"></i>
+            <i class="fas fa-exchange-alt fa-2x text-info"></i>
           </div>
           <h4 class="fw-bold text-center">TRANSACTION</h4>
           <p class="text-center mb-0">Track your project<br>expenses & income!</p>
@@ -352,7 +352,7 @@
                   {% for cat in categories %}
                   <option value="{{ cat.name }}">{{ cat.name }}</option>
                   {% endfor %}
-                  <option value="add_new">➕ Add New Category</option>
+                  {% comment %} <option value="add_new">➕ Add New Category</option> {% endcomment %}
                 </select>
               </div>
               <div class="col-md-6">
