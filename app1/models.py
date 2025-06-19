@@ -106,6 +106,7 @@ class Repayment(models.Model):
     interest_paid = models.DecimalField(max_digits=10, decimal_places=2)
     principal_paid = models.DecimalField(max_digits=10, decimal_places=2)
     balance_after_repayment = models.DecimalField(max_digits=10, decimal_places=2)
+    photo_proof = models.ImageField(upload_to='repayment_proofs/', null=True, blank=True)
 
     def __str__(self):
         return f"{self.loan.project.name} - {self.date} - ₹{self.amount_paid}"

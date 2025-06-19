@@ -433,7 +433,7 @@ def loan_detail(request, loan_id):
     principal_paid = Decimal('0.00')
 
     if request.method == 'POST':
-        repayment_form = RepaymentForm(request.POST)
+        repayment_form = RepaymentForm(request.POST,request.FILES)
         if repayment_form.is_valid():
             repayment = repayment_form.save(commit=False)
             repayment.loan = loan

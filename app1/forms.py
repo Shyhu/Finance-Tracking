@@ -125,14 +125,17 @@ from django import forms
 from .models import Repayment
 from django import forms
 from .models import Repayment
+from django import forms
+from .models import Repayment
 
 class RepaymentForm(forms.ModelForm):
     class Meta:
         model = Repayment
-        fields = ['date', 'amount_paid']
+        fields = ['date', 'amount_paid', 'photo_proof']  # added photo_proof
         labels = {
             'date': 'Repayment Date',
             'amount_paid': 'Amount Paid (₹)',
+            'photo_proof': 'Photo Proof',  # optional label
         }
         widgets = {
             'date': forms.DateInput(attrs={
@@ -143,6 +146,10 @@ class RepaymentForm(forms.ModelForm):
             'amount_paid': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Enter amount paid'
+            }),
+            'photo_proof': forms.ClearableFileInput(attrs={
+                'class': 'form-control',
+                'accept': 'image/*',
             }),
         }
 
