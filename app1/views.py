@@ -230,8 +230,18 @@ def view_transaction(request, pk):
     return JsonResponse({'html': html})
 
 
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from .models import Transaction, BillProof, PaymentProof
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from .models import Transaction, BillProof, PaymentProof
+
 def edit_transaction(request, pk):
     txn = get_object_or_404(Transaction, pk=pk)
+
     if request.method == 'POST':
         txn.project_id = request.POST.get('project')
         txn.type = request.POST.get('type')
@@ -241,19 +251,42 @@ def edit_transaction(request, pk):
         txn.category = request.POST.get('category')
         txn.description = request.POST.get('description')
         txn.save()
+
+        # Save new bill proofs (if any)
+        for f in request.FILES.getlist('bill_proofs'):
+            BillProof.objects.create(transaction=txn, file=f)
+
+        # Save new payment proofs (if any)
+        for f in request.FILES.getlist('payment_proofs'):
+            PaymentProof.objects.create(transaction=txn, file=f)
+
         return JsonResponse({'success': True})
+
     else:
+        # ✅ Ensure `id` is sent to the JS for correct POST URL
         data = {
+            'id': txn.id,
             'transaction_id': txn.transaction_id,
             'project': txn.project_id,
             'type': txn.type,
-            'amount': txn.amount,
+            'amount': str(txn.amount),
             'vendor': txn.vendor,
             'status': txn.status,
             'category': txn.category,
             'description': txn.description,
         }
-        return JsonResponse(data)
+
+        bill_proofs = list(BillProof.objects.filter(transaction=txn).values('id', 'file'))
+        payment_proofs = list(PaymentProof.objects.filter(transaction=txn).values('id', 'file'))
+
+        return JsonResponse({
+            'txn': data,
+            'bill_proofs': bill_proofs,
+            'payment_proofs': payment_proofs,
+        })
+
+
+
 from django.template.loader import render_to_string
 
 from django.shortcuts import render, redirect, get_object_or_404
