@@ -343,7 +343,11 @@
   <input type="text" name="vendor" class="form-control">
 </div>
 
-              
+    <div class="col-md-6">
+    <label for="created_at" class="form-label">Created At</label>
+    <input type="text" id="created_at" class="form-control" readonly>
+</div>
+
               <div class="col-md-6">
                 <label class="form-label">Status</label>
                 <select name="status" class="form-select">
@@ -598,6 +602,25 @@
       typeSelect.addEventListener('change', toggleVendorField);
     });
   });
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('addTransactionModal'); // Replace with your modal ID
+    const createdAtInput = document.getElementById('created_at');
+
+    if (modal && createdAtInput) {
+        modal.addEventListener('show.bs.modal', function () {
+            const now = new Date();
+            const formattedDate = now.getFullYear() + '-' +
+                String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                String(now.getDate()).padStart(2, '0') + ' ' +
+                String(now.getHours()).padStart(2, '0') + ':' +
+                String(now.getMinutes()).padStart(2, '0') + ':' +
+                String(now.getSeconds()).padStart(2, '0');
+            createdAtInput.value = formattedDate;
+        });
+    }
+});
 </script>
 
 

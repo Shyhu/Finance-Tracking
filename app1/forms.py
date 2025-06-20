@@ -37,6 +37,10 @@ from django import forms
 from .models import Transaction
 
 class TransactionForm(forms.ModelForm):
+    created_at = forms.DateTimeField(
+        required=False,
+        widget=forms.TextInput(attrs={'readonly': 'readonly'})
+    )
     class Meta:
         model = Transaction
         fields = ['transaction_id', 'project', 'type', 'amount', 'vendor', 'status', 'category', 'description']
