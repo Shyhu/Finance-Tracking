@@ -389,28 +389,55 @@ from django.db.models import Sum
 from django.shortcuts import render
 from .models import Loan, Repayment
 from .forms import LoanForm
+from django.shortcuts import render
+from decimal import Decimal
+from django.db.models import Sum
+from .models import Loan, Repayment, Project
+from .forms import LoanForm
 
-def loan_list(request): 
+def loan_list(request):
     loans = Loan.objects.select_related('project').all()
-    form = LoanForm()
+    form = LoanForm()  # Required for Add Loan Modal
 
-    total_loaned_amount = loans.aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
+    # Attach repayment info and compute remaining_balance for each loan
+    for loan in loans:
+        loan.get_form = LoanForm(instance=loan)
+        total_interest = loan.repayments.aggregate(total=Sum('interest_paid'))['total'] or Decimal('0.00')
+        total_principal = loan.repayments.aggregate(total=Sum('principal_paid'))['total'] or Decimal('0.00')
+        loan.remaining_balance = loan.amount - total_principal
+        loan.total_interest_paid = total_interest
+
+    # Convert queryset to list for filtering on custom field
+    loans = list(loans)
+
+    # Filters from GET parameters
+    project = request.GET.get('project')
+    loan_amount = request.GET.get('loan_amount')
+    balance = request.GET.get('balance')
+    start_date = request.GET.get('start_date')
+    interest_rate = request.GET.get('interest_rate')
+
+    if project:
+        loans = [loan for loan in loans if str(loan.project_id) == project]
+    if loan_amount:
+        loans = [loan for loan in loans if loan.amount >= Decimal(loan_amount)]
+    if balance:
+        loans = [loan for loan in loans if loan.remaining_balance <= Decimal(balance)]
+    if start_date:
+        loans = [loan for loan in loans if str(loan.start_date) >= start_date]
+    if interest_rate:
+        loans = [loan for loan in loans if loan.interest_rate >= Decimal(interest_rate)]
+
+    # Summary totals (not filtered, but you can change that if needed)
+    total_loaned_amount = sum([loan.amount for loan in loans], Decimal('0.00'))
     total_principal_repaid = Repayment.objects.aggregate(total=Sum('principal_paid'))['total'] or Decimal('0.00')
     total_interest_collected = Repayment.objects.aggregate(total=Sum('interest_paid'))['total'] or Decimal('0.00')
     total_outstanding = total_loaned_amount - total_principal_repaid
 
-    for loan in loans:
-        # Attach edit form to each loan
-        loan.get_form = LoanForm(instance=loan)
-
-        # Calculate totals per loan
-        loan.total_interest_paid = loan.repayments.aggregate(total=Sum('interest_paid'))['total'] or Decimal('0.00')
-        total_principal = loan.repayments.aggregate(total=Sum('principal_paid'))['total'] or Decimal('0.00')
-        loan.remaining_balance = loan.amount - total_principal
-
     context = {
+        'form': form,  # Add Loan Modal
         'loans': loans,
-        'form': form,
+        'projects': Project.objects.all(),
         'total_loaned_amount': total_loaned_amount,
         'total_principal_repaid': total_principal_repaid,
         'total_interest_collected': total_interest_collected,
@@ -975,5 +1002,3 @@ def get_next_project_code(request):
         last_num = 0
     next_code = f"PRJ{last_num + 1:03d}"
     return JsonResponse({'next_code': next_code})
-
-

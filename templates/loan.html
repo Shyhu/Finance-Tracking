@@ -70,6 +70,44 @@
    </div>
 </div>
 
+{% comment %} Filter Section {% endcomment %}
+<div class="card shadow-sm p-4 mb-4 fade-in">
+  <form id="loanFilterForm" method="get">
+    <div class="row g-3">
+      <div class="col-md-3">
+        <label class="form-label">Project</label>
+        <select name="project" class="form-select live-filter">
+          <option value="">All</option>
+          {% for project in projects %}
+          <option value="{{ project.id }}" {% if request.GET.project == project.id|stringformat:"s" %}selected{% endif %}>{{ project.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Loan Amount ≥</label>
+        <input type="number" name="loan_amount" class="form-control live-filter" value="{{ request.GET.loan_amount }}">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Balance ≤</label>
+        <input type="number" name="balance" class="form-control live-filter" value="{{ request.GET.balance }}">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Start Date</label>
+        <input type="date" name="start_date" class="form-control live-filter" value="{{ request.GET.start_date }}">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Interest Rate</label>
+        <input type="number" name="interest_rate" step="0.01" class="form-control live-filter" value="{{ request.GET.interest_rate }}">
+      </div>
+      <div class="col-md-1 d-flex align-items-end">
+        <a href="{% url 'loan_list' %}" class="btn btn-outline-secondary w-100">Reset</a>
+      </div>
+    </div>
+  </form>
+</div>
+
+
+
 <!-- Summary Cards -->
 <div class="row g-3 mb-4">
   <div class="col-md-3">
@@ -292,5 +330,17 @@
   }
 </script>
 
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $('.live-filter').on('input change', function () {
+      clearTimeout(window._filterDelay);
+      window._filterDelay = setTimeout(function () {
+        $('#loanFilterForm').submit();
+      }, 300);
+    });
+  });
+</script>
 
 {% endblock %}
