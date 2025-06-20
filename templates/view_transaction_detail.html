@@ -1,6 +1,5 @@
 <div class="modal-header">
   <h5 class="modal-title">Transaction Details</h5>
-  {% comment %} <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> {% endcomment %}
 </div>
 
 <div class="modal-body">
@@ -9,9 +8,36 @@
     <li class="list-group-item"><strong>Project:</strong> {{ txn.project.name }}</li>
     <li class="list-group-item"><strong>Type:</strong> {{ txn.get_type_display }}</li>
     <li class="list-group-item"><strong>Amount:</strong> ₹{{ txn.amount }}</li>
+    <li class="list-group-item"><strong>Vendor:</strong> {{ txn.vendor|default:"N/A" }}</li>
     <li class="list-group-item"><strong>Category:</strong> {{ txn.category }}</li>
     <li class="list-group-item"><strong>Description:</strong><br>{{ txn.description|default:"N/A" }}</li>
     <li class="list-group-item"><strong>Date:</strong> {{ txn.created_at|date:"d M Y, h:i A" }}</li>
+    
+    <li class="list-group-item">
+      <strong>Bill Proofs:</strong>
+      {% if bill_proofs %}
+        <ul class="mb-0 ps-3">
+          {% for proof in bill_proofs %}
+            <li><a href="{{ proof.file.url }}" target="_blank" download>Download Bill {{ forloop.counter }}</a></li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="text-muted">No bill proofs available.</div>
+      {% endif %}
+    </li>
+
+    <li class="list-group-item">
+      <strong>Payment Proofs:</strong>
+      {% if payment_proofs %}
+        <ul class="mb-0 ps-3">
+          {% for proof in payment_proofs %}
+            <li><a href="{{ proof.file.url }}" target="_blank" download>Download Payment {{ forloop.counter }}</a></li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="text-muted">No payment proofs available.</div>
+      {% endif %}
+    </li>
   </ul>
 </div>
 

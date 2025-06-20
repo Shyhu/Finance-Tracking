@@ -201,10 +201,34 @@ def add_transaction(request):
 
 
 
+# def view_transaction(request, pk):
+#     txn = get_object_or_404(Transaction.objects.select_related('project'), pk=pk)
+#     html = render_to_string('view_transaction_detail.html', {'txn': txn})
+#     return JsonResponse({'html': html})
+
+
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from django.template.loader import render_to_string
+
+from .models import Transaction, BillProof, PaymentProof
+
 def view_transaction(request, pk):
     txn = get_object_or_404(Transaction.objects.select_related('project'), pk=pk)
-    html = render_to_string('view_transaction_detail.html', {'txn': txn})
+
+    # Get related proofs
+    bill_proofs = BillProof.objects.filter(transaction=txn)
+    payment_proofs = PaymentProof.objects.filter(transaction=txn)
+
+    # Render the modal content
+    html = render_to_string('view_transaction_detail.html', {
+        'txn': txn,
+        'bill_proofs': bill_proofs,
+        'payment_proofs': payment_proofs
+    })
+
     return JsonResponse({'html': html})
+
 
 def edit_transaction(request, pk):
     txn = get_object_or_404(Transaction, pk=pk)
