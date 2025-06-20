@@ -238,7 +238,6 @@ from .models import Transaction, BillProof, PaymentProof
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from .models import Transaction, BillProof, PaymentProof
-
 def edit_transaction(request, pk):
     txn = get_object_or_404(Transaction, pk=pk)
 
@@ -252,18 +251,21 @@ def edit_transaction(request, pk):
         txn.description = request.POST.get('description')
         txn.save()
 
-        # Save new bill proofs (if any)
-        for f in request.FILES.getlist('bill_proofs'):
-            BillProof.objects.create(transaction=txn, file=f)
+        # ✅ Only delete BillProofs if new bill_proofs were uploaded
+        if 'bill_proofs' in request.FILES:
+            BillProof.objects.filter(transaction=txn).delete()
+            for f in request.FILES.getlist('bill_proofs'):
+                BillProof.objects.create(transaction=txn, file=f)
 
-        # Save new payment proofs (if any)
-        for f in request.FILES.getlist('payment_proofs'):
-            PaymentProof.objects.create(transaction=txn, file=f)
+        # ✅ Only delete PaymentProofs if new payment_proofs were uploaded
+        if 'payment_proofs' in request.FILES:
+            PaymentProof.objects.filter(transaction=txn).delete()
+            for f in request.FILES.getlist('payment_proofs'):
+                PaymentProof.objects.create(transaction=txn, file=f)
 
         return JsonResponse({'success': True})
 
     else:
-        # ✅ Ensure `id` is sent to the JS for correct POST URL
         data = {
             'id': txn.id,
             'transaction_id': txn.transaction_id,
@@ -284,7 +286,6 @@ def edit_transaction(request, pk):
             'bill_proofs': bill_proofs,
             'payment_proofs': payment_proofs,
         })
-
 
 
 from django.template.loader import render_to_string
