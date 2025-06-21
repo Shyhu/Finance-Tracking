@@ -39,11 +39,13 @@ from .models import Transaction
 class TransactionForm(forms.ModelForm):
     created_at = forms.DateTimeField(
         required=False,
-        widget=forms.TextInput(attrs={'readonly': 'readonly'})
+        widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+         input_formats=['%Y-%m-%dT%H:%M'] 
     )
+
     class Meta:
         model = Transaction
-        fields = ['transaction_id', 'project', 'type', 'amount', 'vendor', 'status', 'category', 'description']
+        fields = ['transaction_id', 'project', 'type', 'amount', 'vendor', 'status', 'category', 'description', 'created_at']
 
 
 

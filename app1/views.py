@@ -178,14 +178,25 @@ def transaction_list(request):
         }
     })
 
-
+from django.utils import timezone
+from django.http import JsonResponse
+from .models import Transaction, BillProof, PaymentProof
+from .forms import TransactionForm
 
 def add_transaction(request):
     if request.method == 'POST':
         form = TransactionForm(request.POST)
-        # file_form = FileUploadForm(request.POST, request.FILES)
+        
         if form.is_valid():
-            transaction = form.save()
+            transaction = form.save(commit=False)
+
+            # Use user input if provided, else set to now
+            if form.cleaned_data.get('created_at'):
+                transaction.created_at = form.cleaned_data['created_at']
+            else:
+                transaction.created_at = timezone.now()
+
+            transaction.save()
 
             # Bill Proofs
             for f in request.FILES.getlist('bill_proofs'):
@@ -199,8 +210,8 @@ def add_transaction(request):
         else:
             print(form.errors, request.POST, request.FILES)
             return JsonResponse({'success': False, 'errors': form.errors})
-    return JsonResponse({'success': False, 'message': 'Invalid request'})
 
+    return JsonResponse({'success': False, 'message': 'Invalid request'})
 
 
 # def view_transaction(request, pk):

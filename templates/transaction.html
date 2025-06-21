@@ -139,13 +139,60 @@
       transform: translateY(0);
     }
   }
+  @media (min-width: 768px) {
+    .card-body {
+      flex-direction: row;
+      text-align: start;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    .form-label,
+    .form-control,
+    .form-select {
+      font-size: 12px;
+    }
+
+    .btn span {
+      display: none;
+    }
+
+    .btn i {
+      margin-right: 0;
+    }
+
+    .page-title {
+      font-size: 18px;
+    }
+  }
+
+  @media (max-width: 575.98px) {
+    .modal-dialog {
+      margin: 1rem;
+    }
+
+    .modal-content {
+      border-radius: 1rem;
+      font-size: 12px;
+    }
+
+    .modal-body,
+    .modal-header,
+    .modal-footer {
+      padding: 1rem;
+    }
+  }
 </style>
 
 <div class="container mt-4 fade-in">
   <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
 
     <!-- Left side: Title + Icon -->
-    <div class="d-flex align-items-center gap-2 px-4 py-2">
+    <div class="d-flex align-items-center gap-2  py-0">
       <i class="bi bi-cash-stack fs-3 text-dark"></i>
       <h2 class="page-title mb-3 mb-md-0">TRANSACTION DASHBOARD</h2>
     </div>
@@ -416,7 +463,8 @@
 
     <div class="col-md-6">
     <label for="created_at" class="form-label">Created At</label>
-    <input type="text" id="created_at" class="form-control" readonly>
+    <input type="datetime-local" name="created_at" id="created_at" class="form-control">
+
 </div>
 
               <div class="col-md-6">
@@ -819,14 +867,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (modal && createdAtInput) {
         modal.addEventListener('show.bs.modal', function () {
+          
             const now = new Date();
-            const formattedDate = now.getFullYear() + '-' +
-                String(now.getMonth() + 1).padStart(2, '0') + '-' +
-                String(now.getDate()).padStart(2, '0') + ' ' +
-                String(now.getHours()).padStart(2, '0') + ':' +
-                String(now.getMinutes()).padStart(2, '0') + ':' +
-                String(now.getSeconds()).padStart(2, '0');
+            const formattedDate = now.toISOString().slice(0, 16); // e.g. "2025-06-21T13:45"
             createdAtInput.value = formattedDate;
+
+          
         });
     }
 });

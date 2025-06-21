@@ -171,27 +171,39 @@
     </div>
 </div>
 
-
-<!-- Filter Section -->
-<div class="card p-3 mb-4">
-  <div class="row g-2">
-    <div class="col-md">
-      <input type="text" id="filter-name" class="form-control" placeholder="Search by Name">
+  
+  <!-- Filter Section -->
+  <div class="row g-2 mb-3 align-items-end">
+    <div class="col-md-3">
+      <label for="filter-name" class="form-label">Filter by Name</label>
+      <select id="filter-name" class="form-select">
+        <option value="">All Names</option>
+        {% for project in projects %}
+          <option value="{{ project.name }}">{{ project.name }}</option>
+        {% endfor %}
+      </select>
     </div>
-    <div class="col-md">
-      <input type="text" id="filter-location" class="form-control" placeholder="Search by Location">
+    <div class="col-md-3">
+      <label for="filter-location" class="form-label">Filter by Location</label>
+      <select id="filter-location" class="form-select">
+        <option value="">All Locations</option>
+        {% for project in projects %}
+          <option value="{{ project.location }}">{{ project.location }}</option>
+        {% endfor %}
+      </select>
     </div>
-    {% comment %} <div class="col-md">
-      <input type="number" id="filter-budget" class="form-control" placeholder="Search by Budget">
-    </div> {% endcomment %}
-    <div class="col-md">
-      <input type="date" id="filter-start" class="form-control" placeholder="Start Date">
+    <div class="col-md-2">
+      <label for="filter-start" class="form-label">Start Date</label>
+      <input type="date" id="filter-start" class="form-control">
     </div>
-    <div class="col-md">
-      <input type="date" id="filter-end" class="form-control" placeholder="End Date">
+    <div class="col-md-2">
+      <label for="filter-end" class="form-label">End Date</label>
+      <input type="date" id="filter-end" class="form-control">
+    </div>
+    <div class="col-md-2">
+      <button class="btn btn-secondary w-100" id="reset-filters">Reset</button>
     </div>
   </div>
-</div>
 
 
 
@@ -527,8 +539,6 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 
 
-
-<!-- JS: Auto Filtering -->
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const rows = document.querySelectorAll("table tbody tr");
@@ -536,31 +546,39 @@ document.addEventListener("DOMContentLoaded", function () {
     const filters = {
       name: document.getElementById("filter-name"),
       location: document.getElementById("filter-location"),
-      budget: document.getElementById("filter-budget"),
       start: document.getElementById("filter-start"),
-      end: document.getElementById("filter-end"),
+      end: document.getElementById("filter-end")
     };
 
-    Object.values(filters).forEach(input => {
-      input.addEventListener("input", filterRows);
-    });
+    const resetButton = document.getElementById("reset-filters");
 
     function filterRows() {
       rows.forEach(row => {
         const [code, name, location, budget, start, end] = row.children;
 
+        const startDate = new Date(start.textContent.trim());
+        const endDate = new Date(end.textContent.trim());
+
         const match =
-          (!filters.name.value || name.textContent.toLowerCase().includes(filters.name.value.toLowerCase())) &&
-          (!filters.location.value || location.textContent.toLowerCase().includes(filters.location.value.toLowerCase())) &&
-          (!filters.budget.value || parseFloat(budget.textContent.replace(/[^\d.]/g, "")) === parseFloat(filters.budget.value)) &&
-          (!filters.start.value || new Date(start.textContent) >= new Date(filters.start.value)) &&
-          (!filters.end.value || new Date(end.textContent) <= new Date(filters.end.value));
+          (!filters.name.value || name.textContent.trim() === filters.name.value) &&
+          (!filters.location.value || location.textContent.trim() === filters.location.value) &&
+          (!filters.start.value || startDate >= new Date(filters.start.value)) &&
+          (!filters.end.value || endDate <= new Date(filters.end.value));
 
         row.style.display = match ? "" : "none";
       });
     }
+
+    Object.values(filters).forEach(input => {
+      input.addEventListener("input", filterRows);
+    });
+
+    resetButton.addEventListener("click", function (e) {
+      e.preventDefault();
+      Object.values(filters).forEach(input => input.value = "");
+      filterRows();
+    });
   });
 </script>
-
 
 {% endblock %}

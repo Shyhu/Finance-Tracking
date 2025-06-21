@@ -40,7 +40,7 @@ class Transaction(models.Model):
     status = models.CharField(max_length=50, default="Approved")
     category = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True,null=True)
+    created_at = models.DateTimeField(blank=True,null=True)
 
     def __str__(self):
         return f"{self.transaction_id} - {self.project.name}"
