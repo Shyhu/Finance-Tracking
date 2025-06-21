@@ -1,11 +1,15 @@
 {% extends 'base.html' %}
 {% block content %}
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Add Roboto font from Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
 <style>
   body {
     background: #f8fafc;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
   }
 
   .dashboard-container {
@@ -15,7 +19,7 @@
   }
 
   h2 {
-    font-size: 32px;
+    font-size: 24px;
     font-weight: 700;
     margin-bottom: 35px;
     color: #0f172a;
@@ -26,7 +30,7 @@
 
   h2 i {
     color: #3b82f6;
-    font-size: 28px;
+    font-size: 22px;
   }
 
   .grid-two {
@@ -52,51 +56,6 @@
     height: 300px;
   }
 
-  .bars {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-evenly;
-    height: 100%;
-    gap: 24px;
-    padding: 10px 10px 0;
-  }
-
-  .bar-group {
-    text-align: center;
-    flex: 1;
-    height: 100%;
-  }
-
-  .bar {
-    width: 50px;
-    margin: 0 auto;
-    border-radius: 8px 8px 0 0;
-    background: linear-gradient(to top, #3b82f6, #60a5fa);
-    animation: grow-bar 1s ease-out forwards;
-    height: 0;
-  }
-
-  .bar span {
-    display: block;
-    margin-top: 6px;
-    font-size: 13px;
-    color: #334155;
-    font-weight: 600;
-  }
-
-  .x-label {
-    margin-top: 12px;
-    font-size: 13px;
-    color: #64748b;
-    font-weight: 500;
-  }
-
-  @keyframes grow-bar {
-    to {
-      height: var(--bar-height);
-    }
-  }
-
   .overview {
     color: white;
     background: linear-gradient(135deg, #2563eb, #1d4ed8);
@@ -109,18 +68,18 @@
   }
 
   .overview h3 {
-    font-size: 22px;
+    font-size: 16px;
     font-weight: 600;
     margin-bottom: 4px;
   }
 
   .overview p {
-    font-size: 15px;
+    font-size: 12px;
     opacity: 0.95;
   }
 
   .overview-item {
-    font-size: 16px;
+    font-size: 12px;
     margin-top: 10px;
     display: flex;
     justify-content: space-between;
@@ -157,7 +116,7 @@
   }
 
   .stat-card i {
-    font-size: 22px;
+    font-size: 18px;
     color: #2563eb;
     position: absolute;
     top: 20px;
@@ -165,38 +124,27 @@
   }
 
   .stat-card h4 {
-    font-size: 15px;
+    font-size: 12px;
     color: #64748b;
     margin-bottom: 10px;
   }
 
   .stat-card p {
-    font-size: 24px;
+    font-size: 18px;
     font-weight: bold;
     color: #0f172a;
   }
 </style>
 
 <div class="dashboard-container">
-  <h2><i class="ri-dashboard-line"></i> Financial Dashboard</h2>
+  <h2><i class="ri-dashboard-line"></i> FINANCIAL DASHBOARD</h2>
 
   <div class="grid-two">
-    <!-- Bar Chart Card -->
+    <!-- ✅ Grouped Bar Chart -->
     <div class="card">
-      <h3 style="margin-bottom: 20px;">📊 Income vs Expense</h3>
+      <h3 style="margin-bottom: 20px;">📊 Project-wise Income vs Expense</h3>
       <div class="bar-chart-container">
-        <div class="bars">
-          <div class="bar-group">
-            <div class="bar" style="--bar-height: {{ income_bar_height }}px;"></div>
-            <span>${{ total_income|floatformat:0 }}</span>
-            <div class="x-label">Income</div>
-          </div>
-          <div class="bar-group">
-            <div class="bar" style="--bar-height: {{ expense_bar_height }}px; background: linear-gradient(to top, #f43f5e, #fb7185);"></div>
-            <span>${{ total_expense|floatformat:0 }}</span>
-            <div class="x-label">Expense</div>
-          </div>
-        </div>
+        <canvas id="projectBarChart" style="width: 100%; height: 100%;"></canvas>
       </div>
     </div>
 
@@ -241,4 +189,44 @@
     </div>
   </div>
 </div>
+
+<!-- ✅ Chart.js Script -->
+<script>
+  const projectBars = {{ project_bars|safe }};
+  const labels = projectBars.map(p => p.name);
+  const incomeData = projectBars.map(p => p.income);
+  const expenseData = projectBars.map(p => p.expense);
+
+  const ctx = document.getElementById('projectBarChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Income',
+          data: incomeData,
+          backgroundColor: 'rgba(59, 130, 246, 0.8)'  // blue
+        },
+        {
+          label: 'Expense',
+          data: expenseData,
+          backgroundColor: 'rgba(244, 63, 94, 0.8)'  // red
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top' }
+      },
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+</script>
 {% endblock %}

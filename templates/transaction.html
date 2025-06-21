@@ -1,73 +1,144 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
+<!-- Include Roboto font from Google -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+
 <style>
-   
-  .table th, .table td {
-    vertical-align: middle;
+  body {
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    background-color: rgba(180, 200, 230, 0.47);
+    color: #212529;
   }
-  .modal-title {
-    font-weight: bold;
+
+  .form-control,
+  .form-select {
+    border-radius: 0.5rem;
+    font-size: 12px;
+    transition: all 0.2s ease-in-out;
+    box-shadow: none;
   }
-  .btn-primary {
-    background: linear-gradient(to right, :rgb(60, 203, 215);,:rgb(60, 203, 215);;
+
+  .form-control:focus,
+  .form-select:focus {
+    border-color: #3ccbd7;
+    box-shadow: 0 0 0 0.25rem rgba(60, 203, 215, 0.25);
+  }
+
+  .btn,
+  .table,
+  .modal,
+  .card,
+  .dropdown-menu {
+    font-size: 12px;
+  }
+
+  .btn-primary,
+  .btn-purple {
+    background: linear-gradient(90deg, #3ccbd7, #3ccbd7);
     border: none;
+    color: white;
+    transition: background 0.3s ease-in-out;
   }
-  .btn-primary:hover {
-    background: linear-gradient(to right,:rgb(60, 203, 215);,:rgb(60, 203, 215););
+
+  .btn-primary:hover,
+  .btn-purple:hover {
+    background: linear-gradient(90deg, #2bb4c3, #2bb4c3);
   }
-  .form-control, .form-select {
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease-in-out;
-  }
-  .form-control:focus, .form-select:focus {
-    border-color: :rgb(60, 203, 215);
-    box-shadow: 0 0 5px :rgb(60, 203, 215);
-  }
-  .fade-in {
-    animation: fadeIn 0.6s ease-in-out both;
-  }
-  @keyframes fadeIn {
-    0% {opacity: 0; transform: translateY(10px);}
-    100% {opacity: 1; transform: translateY(0);}
-  }
+
   .page-title {
-        font-weight: 600;
-        font-size: 2rem;
-        color: #343a40;
-        position: relative;
-        padding-bottom: 10px;
+    font-weight: 700;
+    font-size: 1.6rem;
+    color: #212529;
+    position: relative;
+    padding-bottom: 8px;
+  }
+
+  .page-title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #0d6efd, #6610f2);
+    border-radius: 3px;
+  }
+
+  .table-responsive {
+    border-radius: 0.5rem;
+    overflow-x: auto;
+  }
+
+  .table {
+    background: #ffffff;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid #dee2e6;
+  }
+
+  .table thead {
+    background-color: #f8f9fa;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.65rem 0.75rem;
+    vertical-align: middle;
+    white-space: nowrap;
+    font-size: 12px;
+  }
+
+  .table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f9f9f9;
+  }
+
+  .table tbody tr:hover {
+    background-color: #e7f3f7;
+  }
+
+  .table th {
+    color: #495057;
+    font-weight: 600;
+    background-color: #f1f3f5;
+  }
+
+  .card {
+    border-radius: 0.6rem;
+    border: none;
+    font-size: 12px;
+  }
+
+  .card-title {
+    font-weight: 600;
+    font-size: 13px;
+  }
+
+  .btn-outline-dark {
+    border-radius: 0.4rem;
+    font-size: 12px;
+  }
+
+  .modal-body .fa-exchange-alt {
+    font-size: 2.5rem;
+  }
+
+  .fade-in {
+    animation: fadeIn 0.5s ease-in-out both;
+  }
+
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(10px);
     }
 
-    .page-title::after {
-        content: '';
-        position: absolute;
-        left: 0;
-        bottom: 0;
-        width: 60px;
-        height: 4px;
-        background: linear-gradient(90deg, #0d6efd, #6610f2);
-        border-radius: 2px;
+    100% {
+      opacity: 1;
+      transform: translateY(0);
     }
-
-    .bg-purple {
-  background-color::rgb(60, 203, 215);
-}
-
-.text-purple {
-  color:rgb(60, 203, 215);
-}
-
-.btn-purple {
-  background-color::rgb(60, 203, 215);
-  color: white;
-  border: none;
-}
-
-.btn-purple:hover {
-  background-color:rgb(60, 203, 215);
-  color: white;
-}
+  }
 </style>
 
 <div class="container mt-4 fade-in">
@@ -76,7 +147,7 @@
     <!-- Left side: Title + Icon -->
     <div class="d-flex align-items-center gap-2 px-4 py-2">
       <i class="bi bi-cash-stack fs-3 text-dark"></i>
-      <h2 class="page-title mb-3 mb-md-0">Transaction Dashboard</h2>
+      <h2 class="page-title mb-3 mb-md-0">TRANSACTION DASHBOARD</h2>
     </div>
 
     <!-- Right side: PDF button + Add button -->

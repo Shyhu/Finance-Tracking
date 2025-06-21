@@ -23,6 +23,7 @@ from django.shortcuts import render
 
 def project_list(request):
     projects = Project.objects.order_by('-id')
+    total_budget = projects.aggregate(Sum('total_budget'))['total_budget__sum'] or 0
     form = ProjectForm()
 
     if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -48,7 +49,8 @@ def project_list(request):
                 'budget': f"${project.total_budget:,.0f}",
                 'start_date': project.start_date.strftime("%Y-%m-%d"),
                 'end_date': project.end_date.strftime("%Y-%m-%d"),
-                'notes': project.notes or ""
+                'notes': project.notes or "",
+                 'total_budget': total_budget,
             })
 
         return JsonResponse({'errors': form.errors}, status=400)
@@ -577,6 +579,57 @@ def loan_detail(request, loan_id):
     })
 
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+
+from django.shortcuts import get_object_or_404
+
+def get_repayment_data(repayment, request=None):
+    photo_url = ''
+    if repayment.photo_proof and hasattr(repayment.photo_proof, 'url'):
+        try:
+            photo_url = request.build_absolute_uri(repayment.photo_proof.url) if request else repayment.photo_proof.url
+        except ValueError:
+            photo_url = ''
+    return {
+        'id': repayment.id,
+        'date': repayment.date.strftime('%Y-%m-%d'),
+        'amount_paid': float(repayment.amount_paid),
+        'interest_paid': float(repayment.interest_paid),
+        'principal_paid': float(repayment.principal_paid),
+        'interest_calculated': float(repayment.interest_calculated),
+        'photo_proof_url': photo_url,
+    }
+
+# def repayment_detail(request, repayment_id):
+#     repayment = get_object_or_404(Repayment, id=repayment_id)
+#     return JsonResponse(get_repayment_data(repayment))
+
+def repayment_detail(request, repayment_id):
+    repayment = get_object_or_404(Repayment, id=repayment_id)
+    return JsonResponse(get_repayment_data(repayment, request=request))
+
+
+@require_POST
+def edit_repayment(request, repayment_id):
+    repayment = get_object_or_404(Repayment, id=repayment_id)
+    form = RepaymentForm(request.POST, request.FILES, instance=repayment)
+    if form.is_valid():
+        form.save()
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False, 'errors': form.errors})
+
+@require_POST
+@csrf_exempt
+def delete_repayment(request, repayment_id):
+    repayment = get_object_or_404(Repayment, id=repayment_id)
+    repayment.delete()
+    return JsonResponse({'success': True})
+
+
+
+
 # from django.http import HttpResponse
 # from .utils import generate_loan_pdf
 
@@ -716,6 +769,15 @@ from .models import Project, Transaction, Staff, Loan, Repayment
 from django.shortcuts import render
 from django.db.models import Sum
 from .models import Project, Transaction, Staff, Loan, Repayment
+from django.db.models import Sum
+from collections import defaultdict
+
+from django.shortcuts import render
+from django.db.models import Sum
+from .models import Project, Transaction, Staff, Loan, Repayment
+from django.shortcuts import render
+from .models import Project, Transaction, Staff, Loan, Repayment
+from django.db.models import Sum
 
 def dashboard_view(request):
     total_projects = Project.objects.count()
@@ -727,11 +789,17 @@ def dashboard_view(request):
     total_outstanding_loan = total_loan_amount - total_loan_repaid
     net_profit = total_income - total_expense
 
-    # Calculate bar heights (max 200px)
-    max_height = 200
-    max_value = max(total_income, total_expense, 1)  # Avoid division by 0
-    income_bar_height = int((total_income / max_value) * max_height)
-    expense_bar_height = int((total_expense / max_value) * max_height)
+    # Project-wise income and expense
+    projects = Project.objects.all()
+    project_bars = []
+    for project in projects:
+        income = Transaction.objects.filter(project=project, type='Income').aggregate(Sum('amount'))['amount__sum'] or 0
+        expense = Transaction.objects.filter(project=project, type='Expense').aggregate(Sum('amount'))['amount__sum'] or 0
+        project_bars.append({
+            'name': project.name,
+            'income': float(income),
+            'expense': float(expense),
+        })
 
     context = {
         'total_projects': total_projects,
@@ -742,13 +810,9 @@ def dashboard_view(request):
         'total_loan_repaid': total_loan_repaid,
         'total_outstanding_loan': total_outstanding_loan,
         'net_profit': net_profit,
-        'income_bar_height': income_bar_height,
-        'expense_bar_height': expense_bar_height,
+        'project_bars': project_bars,
     }
     return render(request, 'dashboard_view.html', context)
-
-
-
 
 from django.shortcuts import redirect
 from .models import Category
@@ -1002,3 +1066,6 @@ def get_next_project_code(request):
         last_num = 0
     next_code = f"PRJ{last_num + 1:03d}"
     return JsonResponse({'next_code': next_code})
+
+
+

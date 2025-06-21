@@ -74,6 +74,14 @@ urlpatterns = [
 
 
 
+    path('repayment/<int:repayment_id>/view/', views.repayment_detail, name='repayment_detail'),
+    path('repayment/<int:repayment_id>/edit/', views.edit_repayment, name='edit_repayment'),
+    path('repayment/<int:repayment_id>/delete/', views.delete_repayment, name='delete_repayment'),
+
+    
+
+
+
 
     path('target/', views.target_dashboard, name='target_dashboard'),
     path('target/add/', views.add_target, name='add_target'),

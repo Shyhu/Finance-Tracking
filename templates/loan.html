@@ -2,6 +2,12 @@
 {% load static %}
 {% block content %}
 <style>
+  body {
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    background-color:rgba(180, 200, 230, 0.47);
+    color: #212529;
+  }
   .table th, .table td {
     vertical-align: middle;
   }
@@ -58,7 +64,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
    <h2 class="page-title mb-3 mb-md-0">
-     <i class="bi bi-cash-coin me-2"></i> Loan Management
+     <i class="bi bi-cash-coin me-2"></i> LOAN MANAGEMENT
    </h2>
    <div>
      <a href="{% url 'download_loan_pdf' %}" class="btn btn-outline-secondary me-2">
@@ -259,7 +265,7 @@
               <h5 class="fw-bold">New Loan</h5>
               <p style="font-size: 14px;">Register a loan with full details</p>
             </div>
-            <img src="https://i.pinimg.com/736x/f7/35/dd/f735ddc5552b0dd478ccd35b084b2dea.jpg" alt="Loan Icon" class="img-fluid mt-auto" style="max-height: 80px;">
+            <img src=" " alt="Loan Icon" class="img-fluid mt-auto" style="max-height: 80px;">
           </div>
 
           <!-- White Form Side -->
@@ -337,8 +343,47 @@
     $('.live-filter').on('input change', function () {
       clearTimeout(window._filterDelay);
       window._filterDelay = setTimeout(function () {
-        $('#loanFilterForm').submit();
+      
       }, 300);
+    });
+  });
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const filterForm = document.getElementById('loanFilterForm');
+    const rows = document.querySelectorAll("table tbody tr");
+
+    // Filter fields
+    const projectFilter = filterForm.querySelector('[name="project"]');
+    const amountFilter = filterForm.querySelector('[name="loan_amount"]');
+    const balanceFilter = filterForm.querySelector('[name="balance"]');
+    const dateFilter = filterForm.querySelector('[name="start_date"]');
+    const interestFilter = filterForm.querySelector('[name="interest_rate"]');
+
+    function applyFilters() {
+      rows.forEach(row => {
+        const cells = row.children;
+        const projectText = cells[0].innerText.trim().toLowerCase();
+        const purposeText = cells[1].innerText.trim().toLowerCase();
+        const amount = parseFloat(cells[2].innerText.replace(/[₹$,]/g, '')) || 0;
+        const balance = parseFloat(cells[6].innerText.replace(/[₹$,]/g, '')) || 0;
+        const startDate = cells[4].innerText.trim();
+        const interest = parseFloat(cells[3].innerText.replace('%', '')) || 0;
+
+        const match =
+          (!projectFilter.value || projectText.includes(projectFilter.options[projectFilter.selectedIndex].text.toLowerCase())) &&
+          (!amountFilter.value || amount >= parseFloat(amountFilter.value)) &&
+          (!balanceFilter.value || balance <= parseFloat(balanceFilter.value)) &&
+          (!dateFilter.value || new Date(startDate) >= new Date(dateFilter.value)) &&
+          (!interestFilter.value || interest >= parseFloat(interestFilter.value));
+
+        row.style.display = match ? '' : 'none';
+      });
+    }
+
+    [projectFilter, amountFilter, balanceFilter, dateFilter, interestFilter].forEach(input => {
+      input.addEventListener('input', applyFilters);
+      input.addEventListener('change', applyFilters);
     });
   });
 </script>
