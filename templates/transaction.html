@@ -329,7 +329,7 @@
               <option value="{{ cat.name }}" {% if selected.category == cat.name %}selected{% endif %}>{{ cat.name }}</option>
             {% endfor %}
           </select>
-          <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#addCategoryModal">+</button>
+         
         </div>
       </div>
       <div class="col-md-1 text-end">
@@ -484,6 +484,9 @@
                   {% comment %} <option value="add_new">➕ Add New Category</option> {% endcomment %}
                   
                 </select>
+                
+                <br>
+                 <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#addCategoryModal">➕ Add New Category</button>
               </div>
               
               <div class="col-md-6">

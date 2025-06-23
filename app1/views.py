@@ -789,7 +789,9 @@ from .models import Project, Transaction, Staff, Loan, Repayment
 from django.shortcuts import render
 from .models import Project, Transaction, Staff, Loan, Repayment
 from django.db.models import Sum
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def dashboard_view(request):
     total_projects = Project.objects.count()
     total_income = Transaction.objects.filter(type='Income').aggregate(Sum('amount'))['amount__sum'] or 0
@@ -1078,5 +1080,38 @@ def get_next_project_code(request):
     next_code = f"PRJ{last_num + 1:03d}"
     return JsonResponse({'next_code': next_code})
 
+
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login
+from .forms import LoginForm
+
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')  # Replace with your home/dashboard view
+
+    form = LoginForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password']
+        user = authenticate(request, username=username, password=password)
+
+        if user:
+            login(request, user)
+            return redirect('dashboard')  # or wherever you want to redirect
+        else:
+            form.add_error(None, "Invalid username or password.")
+
+    return render(request, 'login.html', {'form': form})
+
+
+
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')  # Redirect to login page after logout
 
 

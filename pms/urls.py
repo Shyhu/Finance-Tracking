@@ -78,7 +78,8 @@ urlpatterns = [
     path('repayment/<int:repayment_id>/edit/', views.edit_repayment, name='edit_repayment'),
     path('repayment/<int:repayment_id>/delete/', views.delete_repayment, name='delete_repayment'),
 
-    
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
 
 
 

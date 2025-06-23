@@ -125,6 +125,9 @@ USE_TZ = True
 # LOGOUT_REDIRECT_URL = 'login'
 # LOGIN_URL = 'login'
 
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/dashboard/'  # where to redirect after login
+
 
 
 # Static files (CSS, JavaScript, Images)
