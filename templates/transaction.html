@@ -434,18 +434,22 @@
               </div>
               <div class="col-md-6">
                 <label class="form-label">Project</label>
-                <select name="project" class="form-select">
-                  {% for project in projects %}
-                  <option value="{{ project.id }}">{{ project.name }}</option>
-                  {% endfor %}
-                </select>
+                <select name="project" class="form-select" required>
+  <option value="" selected disabled>Select Project</option>
+  {% for project in projects %}
+    <option value="{{ project.id }}">{{ project.name }}</option>
+  {% endfor %}
+</select>
+
               </div>
               <div class="col-md-6">
                 <label class="form-label">Type</label>
-                <select name="type" class="form-select">
-                  <option value="Income">Income</option>
-                  <option value="Expense">Expense</option>
-                </select>
+                <select name="type" class="form-select" required>
+  <option value="" selected disabled>Select Type</option>
+  <option value="Income">Income</option>
+  <option value="Expense">Expense</option>
+</select>
+
               </div>
               <div class="col-md-6">
                 <label class="form-label">Amount</label>
@@ -468,21 +472,23 @@
 
               <div class="col-md-6">
                 <label class="form-label">Status</label>
-                <select name="status" class="form-select">
-                  <option value="Approved">Approved</option>
-                  <option value="Pending">Pending</option>
-                  <option value="Rejected">Rejected</option>
-                </select>
+                <select name="status" class="form-select" required>
+  <option value="" selected disabled>Select Status</option>
+  <option value="Approved">Approved</option>
+  <option value="Pending">Pending</option>
+  <option value="Rejected">Rejected</option>
+</select>
+
               </div>
               <div class="col-md-6">
                 <label class="form-label">Category</label>
-                <select name="category" id="categorySelect" class="form-select">
-                  {% for cat in categories %}
-                  <option value="{{ cat.name }}">{{ cat.name }}</option>
-                  {% endfor %}
-                  {% comment %} <option value="add_new">➕ Add New Category</option> {% endcomment %}
-                  
-                </select>
+                <select name="category" id="categorySelect" class="form-select" required>
+  <option value="" selected disabled>Select Category</option>
+  {% for cat in categories %}
+    <option value="{{ cat.name }}">{{ cat.name }}</option>
+  {% endfor %}
+</select>
+
                 
                 <br>
                  <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#addCategoryModal">➕ Add New Category</button>

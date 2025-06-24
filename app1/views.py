@@ -291,8 +291,8 @@ def edit_transaction(request, pk):
             'description': txn.description,
         }
 
-        bill_proofs = list(BillProof.objects.filter(transaction=txn).values('id', 'file'))
-        payment_proofs = list(PaymentProof.objects.filter(transaction=txn).values('id', 'file'))
+        bill_proofs = [{'id': bp.id, 'file': bp.file.url} for bp in BillProof.objects.filter(transaction=txn)]
+        payment_proofs = [{'id': pp.id, 'file': pp.file.url} for pp in PaymentProof.objects.filter(transaction=txn)]
 
         return JsonResponse({
             'txn': data,

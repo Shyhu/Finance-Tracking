@@ -46,7 +46,18 @@ class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction
         fields = ['transaction_id', 'project', 'type', 'amount', 'vendor', 'status', 'category', 'description', 'created_at']
+    def __init__(self, *args, **kwargs):
+        super(TransactionForm, self).__init__(*args, **kwargs)
 
+        # Add placeholders or empty labels for select fields
+        self.fields['project'].empty_label = "Select Project"
+        self.fields['type'].empty_label = "Select Type"
+        self.fields['status'].empty_label = "Select Status"
+        self.fields['category'].empty_label = "Select Category"
+
+        # Optional: add placeholder for other text fields
+        self.fields['vendor'].widget.attrs.update({'placeholder': 'Enter vendor name'})
+        self.fields['description'].widget.attrs.update({'placeholder': 'Enter description'})
 
 
 from django import forms
