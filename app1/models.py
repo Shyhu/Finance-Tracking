@@ -78,6 +78,7 @@ class Loan(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     loan_id = models.CharField(max_length=50,unique=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_proof = models.FileField(upload_to='loan_payment_proofs/', null=True, blank=True)
     interest_rate = models.DecimalField(max_digits=5, decimal_places=2, help_text='annual Interest in %')
     loan_purpose = models.CharField(max_length=100)
     start_date = models.DateField()
@@ -171,4 +172,5 @@ class Target(models.Model):
 
     def __str__(self):
         return f"{self.staff.name} - {self.date}"
+    
 

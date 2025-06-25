@@ -90,6 +90,8 @@ urlpatterns = [
     path('target/<int:pk>/delete/', views.delete_target, name='delete_target'),
     path('get-next-project-code/', views.get_next_project_code, name='get_next_project_code'),
     
+    
+    
 
     
 

@@ -98,6 +98,17 @@
           <i class="bi bi-wallet"></i> <strong>Remaining Balance:</strong><br>
           <strong class="text-dark">₹{{ remaining_balance|floatformat:2 }}</strong>
         </div>
+        <div class="col-md-4 mb-3">
+  <i class="bi bi-paperclip"></i> <strong>Payment Proof:</strong><br>
+  {% if loan.payment_proof %}
+    <a href="{{ loan.payment_proof.url }}" target="_blank" class="btn btn-sm btn-outline-primary mt-1">
+      View / Download File
+    </a>
+  {% else %}
+    <span class="text-muted">No file uploaded</span>
+  {% endif %}
+</div>
+
       </div>
 
       <div class="text-end mt-4">
@@ -157,7 +168,7 @@
 <div class="modal fade" id="addRepaymentModal" tabindex="-1" aria-labelledby="addRepaymentModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content fancy-form">
-      <form method="POST" action="{% url 'loan_detail' loan.id %}">
+      <form method="POST" action="{% url 'loan_detail' loan.id %}" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="modal-body p-0 d-flex">
           <!-- Left side: Image/branding -->

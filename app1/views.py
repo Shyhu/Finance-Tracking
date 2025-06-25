@@ -428,6 +428,7 @@ def loan_list(request):
     loan_amount = request.GET.get('loan_amount')
     balance = request.GET.get('balance')
     start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')  # new line
     interest_rate = request.GET.get('interest_rate')
 
     if project:
@@ -438,6 +439,9 @@ def loan_list(request):
         loans = [loan for loan in loans if loan.remaining_balance <= Decimal(balance)]
     if start_date:
         loans = [loan for loan in loans if str(loan.start_date) >= start_date]
+    if end_date:
+        loans = [loan for loan in loans if str(loan.start_date) <= end_date]
+
     if interest_rate:
         loans = [loan for loan in loans if loan.interest_rate >= Decimal(interest_rate)]
 
@@ -461,7 +465,7 @@ def loan_list(request):
 
 def create_loan(request):
     if request.method == 'POST':
-        form = LoanForm(request.POST)
+        form = LoanForm(request.POST,request.FILES)
         if form.is_valid():
             form.save()
     return redirect('loan_list')
@@ -469,7 +473,7 @@ def create_loan(request):
 def update_loan(request, pk):
     loan = get_object_or_404(Loan, pk=pk)
     if request.method == 'POST':
-        form = LoanForm(request.POST, instance=loan)
+        form = LoanForm(request.POST,request.FILES,instance=loan)
         if form.is_valid():
             form.save()
     return redirect('loan_list')
@@ -792,7 +796,11 @@ from django.db.models import Sum
 from django.contrib.auth.decorators import login_required
 
 @login_required
+@login_required
 def dashboard_view(request):
+    from decimal import Decimal
+    from django.db.models import Sum
+
     total_projects = Project.objects.count()
     total_income = Transaction.objects.filter(type='Income').aggregate(Sum('amount'))['amount__sum'] or 0
     total_expense = Transaction.objects.filter(type='Expense').aggregate(Sum('amount'))['amount__sum'] or 0
@@ -800,18 +808,28 @@ def dashboard_view(request):
     total_loan_amount = Loan.objects.aggregate(Sum('amount'))['amount__sum'] or 0
     total_loan_repaid = Repayment.objects.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
     total_outstanding_loan = total_loan_amount - total_loan_repaid
-    net_profit = total_income - total_expense
+    net_profit = total_income - total_expense - total_outstanding_loan  # ✅ updated to subtract outstanding loan
+    total_principal_repaid = Repayment.objects.aggregate(Sum('principal_paid'))['principal_paid__sum'] or 0
+    total_outstanding_principal = total_loan_amount - total_principal_repaid
 
-    # Project-wise income and expense
+
     projects = Project.objects.all()
     project_bars = []
     for project in projects:
         income = Transaction.objects.filter(project=project, type='Income').aggregate(Sum('amount'))['amount__sum'] or 0
         expense = Transaction.objects.filter(project=project, type='Expense').aggregate(Sum('amount'))['amount__sum'] or 0
+
+        # Calculate outstanding loan for each project
+        project_loans = Loan.objects.filter(project=project)
+        project_loan_total = project_loans.aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
+        repaid_total = Repayment.objects.filter(loan__project=project).aggregate(Sum('principal_paid'))['principal_paid__sum'] or Decimal('0.00')
+        remaining_loan = project_loan_total - repaid_total
+
         project_bars.append({
             'name': project.name,
             'income': float(income),
             'expense': float(expense),
+            'remaining': float(remaining_loan),  # ✅ add to bar chart data
         })
 
     context = {
@@ -824,8 +842,10 @@ def dashboard_view(request):
         'total_outstanding_loan': total_outstanding_loan,
         'net_profit': net_profit,
         'project_bars': project_bars,
+        'total_outstanding_principal': total_outstanding_principal,
     }
     return render(request, 'dashboard_view.html', context)
+
 
 from django.shortcuts import redirect
 from .models import Category
@@ -1113,5 +1133,3 @@ from django.shortcuts import redirect
 def logout_view(request):
     logout(request)
     return redirect('login')  # Redirect to login page after logout
-
-

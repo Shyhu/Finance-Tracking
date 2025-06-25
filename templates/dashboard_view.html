@@ -154,9 +154,10 @@
       <p>Key financial metrics at a glance</p>
       <div class="overview-item">Total Income: <span>${{ total_income|floatformat:2 }}</span></div>
       <div class="overview-item">Total Expenses: <span>${{ total_expense|floatformat:2 }}</span></div>
-      <div class="overview-item net-profit">
-        Net Profit: <span>${{ net_profit|floatformat:2 }}</span>
-      </div>
+      <div class="overview-item">Outstanding Principal: <span>₹{{ total_outstanding_principal|floatformat:2 }}</span></div>
+
+      <div class="overview-item">Net Profit (after loans): <span class="net-profit">${{ net_profit|floatformat:2 }}</span></div>
+
     </div>
   </div>
 
@@ -194,12 +195,13 @@
 
 <!-- ✅ Chart.js Script -->
 <script>
+  const ctx = document.getElementById('projectBarChart').getContext('2d');
   const projectBars = {{ project_bars|safe }};
   const labels = projectBars.map(p => p.name);
   const incomeData = projectBars.map(p => p.income);
   const expenseData = projectBars.map(p => p.expense);
+  const remainingData = projectBars.map(p => p.remaining);
 
-  const ctx = document.getElementById('projectBarChart').getContext('2d');
   new Chart(ctx, {
     type: 'bar',
     data: {
@@ -214,6 +216,11 @@
           label: 'Expense',
           data: expenseData,
           backgroundColor: 'rgba(244, 63, 94, 0.8)'  // red
+        },
+        {
+          label: 'Remaining Loan',
+          data: remainingData,
+          backgroundColor: 'rgba(251, 191, 36, 0.8)'  // yellow
         }
       ]
     },
@@ -231,5 +238,6 @@
     }
   });
 </script>
+
 
 {% endblock %}

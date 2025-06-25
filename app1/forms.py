@@ -128,9 +128,11 @@ class LoanForm(forms.ModelForm):
             'project': forms.Select(attrs={'class': 'form-select'}),
             'amount': forms.NumberInput(attrs={'class': 'form-control'}),
             'interest_rate': forms.NumberInput(attrs={'class': 'form-control'}),
+            'payment_proof': forms.FileInput(attrs={'class': 'form-control'}) ,
             'purpose': forms.Textarea(attrs={'class': 'form-control'}),
             'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'repayment_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+
         }
     def __init__(self, *args, **kwargs):
         super(LoanForm, self).__init__(*args, **kwargs)
