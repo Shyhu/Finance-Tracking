@@ -119,24 +119,32 @@ class StaffForm(forms.ModelForm):
 from django import forms
 from .models import Loan
 
+from django import forms
+from .models import Loan
+
 class LoanForm(forms.ModelForm):
     class Meta:
         model = Loan
-        exclude = ('created_at', 'updated_at')  # fixed spelling
+        exclude = ('created_at', 'updated_at')
         widgets = {
-            'loan_id': forms.TextInput(attrs={'class': 'form-control'}),
+            'loan_id': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
             'project': forms.Select(attrs={'class': 'form-select'}),
             'amount': forms.NumberInput(attrs={'class': 'form-control'}),
             'interest_rate': forms.NumberInput(attrs={'class': 'form-control'}),
-            'payment_proof': forms.FileInput(attrs={'class': 'form-control'}) ,
-            'purpose': forms.Textarea(attrs={'class': 'form-control'}),
+            'payment_proof': forms.FileInput(attrs={'class': 'form-control'}),
+            'loan_purpose': forms.TextInput(attrs={'class': 'form-control'}),
             'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'repayment_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-
         }
+
     def __init__(self, *args, **kwargs):
-        super(LoanForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['project'].empty_label = "Select Project"
+
+        # ✅ Auto-generate loan_id only if it's a new loan
+        if not self.instance.pk:
+            last_loan = Loan.objects.order_by('-id').first()
+            next_number = 1 if not last_loan else last_loan.id + 1
+            self.fields['loan_id'].initial = f"LOAN-{next_number:04d}"
 
 
 # forms.py
