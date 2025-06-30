@@ -8,70 +8,354 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
 <style>
-  body {
-      background-color: #e5e7eb; /* light gray */
-      font-family: 'Roboto', sans-serif;
-      font-size: 12px;
+  /* Import Roboto Font */
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap');
+  
+  .dashboard-header {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 25px 35px;
+    margin-bottom: 30px;
+    box-shadow: 
+      0 20px 40px rgba(59, 130, 246, 0.1),
+      0 10px 25px rgba(0, 0, 0, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    position: relative;
+    overflow: hidden;
+    transform: translateZ(10px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dashboard-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa, #93c5fd, #3b82f6);
+    background-size: 200% 100%;
+    animation: gradientFlow 3s ease-in-out infinite;
+  }
+
+  .dashboard-header::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.03) 0%, transparent 70%);
+    animation: floatGlow 8s ease-in-out infinite;
+  }
+
+  .header-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+    z-index: 2;
+  }
+
+  @media (min-width: 768px) {
+    .header-content {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0;
+    }
+  }
+
+  .page-title-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .title-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    border-radius: 15px;
+    box-shadow: 
+      0 10px 25px rgba(59, 130, 246, 0.3),
+      0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateZ(5px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .title-icon-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.6s ease;
+  }
+
+  .title-icon-wrapper:hover {
+    transform: translateZ(10px) translateY(-2px);
+    box-shadow: 
+      0 15px 35px rgba(59, 130, 246, 0.4),
+      0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .title-icon-wrapper:hover::before {
+    left: 100%;
+  }
+
+  .title-icon {
+    font-size: 24px;
+    color: #ffffff;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
   }
 
   .page-title {
-      font-weight: 600;
-      font-size: 2rem;
-      color: #343a40;
-      position: relative;
-      padding-bottom: 10px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1e40af;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+    letter-spacing: -0.5px;
+    position: relative;
   }
 
   .page-title::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      width: 60px;
-      height: 4px;
-      background: linear-gradient(90deg, #0d6efd, #6610f2);
-      border-radius: 2px;
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    border-radius: 1px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dashboard-header:hover .page-title::after {
+    width: 100%;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+  }
+
+  .btn-enhanced {
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 12px 24px;
+    border-radius: 12px;
+    border: none;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transform: translateZ(5px);
+  }
+
+  .btn-enhanced::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s ease;
+  }
+
+  .btn-enhanced:hover::before {
+    left: 100%;
   }
 
   .add-btn {
-      background: linear-gradient(135deg, #0d6efd, #6610f2);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 18px;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      font-size: 12px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #ffffff;
+    box-shadow: 
+      0 10px 25px rgba(16, 185, 129, 0.3),
+      0 4px 12px rgba(0, 0, 0, 0.1);
   }
 
   .add-btn:hover {
-      background: linear-gradient(135deg, #6610f2, #0d6efd);
-      box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    transform: translateZ(10px) translateY(-3px);
+    box-shadow: 
+      0 15px 35px rgba(16, 185, 129, 0.4),
+      0 8px 20px rgba(0, 0, 0, 0.15);
+    color: #ffffff;
   }
 
-  .table-container {
-      overflow-x: auto;
-      background-color: #ffffff;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  .add-btn .btn-icon {
+    font-size: 16px;
+    font-weight: bold;
+    transition: transform 0.3s ease;
   }
 
-  .table th, .table td {
-      vertical-align: middle;
-      font-size: 12px;
+  .add-btn:hover .btn-icon {
+    transform: rotate(90deg);
   }
 
-  @media (max-width: 768px) {
-      .page-title {
-          font-size: 1.5rem;
-      }
-
-      .add-btn {
-          width: 100%;
-      }
+  .pdf-btn {
+    background: rgba(255, 255, 255, 0.9);
+    color: #374151;
+    border: 2px solid rgba(59, 130, 246, 0.2);
+    box-shadow: 
+      0 8px 20px rgba(59, 130, 246, 0.1),
+      0 3px 10px rgba(0, 0, 0, 0.05);
   }
 
+  .pdf-btn:hover {
+    background: rgba(59, 130, 246, 0.05);
+    border-color: rgba(59, 130, 246, 0.4);
+    color: #1e40af;
+    transform: translateZ(10px) translateY(-3px);
+    box-shadow: 
+      0 12px 30px rgba(59, 130, 246, 0.2),
+      0 6px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .pdf-btn .btn-icon {
+    font-size: 14px;
+    transition: transform 0.3s ease;
+  }
+
+  .pdf-btn:hover .btn-icon {
+    transform: scale(1.1);
+  }
+
+  /* Stats indicators */
+  .stats-indicator {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    display: flex;
+    gap: 8px;
+  }
+
+  .stat-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #10b981, #059669);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .stat-dot:nth-child(2) {
+    background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    animation-delay: 0.5s;
+  }
+
+  .stat-dot:nth-child(3) {
+    background: linear-gradient(45deg, #f59e0b, #d97706);
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+    animation-delay: 1s;
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 767px) {
+    .dashboard-header {
+      padding: 20px 25px;
+      margin-bottom: 20px;
+    }
+
+    .page-title {
+      font-size: 22px;
+    }
+
+    .title-icon-wrapper {
+      width: 40px;
+      height: 40px;
+    }
+
+    .title-icon {
+      font-size: 20px;
+    }
+
+    .action-buttons {
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .btn-enhanced {
+      padding: 10px 20px;
+      font-size: 11px;
+    }
+  }
+
+  /* Animations */
+  @keyframes gradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  @keyframes floatGlow {
+    0%, 100% { 
+      transform: translateY(0px) translateX(0px) rotate(0deg);
+      opacity: 0.5;
+    }
+    50% { 
+      transform: translateY(-20px) translateX(10px) rotate(180deg);
+      opacity: 0.8;
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.2);
+      opacity: 0.7;
+    }
+  }
+
+  /* Loading animation */
+  .dashboard-header {
+    animation: slideInDown 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes slideInDown {
+    from {
+      opacity: 0;
+      transform: translateZ(0px) translateY(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateZ(10px) translateY(0px);
+    }
+  }
+
+  /* Hover effect for entire header */
+  .dashboard-header:hover {
+    transform: translateZ(15px);
+    box-shadow: 
+      0 25px 50px rgba(59, 130, 246, 0.15),
+      0 15px 35px rgba(0, 0, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+  
   /* Form input & label enhancements */
   .modal-body label {
       font-weight: 500;
@@ -154,109 +438,1358 @@
       background-color: #684b67;
       color: white;
   }
+
+
+
+
+  
+  /* Filter Section Styling */
+  .filters-container {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    border-radius: 18px;
+    padding: 30px;
+    margin-bottom: 25px;
+    box-shadow: 
+      0 15px 35px rgba(59, 130, 246, 0.08),
+      0 8px 20px rgba(0, 0, 0, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    position: relative;
+    overflow: hidden;
+    transform: translateZ(5px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .filters-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa, #93c5fd, #3b82f6);
+    background-size: 200% 100%;
+    animation: gradientFlow 3s ease-in-out infinite;
+  }
+
+  .filters-container:hover {
+    transform: translateZ(8px);
+    box-shadow: 
+      0 20px 45px rgba(59, 130, 246, 0.12),
+      0 12px 25px rgba(0, 0, 0, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  .filter-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    align-items: end;
+  }
+
+  .filter-group {
+    position: relative;
+  }
+
+  .filter-label {
+    font-family: 'Roboto', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .filter-label::before {
+    content: '';
+    width: 3px;
+    height: 3px;
+    background: #3b82f6;
+    border-radius: 50%;
+    box-shadow: 0 0 4px rgba(59, 130, 246, 0.5);
+  }
+
+  .form-control-enhanced,
+  .form-select-enhanced {
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    padding: 12px 16px;
+    border: 2px solid rgba(59, 130, 246, 0.1);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #1e40af;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.05);
+    transform: translateZ(2px);
+  }
+
+  .form-control-enhanced:focus,
+  .form-select-enhanced:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 
+      0 0 0 3px rgba(59, 130, 246, 0.1),
+      0 8px 20px rgba(59, 130, 246, 0.15);
+    transform: translateZ(5px) translateY(-2px);
+  }
+
+  .form-control-enhanced:hover,
+  .form-select-enhanced:hover {
+    border-color: rgba(59, 130, 246, 0.3);
+    transform: translateZ(3px);
+  }
+
+  .reset-btn {
+    font-family: 'Roboto', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #64748b, #475569);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+      0 8px 20px rgba(100, 116, 139, 0.2),
+      0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateZ(2px);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .reset-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s ease;
+  }
+
+  .reset-btn:hover {
+    transform: translateZ(5px) translateY(-2px);
+    box-shadow: 
+      0 12px 30px rgba(100, 116, 139, 0.3),
+      0 6px 15px rgba(0, 0, 0, 0.15);
+  }
+
+  .reset-btn:hover::before {
+    left: 100%;
+  }
+
+  /* Table Container Styling */
+  .table-container {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    border-radius: 18px;
+    padding: 0;
+    box-shadow: 
+      0 20px 40px rgba(59, 130, 246, 0.1),
+      0 10px 25px rgba(0, 0, 0, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    overflow: hidden;
+    transform: translateZ(5px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+
+  .table-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa, #93c5fd, #3b82f6);
+    background-size: 200% 100%;
+    animation: gradientFlow 3s ease-in-out infinite;
+  }
+
+  .table-container:hover {
+    transform: translateZ(8px);
+    box-shadow: 
+      0 25px 50px rgba(59, 130, 246, 0.15),
+      0 15px 35px rgba(0, 0, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  .table-enhanced {
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    margin: 0;
+    background: transparent;
+  }
+
+  .table-enhanced thead {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 197, 253, 0.1));
+    border-bottom: 2px solid rgba(59, 130, 246, 0.2);
+  }
+
+  .table-enhanced thead th {
+    font-weight: 700;
+    color: #1e40af;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 10px;
+    padding: 20px 16px;
+    border: none;
+    position: relative;
+    text-shadow: 0 1px 2px rgba(59, 130, 246, 0.1);
+  }
+
+  .table-enhanced thead th::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    transition: width 0.3s ease;
+  }
+
+  .table-enhanced thead th:hover::after {
+    width: 80%;
+  }
+
+  .table-enhanced tbody tr {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+  }
+
+  .table-enhanced tbody tr:hover {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(147, 197, 253, 0.05));
+    transform: translateZ(2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+  }
+
+  .table-enhanced tbody td {
+    padding: 16px;
+    border: none;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.05);
+    color: #334155;
+    font-weight: 500;
+    vertical-align: middle;
+  }
+
+  .table-enhanced tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* Action Buttons */
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .btn-action {
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 2px solid;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateZ(2px);
+    position: relative;
+    overflow: hidden;
+    min-width: 36px;
+    height: 36px;
+  }
+
+  .btn-action::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.4s ease;
+  }
+
+  .btn-action:hover::before {
+    left: 100%;
+  }
+
+  .btn-view {
+    background: rgba(100, 116, 139, 0.1);
+    border-color: rgba(100, 116, 139, 0.3);
+    color: #64748b;
+  }
+
+  .btn-view:hover {
+    background: rgba(100, 116, 139, 0.2);
+    border-color: #64748b;
+    color: #475569;
+    transform: translateZ(5px) translateY(-2px);
+    box-shadow: 0 8px 20px rgba(100, 116, 139, 0.2);
+  }
+
+  .btn-edit {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.3);
+    color: #3b82f6;
+  }
+
+  .btn-edit:hover {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: #3b82f6;
+    color: #1d4ed8;
+    transform: translateZ(5px) translateY(-2px);
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+  }
+
+  .btn-delete {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+  }
+
+  .btn-delete:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: #ef4444;
+    color: #dc2626;
+    transform: translateZ(5px) translateY(-2px);
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+  }
+
+  /* Budget styling */
+  .budget-cell {
+    font-weight: 700;
+    color: #059669;
+    font-family: 'Roboto Mono', monospace;
+  }
+
+  /* Date styling */
+  .date-cell {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 11px;
+    background: rgba(59, 130, 246, 0.05);
+    padding: 4px 8px;
+    border-radius: 6px;
+    display: inline-block;
+  }
+
+  /* Code styling */
+  .code-cell {
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 600;
+    color: #1e40af;
+    background: rgba(59, 130, 246, 0.1);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+  }
+
+  /* Notes truncation */
+  .notes-cell {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 11px;
+    color: #64748b;
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    .filters-container {
+      padding: 20px;
+    }
+
+    .filter-row {
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    .table-enhanced {
+      min-width: 800px;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .btn-action {
+      min-width: 32px;
+      height: 32px;
+      font-size: 10px;
+    }
+  }
+
+  /* Loading animations */
+  .filters-container,
+  .table-container {
+    animation: slideInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .table-container {
+    animation-delay: 0.2s;
+  }
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateZ(0px) translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateZ(5px) translateY(0px);
+    }
+  }
+
+  @keyframes gradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+
+  
+/* Modal styling */
+.modal-dialog {
+  font-family: "Roboto", sans-serif;
+}
+
+.modal-content {
+  border: none;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  border-radius: 20px !important;
+  overflow: hidden;
+  background: transparent;
+}
+
+.modal-body {
+  padding: 0 !important;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+/* Left Panel (Branding) Styling */
+.bg-purple {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.bg-purple::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  animation: shimmer 8s linear infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.bg-purple .bg-white {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  animation: iconFloat 3s ease-in-out infinite;
+}
+
+@keyframes iconFloat {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.text-purple {
+  color: #667eea !important;
+}
+
+.bg-purple h4 {
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
+}
+
+.bg-purple p {
+  font-size: 14px;
+  opacity: 0.9;
+  line-height: 1.4;
+  font-weight: 300;
+}
+
+/* Right Panel (Form) Styling */
+.bg-light {
+  background: linear-gradient(135deg, #f8faff 0%, #e3f2fd 100%) !important;
+  position: relative;
+}
+
+.bg-light::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+}
+
+/* Form Styling */
+#addProjectForm {
+  position: relative;
+  z-index: 2;
+}
+
+.form-label {
+  color: #333;
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-control,
+.form-select {
+  border: 2px solid #e1e8ed;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(5px);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+  background: rgba(255, 255, 255, 1);
+  transform: translateY(-1px);
+}
+
+.form-control:hover,
+.form-select:hover {
+  border-color: #a8b8f0;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+/* Textarea specific styling */
+textarea.form-control {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* Row and column spacing */
+.row.g-3 {
+  margin: 0;
+}
+
+.row.g-3 > * {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+/* Button Styling */
+.btn {
+  font-weight: 600;
+  font-size: 14px;
+  padding: 12px 24px;
+  border-radius: 25px !important;
+  transition: all 0.3s ease;
+  border-width: 2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+.btn-outline-dark {
+  border-color: #495057;
+  color: #495057;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(5px);
+}
+
+.btn-outline-dark:hover {
+  background: #495057;
+  border-color: #495057;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(73, 80, 87, 0.3);
+}
+
+.btn-purple {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: 2px solid transparent;
+  color: white;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-purple:hover {
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  color: white;
+}
+
+/* Action buttons container */
+.d-flex.justify-content-end {
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+/* Enhanced spacing and layout */
+.modal-body .p-4 {
+  padding: 30px !important;
+}
+
+.bg-purple.p-4 {
+  padding: 40px 30px !important;
+}
+
+/* Input group enhancements */
+.col-md-6,
+.col-12 {
+  margin-bottom: 15px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .modal-dialog {
+    margin: 20px;
+  }
+
+  .modal-body {
+    flex-direction: column !important;
+    min-height: auto !important;
+  }
+
+  .bg-purple {
+    width: 100% !important;
+    padding: 25px !important;
+    text-align: center;
+  }
+
+  .bg-purple h4 {
+    font-size: 20px;
+  }
+
+  .bg-light {
+    padding: 25px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-lg {
+    max-width: 95%;
+  }
+
+  .row.g-3 .col-md-6 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+
+  .form-control,
+  .form-select {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+}
+
+/* Animation for modal appearance */
+.modal.fade .modal-dialog {
+  transform: scale(0.8) translateY(-50px);
+  transition: all 0.3s ease;
+}
+
+.modal.show .modal-dialog {
+  transform: scale(1) translateY(0);
+}
+
+/* Loading state for form submission */
+.btn-purple:disabled {
+  background: linear-gradient(135deg, #a0a0a0 0%, #808080 100%);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-purple:disabled::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border: 2px solid transparent;
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Enhanced focus states for accessibility */
+.btn:focus,
+.form-control:focus,
+.form-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition: all 0.2s ease;
+}
+
+
+
+/* Import Roboto font */
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap");
+
+/* Edit Modal specific styling */
+#editProjectModal .modal-dialog {
+  font-family: "Roboto", sans-serif;
+  max-width: 800px;
+  margin: 3rem auto; /* Increased top/bottom margin */
+}
+
+#editProjectModal .modal-content {
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
+  position: relative;
+  margin: 20px; /* Added margin around content */
+}
+
+#editProjectModal .modal-content::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);
+  z-index: 1;
+}
+
+/* Modal Header Styling */
+#editProjectModal .modal-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 30px 40px; /* Increased padding */
+  position: relative;
+  overflow: hidden;
+}
+
+#editProjectModal .modal-header::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  animation: headerShimmer 8s linear infinite;
+}
+
+@keyframes headerShimmer {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+#editProjectModal .modal-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+}
+
+#editProjectModal .modal-title::before {
+  content: "✏️";
+  margin-right: 15px; /* Increased margin */
+  font-size: 20px;
+  animation: iconBounce 2s ease-in-out infinite;
+}
+
+@keyframes iconBounce {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+#editProjectModal .btn-close {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 40px; /* Increased size */
+  height: 40px;
+  opacity: 1;
+  position: relative;
+  z-index: 2;
+  transition: all 0.3s ease;
+  margin-left: 20px; /* Added left margin */
+}
+
+#editProjectModal .btn-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg) scale(1.1);
+}
+
+#editProjectModal .btn-close:focus {
+  box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.3);
+}
+
+/* Modal Body Styling */
+#editProjectModal .modal-body {
+  padding: 40px 40px 30px 40px; /* Increased padding significantly */
+  background: linear-gradient(135deg, #f8faff 0%, #e3f2fd 100%);
+  position: relative;
+}
+
+#editProjectModal .modal-body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 30px; /* Increased left margin */
+  right: 30px; /* Increased right margin */
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.3), transparent);
+}
+
+/* Form Styling */
+#editProjectForm {
+  position: relative;
+}
+
+#editProjectModal .form-label {
+  color: #333;
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 12px; /* Increased bottom margin */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+}
+
+#editProjectModal .form-label::after {
+  content: "";
+  position: absolute;
+  bottom: -4px; /* Adjusted position */
+  left: 0;
+  width: 30px;
+  height: 2px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 1px;
+}
+
+#editProjectModal .form-control {
+  border: 2px solid #e1e8ed;
+  border-radius: 12px;
+  padding: 16px 20px; /* Increased padding */
+  font-size: 14px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(5px);
+  position: relative;
+  margin-bottom: 8px; /* Added bottom margin */
+}
+
+#editProjectModal .form-control:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+  background: rgba(255, 255, 255, 1);
+  transform: translateY(-2px);
+}
+
+#editProjectModal .form-control:hover {
+  border-color: #a8b8f0;
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateY(-1px);
+}
+
+/* Specific input type styling */
+#editProjectModal input[type="date"] {
+  position: relative;
+}
+
+#editProjectModal input[type="date"]::-webkit-calendar-picker-indicator {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 4px;
+  padding: 2px;
+  cursor: pointer;
+}
+
+#editProjectModal input[type="number"] {
+  position: relative;
+}
+
+#editProjectModal input[type="number"]::-webkit-outer-spin-button,
+#editProjectModal input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Textarea specific styling */
+#editProjectModal textarea.form-control {
+  min-height: 100px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+/* Row and column enhancements */
+#editProjectModal .row {
+  margin-left: -15px; /* Increased negative margin */
+  margin-right: -15px;
+}
+
+#editProjectModal .row .col {
+  padding-left: 15px; /* Increased padding */
+  padding-right: 15px;
+}
+
+#editProjectModal .mb-3 {
+  margin-bottom: 30px !important; /* Increased bottom margin */
+}
+
+/* Modal Footer Styling */
+#editProjectModal .modal-footer {
+  background: linear-gradient(135deg, #f8faff 0%, #ffffff 100%);
+  border: none;
+  padding: 30px 40px; /* Increased padding */
+  position: relative;
+  gap: 15px; /* Added gap between buttons */
+}
+
+#editProjectModal .modal-footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 30px; /* Increased left margin */
+  right: 30px; /* Increased right margin */
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.2), transparent);
+}
+
+/* Button Styling */
+#editProjectModal .btn {
+  font-weight: 600;
+  font-size: 14px;
+  padding: 14px 32px; /* Increased padding */
+  border-radius: 25px;
+  transition: all 0.3s ease;
+  border-width: 2px;
+  position: relative;
+  overflow: hidden;
+  margin: 0 8px; /* Increased margin between buttons */
+}
+
+#editProjectModal .btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+#editProjectModal .btn:hover::before {
+  left: 100%;
+}
+
+#editProjectModal .btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: 2px solid transparent;
+  color: white;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+#editProjectModal .btn-primary:hover {
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  color: white;
+}
+
+#editProjectModal .btn-secondary {
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid #6c757d;
+  color: #6c757d;
+  backdrop-filter: blur(5px);
+}
+
+#editProjectModal .btn-secondary:hover {
+  background: #6c757d;
+  border-color: #6c757d;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(108, 117, 125, 0.3);
+}
+
+/* Loading state for buttons */
+#editProjectModal .btn-primary:disabled {
+  background: linear-gradient(135deg, #a0a0a0 0%, #808080 100%);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+#editProjectModal .btn-primary:disabled::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border: 2px solid transparent;
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: buttonSpin 1s linear infinite;
+}
+
+@keyframes buttonSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Animation for modal appearance */
+#editProjectModal.fade .modal-dialog {
+  transform: scale(0.8) translateY(-50px);
+  transition: all 0.3s ease;
+}
+
+#editProjectModal.show .modal-dialog {
+  transform: scale(1) translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+  #editProjectModal .modal-dialog {
+    margin: 2rem 20px; /* Adjusted margin */
+    max-width: calc(100% - 40px);
+  }
+
+  #editProjectModal .modal-content {
+    margin: 10px; /* Reduced margin for smaller screens */
+  }
+
+  #editProjectModal .modal-header,
+  #editProjectModal .modal-body,
+  #editProjectModal .modal-footer {
+    padding-left: 25px;
+    padding-right: 25px;
+  }
+
+  #editProjectModal .modal-body {
+    padding-top: 30px;
+    padding-bottom: 25px;
+  }
+}
+
+@media (max-width: 768px) {
+  #editProjectModal .modal-dialog {
+    margin: 1rem 15px; /* Further adjusted margin */
+  }
+
+  #editProjectModal .modal-title {
+    font-size: 20px;
+  }
+
+  #editProjectModal .row .col {
+    flex: 0 0 100%;
+    max-width: 100%;
+    margin-bottom: 20px; /* Increased margin */
+  }
+
+  #editProjectModal .btn {
+    padding: 12px 24px;
+    font-size: 13px;
+    margin: 8px 0; /* Increased vertical margin */
+    width: 100%;
+  }
+
+  #editProjectModal .modal-footer {
+    flex-direction: column-reverse;
+    gap: 10px;
+  }
+
+  #editProjectModal .modal-header,
+  #editProjectModal .modal-body,
+  #editProjectModal .modal-footer {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+@media (max-width: 576px) {
+  #editProjectModal .modal-dialog {
+    margin: 0.5rem 10px; /* Minimal margin for very small screens */
+  }
+
+  #editProjectModal .modal-content {
+    margin: 5px;
+  }
+
+  #editProjectModal .modal-header,
+  #editProjectModal .modal-body,
+  #editProjectModal .modal-footer {
+    padding: 20px 15px;
+  }
+
+  #editProjectModal .form-control {
+    padding: 14px 18px;
+    font-size: 13px;
+  }
+
+  #editProjectModal .mb-3 {
+    margin-bottom: 25px !important;
+  }
+}
+
+/* Enhanced focus states for accessibility */
+#editProjectModal .btn:focus,
+#editProjectModal .form-control:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+/* Form validation states */
+#editProjectModal .form-control.is-valid {
+  border-color: #28a745;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='m2.3 6.73.94-.94 1.44 1.44L7.4 4.5l.94.94L4.6 9.18z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right calc(0.375em + 0.1875rem) center;
+  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+#editProjectModal .form-control.is-invalid {
+  border-color: #dc3545;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 4.6 1.4 1.4M7.2 4.6l-1.4 1.4'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right calc(0.375em + 0.1875rem) center;
+  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
 </style>
 
 
-<div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
-    <h2 class="page-title mb-3 mb-md-0">
-        <i class="bi bi-kanban-fill me-2"></i> PROJECT DASHBOARD
-    </h2>
-    <div class="d-flex gap-2">
-        <button type="button" class="add-btn" data-bs-toggle="modal" data-bs-target="#addProjectModal">
-            + Add Project
-        </button>
-        <a href="{% url 'project-pdf' %}" class="btn btn-outline-dark">
-            <i class="bi bi-file-earmark-pdf"></i> Download PDF
-        </a>
-    </div>
-</div>
 
+<div class="dashboard-header">
+  <!-- Animated status indicators -->
+  <div class="stats-indicator">
+    <div class="stat-dot"></div>
+    <div class="stat-dot"></div>
+    <div class="stat-dot"></div>
+  </div>
+
+  <div class="header-content">
+    <div class="page-title-section">
+      <div class="title-icon-wrapper">
+        <i class="bi bi-kanban-fill title-icon"></i>
+      </div>
+      <h2 class="page-title">PROJECT DASHBOARD</h2>
+    </div>
+    
+    <div class="action-buttons">
+      <button type="button" class="btn-enhanced add-btn" data-bs-toggle="modal" data-bs-target="#addProjectModal">
+        <span class="btn-icon">+</span>
+        Add Project
+      </button>
+      <a href="{% url 'project-pdf' %}" class="btn-enhanced pdf-btn">
+        <i class="bi bi-file-earmark-pdf btn-icon"></i>
+        Download PDF
+      </a>
+    </div>
+  </div>
+</div>
   
-  <!-- Filter Section -->
-  <div class="row g-2 mb-3 align-items-end">
-    <div class="col-md-3">
-      <label for="filter-name" class="form-label">Filter by Name</label>
-      <select id="filter-name" class="form-select">
+<!-- Enhanced Filter Section -->
+<div class="filters-container">
+  <div class="filter-row">
+    <div class="filter-group">
+      <label for="filter-name" class="filter-label">
+        <i class="bi bi-funnel"></i>
+        Filter by Name
+      </label>
+      <select id="filter-name" class="form-select-enhanced">
         <option value="">All Names</option>
         {% for project in projects %}
           <option value="{{ project.name }}">{{ project.name }}</option>
         {% endfor %}
       </select>
     </div>
-    <div class="col-md-3">
-      <label for="filter-location" class="form-label">Filter by Location</label>
-      <select id="filter-location" class="form-select">
+    
+    <div class="filter-group">
+      <label for="filter-location" class="filter-label">
+        <i class="bi bi-geo-alt"></i>
+        Filter by Location
+      </label>
+      <select id="filter-location" class="form-select-enhanced">
         <option value="">All Locations</option>
         {% for project in projects %}
           <option value="{{ project.location }}">{{ project.location }}</option>
         {% endfor %}
       </select>
     </div>
-    <div class="col-md-2">
-      <label for="filter-start" class="form-label">Start Date</label>
-      <input type="date" id="filter-start" class="form-control">
+    
+    <div class="filter-group">
+      <label for="filter-start" class="filter-label">
+        <i class="bi bi-calendar-event"></i>
+        Start Date
+      </label>
+      <input type="date" id="filter-start" class="form-control-enhanced">
     </div>
-    <div class="col-md-2">
-      <label for="filter-end" class="form-label">End Date</label>
-      <input type="date" id="filter-end" class="form-control">
+    
+    <div class="filter-group">
+      <label for="filter-end" class="filter-label">
+        <i class="bi bi-calendar-check"></i>
+        End Date
+      </label>
+      <input type="date" id="filter-end" class="form-control-enhanced">
     </div>
-    <div class="col-md-2">
-      <button class="btn btn-secondary w-100" id="reset-filters">Reset</button>
+    
+    <div class="filter-group">
+      <button class="reset-btn w-100" id="reset-filters">
+        <i class="bi bi-arrow-clockwise me-1"></i>
+        Reset Filters
+      </button>
     </div>
   </div>
-
-
-
-    <div class="table-container">
-        <table class="table table-hover">
-            <thead class="table-light">
-                <tr>
-                    <th>CODE</th>
-                    <th>NAME</th>
-                    <th>LOCATION</th>
-                    <th>BUDGET</th>
-                    <th>START DATE</th>
-                    <th>END DATE</th>
-                    <th>NOTES</th>
-                    <th>ACTIONS</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for project in projects %}
-                <tr>
-                    <td>{{ project.code }}</td>
-                    <td>{{ project.name }}</td>
-                    <td>{{ project.location }}</td>
-                    <td>${{ project.total_budget }}</td>
-                    <td>{{ project.start_date }}</td>
-                    <td>{{ project.end_date }}</td>
-                    <td>{{ project.notes }}</td>
-                    <td>
-                        <a href="{% url 'project-detail' project.pk %}" class="btn btn-sm btn-outline-secondary" title="View">
-                            <i class="bi bi-eye"></i>
-                        </a>
-                        <a href="#" class="btn btn-sm btn-outline-primary edit-project-btn"
-                            data-id="{{ project.id }}"
-                            data-code="{{ project.code }}"
-                            data-name="{{ project.name }}"
-                            data-location="{{ project.location }}"
-                            data-budget="{{ project.total_budget }}"
-                            data-start="{{ project.start_date }}"
-                            data-end="{{ project.end_date }}"
-                            data-notes="{{ project.notes|default_if_none:'' }}">
-                            <i class="bi bi-pencil-square"></i>
-                        </a>
-                        <a href="#" class="btn btn-sm btn-outline-danger delete-project-btn" data-id="{{ project.id }}">
-                             <i class="bi bi-trash"></i>
-                        </a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
 </div>
 
+<!-- Enhanced Table Section -->
+<div class="table-container">
+  <table class="table table-enhanced">
+    <thead>
+      <tr>
+        <th><i class="bi bi-hash me-1"></i>CODE</th>
+        <th><i class="bi bi-folder me-1"></i>NAME</th>
+        <th><i class="bi bi-geo-alt me-1"></i>LOCATION</th>
+        <th><i class="bi bi-currency-dollar me-1"></i>BUDGET</th>
+        <th><i class="bi bi-calendar-event me-1"></i>START DATE</th>
+        <th><i class="bi bi-calendar-check me-1"></i>END DATE</th>
+        <th><i class="bi bi-journal-text me-1"></i>NOTES</th>
+        <th><i class="bi bi-gear me-1"></i>ACTIONS</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for project in projects %}
+      <tr class="project-row" data-name="{{ project.name }}" data-location="{{ project.location }}" data-start="{{ project.start_date }}" data-end="{{ project.end_date }}">
+        <td><span class="code-cell">{{ project.code }}</span></td>
+        <td><strong>{{ project.name }}</strong></td>
+        <td>{{ project.location }}</td>
+        <td><span class="budget-cell">${{ project.total_budget }}</span></td>
+        <td><span class="date-cell">{{ project.start_date }}</span></td>
+        <td><span class="date-cell">{{ project.end_date }}</span></td>
+        <td><span class="notes-cell" title="{{ project.notes }}">{{ project.notes|truncatechars:30 }}</span></td>
+        <td>
+          <div class="action-buttons">
+            <a href="{% url 'project-detail' project.pk %}" class="btn-action btn-view" title="View Project">
+              <i class="bi bi-eye"></i>
+            </a>
+            <a href="#" class="btn-action btn-edit edit-project-btn" title="Edit Project"
+                data-id="{{ project.id }}"
+                data-code="{{ project.code }}"
+                data-name="{{ project.name }}"
+                data-location="{{ project.location }}"
+                data-budget="{{ project.total_budget }}"
+                data-start="{{ project.start_date }}"
+                data-end="{{ project.end_date }}"
+                data-notes="{{ project.notes|default_if_none:'' }}">
+              <i class="bi bi-pencil-square"></i>
+            </a>
+            <a href="#" class="btn-action btn-delete delete-project-btn" title="Delete Project" data-id="{{ project.id }}">
+              <i class="bi bi-trash"></i>
+            </a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 
 <!-- Modal for Add Project -->
 <!-- Add Project Modal -->
@@ -580,5 +2113,190 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 </script>
+<script>
+  / Enhanced interactions
+document.addEventListener('DOMContentLoaded', function() {
+  const header = document.querySelector('.dashboard-header');
+  const buttons = document.querySelectorAll('.btn-enhanced');
+  
+  // Add click ripple effect
+  buttons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      const rect = this.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      const x = e.clientX - rect.left - size / 2;
+      const y = e.clientY - rect.top - size / 2;
+      
+      ripple.style.cssText = `
+        position: absolute;
+        width: ${size}px;
+        height: ${size}px;
+        left: ${x}px;
+        top: ${y}px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        transform: scale(0);
+        animation: ripple 0.6s ease-out;
+        pointer-events: none;
+      `;
+      
+      this.appendChild(ripple);
+      
+      setTimeout(() => {
+        ripple.remove();
+      }, 600);
+    });
+  });
+  
+  // Add CSS for ripple animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes ripple {
+      to {
+        transform: scale(2);
+        opacity: 0;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  // Parallax effect on mouse move
+  header.addEventListener('mousemove', function(e) {
+    const rect = this.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    
+    const moveX = (x - 0.5) * 10;
+    const moveY = (y - 0.5) * 10;
+    
+    this.style.transform = `translateZ(15px) translateX(${moveX}px) translateY(${moveY}px)`;
+  });
+  
+  header.addEventListener('mouseleave', function() {
+    this.style.transform = 'translateZ(10px)';
+  });
+});
+</script>
 
+
+
+<script>
+// Enhanced filter and table interactions
+document.addEventListener('DOMContentLoaded', function() {
+  const filterName = document.getElementById('filter-name');
+  const filterLocation = document.getElementById('filter-location');
+  const filterStart = document.getElementById('filter-start');
+  const filterEnd = document.getElementById('filter-end');
+  const resetBtn = document.getElementById('reset-filters');
+  const projectRows = document.querySelectorAll('.project-row');
+
+  // Filter functionality
+  function filterProjects() {
+    const nameValue = filterName.value.toLowerCase();
+    const locationValue = filterLocation.value.toLowerCase();
+    const startValue = filterStart.value;
+    const endValue = filterEnd.value;
+
+    projectRows.forEach(row => {
+      const name = row.dataset.name.toLowerCase();
+      const location = row.dataset.location.toLowerCase();
+      const start = row.dataset.start;
+      const end = row.dataset.end;
+
+      let show = true;
+
+      if (nameValue && !name.includes(nameValue)) show = false;
+      if (locationValue && !location.includes(locationValue)) show = false;
+      if (startValue && start < startValue) show = false;
+      if (endValue && end > endValue) show = false;
+
+      if (show) {
+        row.style.display = '';
+        row.style.animation = 'fadeIn 0.3s ease';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+
+  // Add event listeners
+  [filterName, filterLocation, filterStart, filterEnd].forEach(filter => {
+    filter.addEventListener('change', filterProjects);
+    filter.addEventListener('input', filterProjects);
+  });
+
+  // Reset filters
+  resetBtn.addEventListener('click', function() {
+    [filterName, filterLocation, filterStart, filterEnd].forEach(filter => {
+      filter.value = '';
+    });
+    projectRows.forEach(row => {
+      row.style.display = '';
+      row.style.animation = 'fadeIn 0.3s ease';
+    });
+    
+    // Add reset animation
+    this.style.transform = 'translateZ(8px) scale(0.95)';
+    setTimeout(() => {
+      this.style.transform = 'translateZ(5px) scale(1)';
+    }, 150);
+  });
+
+  // Add hover effects to table rows
+  projectRows.forEach(row => {
+    row.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateZ(3px)';
+    });
+    
+    row.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateZ(0px)';
+    });
+  });
+
+  // Add click effects to action buttons
+  document.querySelectorAll('.btn-action').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      // Create ripple effect
+      const ripple = document.createElement('span');
+      const rect = this.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      const x = e.clientX - rect.left - size / 2;
+      const y = e.clientY - rect.top - size / 2;
+      
+      ripple.style.cssText = `
+        position: absolute;
+        width: ${size}px;
+        height: ${size}px;
+        left: ${x}px;
+        top: ${y}px;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+        transform: scale(0);
+        animation: ripple 0.6s ease-out;
+        pointer-events: none;
+      `;
+      
+      this.appendChild(ripple);
+      
+      setTimeout(() => {
+        ripple.remove();
+      }, 600);
+    });
+  });
+
+  // Add CSS for animations
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes ripple {
+      to { transform: scale(2); opacity: 0; }
+    }
+  `;
+  document.head.appendChild(style);
+});
+</script>
 {% endblock %}

@@ -11,8 +11,16 @@
     <li class="list-group-item"><strong>Vendor:</strong> {{ txn.vendor|default:"N/A" }}</li>
     <li class="list-group-item"><strong>Category:</strong> {{ txn.category }}</li>
     <li class="list-group-item"><strong>Description:</strong><br>{{ txn.description|default:"N/A" }}</li>
-    <li class="list-group-item"><strong>Date:</strong> {{ txn.created_at|date:"d M Y, h:i A" }}</li>
-    
+
+    <li class="list-group-item">
+      <strong>Date:</strong>
+      {% if txn.created_at %}
+        {{ txn.created_at|date:"d M Y" }}
+      {% else %}
+        Not Available
+      {% endif %}
+    </li>
+
     <li class="list-group-item">
       <strong>Bill Proofs:</strong>
       {% if bill_proofs %}

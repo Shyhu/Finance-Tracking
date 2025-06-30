@@ -1,129 +1,549 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>{% block title %}FinanceTrack{% endblock %}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- Bootstrap 5 -->
+  <title>Staff Dashboard - FinanceTrack</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+      --danger-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+      --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      --hover-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    * {
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Animated Background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
+      z-index: -1;
+      animation: backgroundShift 20s ease-in-out infinite;
+    }
+
+    @keyframes backgroundShift {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+
+    /* Enhanced Navbar */
+    .navbar {
+      background: var(--primary-gradient);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      padding: 1rem 0;
+    }
+
+    .navbar-brand {
+      color: #fff !important;
+      font-weight: 700;
+      font-size: 1.5rem;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .navbar-text {
+      color: rgba(255, 255, 255, 0.9) !important;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .navbar-text::before {
+      content: '\f007';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+    }
+
+    .btn-logout {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white !important;
+      border-radius: 25px;
+      padding: 0.5rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .btn-logout:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Main Container */
+    .main-container {
+      margin-top: 2rem;
+      padding: 0 1rem;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .page-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+      color: #6c757d;
+      font-size: 1.1rem;
+      font-weight: 400;
+    }
+
+    /* Task Cards */
+    .task-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .task-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      box-shadow: var(--card-shadow);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 2rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .task-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--primary-gradient);
+      border-radius: 20px 20px 0 0;
+    }
+
+    .task-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--hover-shadow);
+    }
+
+    .task-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .task-id {
+      background: var(--primary-gradient);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .task-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #2d3748;
+      margin: 1rem 0;
+    }
+
+    .task-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .meta-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--primary-gradient);
+      color: white;
+      font-size: 0.8rem;
+    }
+
+    .status-badge {
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      font-weight: 500;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-pending {
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      color: #8b4513;
+    }
+
+    .status-in-progress {
+      background: var(--success-gradient);
+      color: white;
+    }
+
+    .status-completed {
+      background: var(--warning-gradient);
+      color: #2d5016;
+    }
+
+    .task-description {
+      background: rgba(108, 117, 125, 0.1);
+      padding: 1rem;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #495057;
+    }
+
+    .task-attachments {
+      margin-top: 1.5rem;
+    }
+
+    .attachment-section {
+      margin-bottom: 1rem;
+    }
+
+    .attachment-title {
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .attachment-title i {
+      color: #6c757d;
+    }
+
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--primary-gradient);
+      color: white;
+      text-decoration: none;
+      border-radius: 25px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin: 0.25rem 0.5rem 0.25rem 0;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .download-btn:hover {
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .download-btn.voice-memo {
+      background: var(--secondary-gradient);
+      box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+    }
+
+    .download-btn.voice-memo:hover {
+      box-shadow: 0 6px 20px rgba(240, 147, 251, 0.4);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      box-shadow: var(--card-shadow);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .empty-icon {
+      font-size: 4rem;
+      color: #dee2e6;
+      margin-bottom: 1rem;
+    }
+
+    .empty-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #6c757d;
+      margin-bottom: 0.5rem;
+    }
+
+    .empty-subtitle {
+      color: #adb5bd;
+      font-size: 1rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .task-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .task-card {
+        padding: 1.5rem;
+      }
+
+      .page-title {
+        font-size: 2rem;
+      }
+
+      .task-meta {
+        grid-template-columns: 1fr;
+      }
+
+      .main-container {
+        padding: 0 0.5rem;
+      }
+    }
+
+    /* Loading Animation */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .loading {
+      animation: pulse 2s infinite;
+    }
+
+    /* Floating Action Button */
+    .fab {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      width: 60px;
+      height: 60px;
+      background: var(--primary-gradient);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+
+    .fab:hover {
+      transform: scale(1.1);
+      box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
+    }
+  </style>
 </head>
 <body>
-<div class="container mt-4">
-    <h2>Welcome, {{ staff.name }}!</h2>
 
-    <div class="row mt-4">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">Daily Attendance</div>
-                <div class="card-body">
-                    <div class="alert alert-success">
-                        Marked for {{ today }}: <strong>ON LEAVE</strong>
+  <!-- Enhanced Navbar -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <i class="fas fa-chart-line me-2"></i>
+        FinanceTrack
+      </a>
+      <div class="ms-auto d-flex align-items-center">
+        <span class="navbar-text me-3">
+          Hello, {{ staff.name }}
+        </span>
+        <a href="{% url 'logout' %}" class="btn btn-logout">
+          <i class="fas fa-sign-out-alt me-1"></i>
+          Logout
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container main-container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1 class="page-title">Your Dashboard</h1>
+      <p class="page-subtitle">Manage your assigned tasks efficiently</p>
+    </div>
+
+    <!-- Tasks Section -->
+    {% if tasks %}
+      <div class="task-grid">
+        {% for task in tasks %}
+          <div class="task-card">
+            <div class="task-header">
+              <div class="task-id">{{ task.task_id }}</div>
+              <div class="status-badge status-{{ task.status|lower|cut:' ' }}">
+                {{ task.status }}
+              </div>
+            </div>
+
+            <h3 class="task-title">{{ task.project.name }}</h3>
+
+            <div class="task-meta">
+              <div class="meta-item">
+                <div class="meta-icon">
+                  <i class="fas fa-calendar"></i>
+                </div>
+                <span><strong>Due:</strong> {{ task.due_date|date:"M d, Y" }}</span>
+              </div>
+              <div class="meta-item">
+                <div class="meta-icon">
+                  <i class="fas fa-clock"></i>
+                </div>
+                <span><strong>Priority:</strong> High</span>
+              </div>
+            </div>
+
+            {% if task.description %}
+              <div class="task-description">
+                <i class="fas fa-info-circle me-2"></i>
+                {{ task.description }}
+              </div>
+            {% endif %}
+
+            <!-- Attachments -->
+            {% if task.voice_memo or task.files.all %}
+              <div class="task-attachments">
+                {% if task.voice_memo %}
+                  <div class="attachment-section">
+                    <div class="attachment-title">
+                      <i class="fas fa-microphone"></i>
+                      Voice Memo
                     </div>
-                </div>
-            </div>
-        </div>
+                    <a href="{{ task.voice_memo.url }}" class="download-btn voice-memo" download>
+                      <i class="fas fa-download"></i>
+                      Download Audio
+                    </a>
+                  </div>
+                {% endif %}
 
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">Submit a Request</div>
-                <div class="card-body text-center">
-                    <a href="#" class="btn btn-primary">New General Request</a>
-                    <p>For leave, payment, documents, or other queries.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="mt-4 card">
-        <div class="card-header">My Daily Targets ({{ today }})</div>
-        <div class="card-body">
-            {% if targets %}
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Project</th>
-                <th>Target Amount</th>
-                <th>Achieved Amount</th>
-                <th>Status</th>
-                <th>Notes</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for target in targets %}
-            <tr>
-                <td>{{ target.project }}</td>
-                <td>{{ target.target_amount }}</td>
-                <td>{{ target.achieved_amount|default:"-" }}</td>
-                <td>
-                    <span class="badge {% if target.status == 'COMPLETED' %}bg-success{% elif target.status == 'PENDING STAFF UPDATE' %}bg-warning{% else %}bg-secondary{% endif %}">
-                        {{ target.status }}
-                    </span>
-                </td>
-                <td>{{ target.notes|default:"-" }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    <p>No targets assigned for today.</p>
-{% endif %}
-
-        </div>
-    </div>
-
-    <div class="mt-4 card">
-        <div class="card-header">My Assigned Tasks ({{ tasks.count }})</div>
-        <div class="card-body">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>TASK ID</th>
-                        <th>PROJECT</th>
-                        <th>DESCRIPTION</th>
-                        <th>DUE DATE</th>
-                        <th>STATUS</th>
-                        <th>ADMIN FILES</th>
-                        <th>ACTIONS</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for task in tasks %}
-                    <tr>
-                        <td>{{ task.task_id }}</td>
-                        <td>{{ task.project }}</td>
-                        <td>{{ task.description }}</td>
-                        <td>{{ task.due_date }}</td>
-                        <td><span class="badge bg-primary">{{ task.status }}</span></td>
-                        <td>
-                            {% if task.voice_memo %}
-                                <audio controls>
-                                    <source src="{{ task.voice_memo.url }}" type="audio/webm">
-                                </audio>
-                            {% endif %}
-                            {% for file in task.files.all %}
-                                <a href="{{ file.file.url }}" target="_blank">{{ file.file.name }}</a><br>
-                            {% endfor %}
-                        </td>
-                        <td>
-                            <form method="post" action="">
-                                {% csrf_token %}
-                                <input type="hidden" name="task_id" value="{{ task.id }}">
-                                <textarea name="message" class="form-control" placeholder="Message Admin"></textarea>
-                                <button class="btn btn-sm btn-secondary mt-2">Send</button>
-                            </form>
-                        </td>
-                    </tr>
+                {% if task.files.all %}
+                  <div class="attachment-section">
+                    <div class="attachment-title">
+                      <i class="fas fa-paperclip"></i>
+                      Attached Files ({{ task.files.all|length }})
+                    </div>
+                    {% for f in task.files.all %}
+                      <a href="{{ f.file.url }}" download class="download-btn">
+                        <i class="fas fa-file-download"></i>
+                        File {{ forloop.counter }}
+                      </a>
                     {% endfor %}
-                </tbody>
-            </table>
+                  </div>
+                {% endif %}
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <!-- Empty State -->
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-tasks"></i>
         </div>
-    </div>
-</div>
+        <h3 class="empty-title">No Tasks Assigned</h3>
+        <p class="empty-subtitle">You don't have any tasks assigned at the moment. Check back later!</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Floating Action Button -->
+  <div class="fab" title="Refresh Tasks">
+    <i class="fas fa-sync-alt"></i>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Add smooth scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+    });
+
+    // Add loading animation to download buttons
+    document.querySelectorAll('.download-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        this.classList.add('loading');
+        setTimeout(() => {
+          this.classList.remove('loading');
+        }, 2000);
+      });
+    });
+
+    // Refresh functionality for FAB
+    document.querySelector('.fab').addEventListener('click', function() {
+      this.style.transform = 'rotate(360deg) scale(1.1)';
+      setTimeout(() => {
+        this.style.transform = '';
+        location.reload();
+      }, 500);
+    });
+
+    // Add entrance animations
+    document.addEventListener('DOMContentLoaded', function() {
+      const cards = document.querySelectorAll('.task-card');
+      cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        setTimeout(() => {
+          card.style.transition = 'all 0.6s ease';
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, index * 100);
+      });
+    });
+  </script>
+
 </body>
 </html>

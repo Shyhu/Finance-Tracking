@@ -137,9 +137,10 @@ def transaction_list(request):
     }
 
     if start_date:
-        transactions = transactions.filter(created_at__date__gte=parse_date(start_date))
+        transactions = transactions.filter(created_at__gte=parse_date(start_date))
     if end_date:
-        transactions = transactions.filter(created_at__date__lte=parse_date(end_date))
+        transactions = transactions.filter(created_at__lte=parse_date(end_date))
+
     if project_id and project_id != 'all':
         try:
             transactions = transactions.filter(project__id=int(project_id))
@@ -321,6 +322,63 @@ from django.contrib import messages
 from .models import Staff, Project
 from .forms import StaffForm
 
+# def staff_list(request):
+#     staff_list = Staff.objects.all()
+#     project_list = Project.objects.all()
+#     form = StaffForm()
+
+#     if request.method == 'POST':
+#         if 'add_staff' in request.POST:
+#             form = StaffForm(request.POST, request.FILES)
+#             if form.is_valid():
+#                 form.save()
+#                 messages.success(request, "Staff added successfully.")
+#                 return redirect('staff_list')
+#             else:
+#                 messages.error(request, "Error adding staff.")
+
+#         elif 'edit_staff' in request.POST:
+#             staff_pk = request.POST.get('staff_pk')
+#             staff_obj = get_object_or_404(Staff, id=staff_pk)
+#             form = StaffForm(request.POST, request.FILES, instance=staff_obj)
+#             if form.is_valid():
+#                 form.save()
+#                 messages.success(request, "Staff updated successfully.")
+#                 return redirect('staff_list')
+#             else:
+#                 messages.error(request, "Error updating staff.")
+
+#     return render(request, 'staff_list.html', {
+#         'staff_list': staff_list,
+#         'project_list': project_list,
+#         'form': form,
+#     })
+
+
+
+
+
+# # def view_staff(request, pk):
+# #     staff = get_object_or_404(Staff, pk=pk)
+# #     files = staff.files.all()
+# #     return render(request, 'staff_detail.html', {'staff': staff, 'files': files})
+
+
+
+
+# def delete_staff(request, staff_id):
+#     staff = get_object_or_404(Staff, id=staff_id)
+#     staff.delete()
+#     messages.success(request, "Staff member deleted.")
+#     return redirect('staff_list')
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from .models import Staff, Project, Task
+from .forms import StaffForm
+
 def staff_list(request):
     staff_list = Staff.objects.all()
     project_list = Project.objects.all()
@@ -329,8 +387,15 @@ def staff_list(request):
     if request.method == 'POST':
         if 'add_staff' in request.POST:
             form = StaffForm(request.POST, request.FILES)
+            password = request.POST.get('password')
             if form.is_valid():
-                form.save()
+                user = User.objects.create_user(
+                    username=request.POST.get('staff_id'),
+                    password=password
+                )
+                staff = form.save(commit=False)
+                staff.user = user
+                staff.save()
                 messages.success(request, "Staff added successfully.")
                 return redirect('staff_list')
             else:
@@ -353,23 +418,12 @@ def staff_list(request):
         'form': form,
     })
 
-
-
-
-
-# def view_staff(request, pk):
-#     staff = get_object_or_404(Staff, pk=pk)
-#     files = staff.files.all()
-#     return render(request, 'staff_detail.html', {'staff': staff, 'files': files})
-
-
-
-
 def delete_staff(request, staff_id):
     staff = get_object_or_404(Staff, id=staff_id)
     staff.delete()
     messages.success(request, "Staff member deleted.")
     return redirect('staff_list')
+
 
 
 
@@ -1107,23 +1161,41 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from .forms import LoginForm
 
+# def login_view(request):
+#     if request.user.is_authenticated:
+#         return redirect('dashboard')  # Replace with your home/dashboard view
+
+#     form = LoginForm(request.POST or None)
+#     if request.method == 'POST' and form.is_valid():
+#         username = form.cleaned_data['username']
+#         password = form.cleaned_data['password']
+#         user = authenticate(request, username=username, password=password)
+
+#         if user:
+#             login(request, user)
+#             return redirect('dashboard')  # or wherever you want to redirect
+#         else:
+#             form.add_error(None, "Invalid username or password.")
+
+#     return render(request, 'login.html', {'form': form})
+from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect
+
+from django.contrib.auth.forms import AuthenticationForm
+
 def login_view(request):
-    if request.user.is_authenticated:
-        return redirect('dashboard')  # Replace with your home/dashboard view
-
-    form = LoginForm(request.POST or None)
-    if request.method == 'POST' and form.is_valid():
-        username = form.cleaned_data['username']
-        password = form.cleaned_data['password']
-        user = authenticate(request, username=username, password=password)
-
-        if user:
+    form = AuthenticationForm(request, data=request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            user = form.get_user()
             login(request, user)
-            return redirect('dashboard')  # or wherever you want to redirect
-        else:
-            form.add_error(None, "Invalid username or password.")
-
+            if user.is_superuser:
+                return redirect('dashboard')
+            else:
+                return redirect('staff_dashboard')
     return render(request, 'login.html', {'form': form})
+
+
 
 
 
@@ -1133,3 +1205,119 @@ from django.shortcuts import redirect
 def logout_view(request):
     logout(request)
     return redirect('login')  # Redirect to login page after logout
+
+
+
+
+
+import openpyxl
+import requests
+from django.core.files.base import ContentFile
+from django.shortcuts import redirect
+from django.contrib import messages
+from django.utils.dateparse import parse_datetime
+from .models import Transaction, Project, Category
+
+def import_transactions(request):
+    if request.method == "POST":
+        excel_file = request.FILES.get('excel_file')
+        if not excel_file:
+            messages.error(request, "No file uploaded.")
+            return redirect('transaction_list')
+
+        try:
+            wb = openpyxl.load_workbook(excel_file)
+            sheet = wb.active
+
+            for idx, row in enumerate(sheet.iter_rows(min_row=2, values_only=True), start=2):
+                try:
+                    (
+                        project_name, txn_id, txn_type, amount, vendor,
+                        created_at, status, category_name, description,
+                        bill_url, payment_url
+                    ) = row
+                    print(project_name,payment_url)
+
+                    # Validate Project
+                    project = Project.objects.filter(name=project_name).first()
+                    if not project:
+                        messages.warning(request, f"Row {idx}: Project '{project_name}' not found.")
+                        continue
+
+                    # Skip duplicates
+                    if Transaction.objects.filter(transaction_id=txn_id).exists():
+                        messages.warning(request, f"Row {idx}: Transaction ID '{txn_id}' already exists. Skipped.")
+                        continue
+
+                    # Validate datetime
+                    parsed_date = parse_datetime(str(created_at))
+                    if not parsed_date:
+                        messages.warning(request, f"Row {idx}: Invalid date '{created_at}'. Skipped.")
+                        continue
+
+                    # Get/Create Category
+                    category, _ = Category.objects.get_or_create(name=category_name)
+
+                    # Create Transaction
+                    txn = Transaction(
+                        transaction_id=txn_id,
+                        project=project,
+                        type=txn_type,
+                        amount=amount,
+                        vendor=vendor,
+                        created_at=parsed_date,
+                        status=status,
+                        category=category,
+                        description=description
+                    )
+                    txn.save()
+
+                    # Bill Proof from URL
+                    if bill_url:
+                        response = requests.get(bill_url)
+                        if response.status_code == 200:
+                            file_name = f"{txn_id}_bill.{bill_url.split('.')[-1]}"
+                            BillProof.objects.create( transaction =txn,file=file_name)
+                            # txn.bill_proof.save(file_name, ContentFile(response.content), save=False)
+
+                    # Payment Proof from URL
+                    if payment_url:
+                        response = requests.get(payment_url)
+                        print(response)
+                        if response.status_code == 200:
+                            file_name = f"{txn_id}_payment.{payment_url.split('.')[-1]}"
+                            PaymentProof.objects.create( transaction=txn,file=file_name)
+                            # txn.payment_proof.save(file_name, ContentFile(response.content), save=False)
+
+                    # txn.save()
+
+                except Exception as e:
+                    print(e,'ssssss,sxmxmnncxbncbcmbvnchfdffgd')
+                    messages.error(request, f"Row {idx} error: {str(e)}")
+
+            messages.success(request, "Transactions imported successfully.")
+            return redirect('transaction_list')
+
+        except Exception as e:
+            messages.error(request, f"Import failed: {str(e)}")
+            return redirect('transaction_list')
+
+    return redirect('transaction_list')
+
+
+
+from django.contrib.auth.decorators import login_required
+from .models import Staff, Task
+
+@login_required
+def staff_dashboard(request):
+    try:
+        staff = Staff.objects.get(user=request.user)
+    except Staff.DoesNotExist:
+        return redirect('logout')  # Not a staff
+
+    tasks = Task.objects.filter(staff=staff)
+
+    return render(request, 'staff_dashboard.html', {'staff': staff, 'tasks': tasks})
+
+

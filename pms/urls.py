@@ -20,6 +20,7 @@ from app1 import views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
+# from . import staff_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -89,6 +90,13 @@ urlpatterns = [
     path('target/<int:pk>/edit/', views.edit_target, name='edit_target'),
     path('target/<int:pk>/delete/', views.delete_target, name='delete_target'),
     path('get-next-project-code/', views.get_next_project_code, name='get_next_project_code'),
+
+
+
+    path('import-excel/', views.import_transactions, name='import_transactions'),
+    
+    path('staff-dashboard/', views.staff_dashboard, name='staff_dashboard'),
+
     
     
     
