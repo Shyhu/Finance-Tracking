@@ -1309,15 +1309,105 @@ def import_transactions(request):
 from django.contrib.auth.decorators import login_required
 from .models import Staff, Task
 
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
+from app1.models import Staff, Task
+from .models import Target  # Assuming Target is in the same app
+
+
+from app1.models import LeaveRequest
+from .forms import LeaveRequestForm
+
+from app1.models import LeaveRequest, Target, Task, Staff
+from .forms import LeaveRequestForm
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.db import models  
 @login_required
 def staff_dashboard(request):
-    try:
-        staff = Staff.objects.get(user=request.user)
-    except Staff.DoesNotExist:
-        return redirect('logout')  # Not a staff
+    staff = get_object_or_404(Staff, user=request.user)
 
     tasks = Task.objects.filter(staff=staff)
+    targets = Target.objects.filter(staff=staff)
+    leaves = LeaveRequest.objects.filter(staff=staff).order_by('-requested_at')
 
-    return render(request, 'staff_dashboard.html', {'staff': staff, 'tasks': tasks})
+    # ✅ Calculate counts
+    total_targets = targets.count()
+    total_target_amount = targets.aggregate(total=models.Sum('target_amount'))['total'] or 0
+
+    if request.method == 'POST':
+        leave_form = LeaveRequestForm(request.POST)
+        if leave_form.is_valid():
+            leave = leave_form.save(commit=False)
+            leave.staff = staff
+            leave.save()
+            messages.success(request, "Leave request submitted.")
+            return redirect('staff_dashboard')
+    else:
+        leave_form = LeaveRequestForm()
+
+    return render(request, 'staff_dashboard.html', {
+        'staff': staff,
+        'tasks': tasks,
+        'targets': targets,
+        'leaves': leaves,
+        'leave_form': leave_form,
+        'total_targets': total_targets,                # ✅ Pass total targets
+        'total_target_amount': total_target_amount     # ✅ Pass total target amount
+    })
+
+
+
+
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from .models import Task
+
+@login_required
+def mark_task_complete(request, task_id):
+    task = get_object_or_404(Task, id=task_id, staff=request.user.staff)
+    if request.method == 'POST' and task.status != 'Completed':
+        task.status = 'Completed'
+        task.save()
+        messages.success(request, "Task marked as completed.")
+    return redirect('staff_dashboard')
+
+
+def admin_task_report(request):
+    staff_members = Staff.objects.all()
+    task_data = []
+
+    for staff in staff_members:
+        tasks = Task.objects.filter(staff=staff)
+        total = tasks.count()
+        completed = tasks.filter(status='Completed').count()
+        pending = tasks.exclude(status='Completed').count()
+        progress = int((completed / total) * 100) if total else 0
+
+        task_data.append({
+            'staff': staff,
+            'total': total,
+            'completed': completed,
+            'pending': pending,
+            'progress': progress,
+        })
+
+    leaves = LeaveRequest.objects.select_related('staff').order_by('-requested_at')
+    return render(request, 'admin_task_report.html', {
+        'task_data': task_data,
+        'leaves': leaves
+    })
+
+def update_leave_status(request, leave_id, status):
+    leave = get_object_or_404(LeaveRequest, id=leave_id)
+    if status in ['Approved', 'Rejected']:
+        leave.status = status
+        leave.save()
+        messages.success(request, f"Leave marked as {status}.")
+    return redirect('admin_task_report')
 
 

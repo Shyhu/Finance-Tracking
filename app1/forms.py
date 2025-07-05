@@ -115,6 +115,9 @@ class StaffForm(forms.ModelForm):
                 'class': 'form-control'
             }),
         }
+    def __init__(self, *args, **kwargs):
+        super(StaffForm, self).__init__(*args, **kwargs)
+        self.fields['project'].empty_label = "Select Project"
 
 from django import forms
 from .models import Loan
@@ -253,14 +256,40 @@ class StaffMessageForm(forms.ModelForm):
 
 from django import forms
 from .models import Target
+from django import forms
+from .models import Target
 
 class TargetForm(forms.ModelForm):
     class Meta:
         model = Target
         fields = ['date', 'project', 'staff', 'target_amount', 'notes']
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'}),
+            'date': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-control',
+                'placeholder': 'Select target date'
+            }),
+            'project': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+            'staff': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+            'target_amount': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter target amount'
+            }),
+            'notes': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Enter notes (optional)'
+            }),
         }
+
+    def __init__(self, *args, **kwargs):
+        super(TargetForm, self).__init__(*args, **kwargs)
+        self.fields['project'].empty_label = "Select Project"
+        self.fields['staff'].empty_label = "Select Staff"
 
 
 from django import forms
@@ -274,3 +303,19 @@ class LoginForm(forms.Form):
         'class': 'form-control',
         'placeholder': 'Enter your password'
     }))
+
+
+
+from .models import LeaveRequest
+
+class LeaveRequestForm(forms.ModelForm):
+    class Meta:
+        model = LeaveRequest
+        fields = ['start_date', 'end_date', 'reason']
+        widgets = {
+            'start_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'end_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'reason': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
+
+

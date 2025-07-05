@@ -97,6 +97,15 @@ urlpatterns = [
     
     path('staff-dashboard/', views.staff_dashboard, name='staff_dashboard'),
 
+
+
+
+    path('task/complete/<int:task_id>/', views.mark_task_complete, name='mark_task_complete'),
+    path('task-report/', views.admin_task_report, name='admin_task_report'),
+
+    path('leave-requests/<int:leave_id>/<str:status>/', views.update_leave_status, name='update_leave_status'),
+
+
     
     
     
