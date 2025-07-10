@@ -4,10 +4,10 @@ from django.shortcuts import render
 from django.shortcuts import render, redirect
 from .models import Project
 from .forms import ProjectForm
-
-def base(request):
-    return render(request,'base.html')
-
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from .models import Task
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Project
 from .forms import ProjectForm
@@ -20,6 +20,63 @@ from django.http import JsonResponse
 from .models import Project
 from .forms import ProjectForm
 from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from .models import Project
+
+from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
+from .models import Project
+from .forms import ProjectForm
+
+from django.http import JsonResponse, HttpResponseNotAllowed
+from django.views.decorators.http import require_POST
+from .models import Project
+
+from django.shortcuts import render
+from django.http import JsonResponse
+from .models import Transaction, BillProof, PaymentProof, Category, Project
+from .forms import TransactionForm
+from django.shortcuts import render
+from .models import Transaction, Project, Category
+from django.utils.dateparse import parse_date
+from datetime import datetime
+
+from django.db.models import Sum, Count
+from django.utils import timezone
+from django.http import JsonResponse
+from .models import Transaction, BillProof, PaymentProof
+from .forms import TransactionForm
+
+
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from django.template.loader import render_to_string
+
+from .models import Transaction, BillProof, PaymentProof
+
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from .models import Transaction, BillProof, PaymentProof
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from .models import Transaction, BillProof, PaymentProof
+
+from django.template.loader import render_to_string
+
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Transaction
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from .models import Staff, Project
+from .forms import StaffForm
+
+def base(request):
+    return render(request,'base.html')
+
+
 
 def project_list(request):
     projects = Project.objects.order_by('-id')
@@ -61,8 +118,7 @@ def project_list(request):
 
 
 
-from django.shortcuts import render, get_object_or_404
-from .models import Project
+
 
 def project_detail_view(request, pk):
     project = get_object_or_404(Project, pk=pk)
@@ -70,10 +126,6 @@ def project_detail_view(request, pk):
 
 
 
-from django.shortcuts import render, get_object_or_404
-from django.http import JsonResponse
-from .models import Project
-from .forms import ProjectForm
 
 def edit_project(request, pk):
     project = get_object_or_404(Project, pk=pk)
@@ -89,9 +141,6 @@ def edit_project(request, pk):
         return render(request, 'project.html', {'edit_form': form, 'project_id': pk})
     
 
-from django.http import JsonResponse, HttpResponseNotAllowed
-from django.views.decorators.http import require_POST
-from .models import Project
 
 @require_POST
 def delete_project(request, pk):
@@ -104,17 +153,6 @@ def delete_project(request, pk):
 
 
 
-
-from django.shortcuts import render
-from django.http import JsonResponse
-from .models import Transaction, BillProof, PaymentProof, Category, Project
-from .forms import TransactionForm
-from django.shortcuts import render
-from .models import Transaction, Project, Category
-from django.utils.dateparse import parse_date
-from datetime import datetime
-
-from django.db.models import Sum, Count
 
 def transaction_list(request):
     transactions = Transaction.objects.all().select_related('project')
@@ -179,10 +217,7 @@ def transaction_list(request):
         }
     })
 
-from django.utils import timezone
-from django.http import JsonResponse
-from .models import Transaction, BillProof, PaymentProof
-from .forms import TransactionForm
+
 
 def add_transaction(request):
     if request.method == 'POST':
@@ -221,12 +256,6 @@ def add_transaction(request):
 #     return JsonResponse({'html': html})
 
 
-from django.shortcuts import get_object_or_404
-from django.http import JsonResponse
-from django.template.loader import render_to_string
-
-from .models import Transaction, BillProof, PaymentProof
-
 def view_transaction(request, pk):
     txn = get_object_or_404(Transaction.objects.select_related('project'), pk=pk)
 
@@ -244,14 +273,6 @@ def view_transaction(request, pk):
     return JsonResponse({'html': html})
 
 
-from django.shortcuts import get_object_or_404
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from django.http import JsonResponse
-from .models import Transaction, BillProof, PaymentProof
-from django.shortcuts import get_object_or_404
-from django.http import JsonResponse
-from .models import Transaction, BillProof, PaymentProof
 def edit_transaction(request, pk):
     txn = get_object_or_404(Transaction, pk=pk)
 
@@ -302,10 +323,6 @@ def edit_transaction(request, pk):
         })
 
 
-from django.template.loader import render_to_string
-
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Transaction
 
 def delete_transaction(request, pk):
     txn = get_object_or_404(Transaction, pk=pk)
@@ -317,10 +334,6 @@ def delete_transaction(request, pk):
 
 # app1/views.py
 
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from .models import Staff, Project
-from .forms import StaffForm
 
 # def staff_list(request):
 #     staff_list = Staff.objects.all()
@@ -1325,19 +1338,148 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.db import models  
+# @login_required
+# def staff_dashboard(request):
+#     staff = get_object_or_404(Staff, user=request.user)
+
+#     tasks = Task.objects.filter(staff=staff).prefetch_related('files')
+#     targets = Target.objects.filter(staff=staff)
+#     leaves = LeaveRequest.objects.filter(staff=staff).order_by('-requested_at')
+
+#     # ✅ Calculate counts
+#     total_targets = targets.count()
+#     total_target_amount = targets.aggregate(total=models.Sum('target_amount'))['total'] or 0
+
+#     if request.method == 'POST':
+#         leave_form = LeaveRequestForm(request.POST)
+#         if leave_form.is_valid():
+#             leave = leave_form.save(commit=False)
+#             leave.staff = staff
+#             leave.save()
+#             messages.success(request, "Leave request submitted.")
+#             return redirect('staff_dashboard')
+#     else:
+#         leave_form = LeaveRequestForm()
+
+#     return render(request, 'staff_dashboard.html', {
+#         'staff': staff,
+#         'tasks': tasks,
+#         'targets': targets,
+#         'leaves': leaves,
+#         'leave_form': leave_form,
+#         'total_targets': total_targets,                # ✅ Pass total targets
+#         'total_target_amount': total_target_amount     # ✅ Pass total target amount
+#     })
+
+# NEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+
+# from django.shortcuts import render, get_object_or_404, redirect
+# from django.contrib.auth.decorators import login_required
+# from django.contrib import messages
+# from django.db.models import Sum
+# from datetime import datetime
+# from .forms import LeaveRequestForm
+# from app1.models import Staff, Task, Target, LeaveRequest
+
+# @login_required
+# def staff_dashboard(request):
+#     staff = get_object_or_404(Staff, user=request.user)
+
+#     # Handle month filter
+#     selected_month = request.GET.get('month')
+#     if selected_month and selected_month.lower() != 'none':
+#         try:
+#             selected_date = datetime.strptime(selected_month, '%Y-%m')
+#         except ValueError:
+#             selected_date = datetime.today()
+#     else:
+#         selected_date = datetime.today()
+
+#     # Get targets for the month
+#     targets = Target.objects.filter(
+#         staff=staff,
+#         date__year=selected_date.year,
+#         date__month=selected_date.month
+#     )
+
+#     # ✅ Handle achieved amount update (NO impact on leave form)
+#     if request.method == 'POST' and 'target_id' in request.POST:
+#         target_id = request.POST.get('target_id')
+#         achieved_amount = request.POST.get('achieved_amount')
+#         try:
+#             target = Target.objects.get(id=target_id, staff=staff)
+#             target.achieved_amount = achieved_amount
+#             target.save()
+#             messages.success(request, "Achieved amount updated.")
+#             return redirect(f'{request.path}?month={selected_month or selected_date.strftime("%Y-%m")}')
+#         except Target.DoesNotExist:
+#             messages.error(request, "Target not found.")
+
+#     # Leave form logic untouched ✅
+#     if request.method == 'POST' and 'start_date' in request.POST:
+#         leave_form = LeaveRequestForm(request.POST)
+#         if leave_form.is_valid():
+#             leave = leave_form.save(commit=False)
+#             leave.staff = staff
+#             leave.save()
+#             messages.success(request, "Leave request submitted.")
+#             return redirect('staff_dashboard')
+#     else:
+#         leave_form = LeaveRequestForm()
+
+#     # Other dashboard data
+#     tasks = Task.objects.filter(staff=staff).prefetch_related('files')
+#     leaves = LeaveRequest.objects.filter(staff=staff).order_by('-requested_at')
+#     total_targets = targets.count()
+#     total_target_amount = targets.aggregate(total=Sum('target_amount'))['total'] or 0
+
+#     return render(request, 'staff_dashboard.html', {
+#         'staff': staff,
+#         'tasks': tasks,
+#         'targets': targets,
+#         'leaves': leaves,
+#         'leave_form': leave_form,
+#         'total_targets': total_targets,
+#         'total_target_amount': total_target_amount,
+#         'selected_month': selected_month,
+#         'today': datetime.today()
+#    
 @login_required
 def staff_dashboard(request):
     staff = get_object_or_404(Staff, user=request.user)
 
-    tasks = Task.objects.filter(staff=staff)
-    targets = Target.objects.filter(staff=staff)
-    leaves = LeaveRequest.objects.filter(staff=staff).order_by('-requested_at')
+    # Month filtering (existing)
+    selected_month = request.GET.get('month')
+    if selected_month and selected_month.lower() != 'none':
+        try:
+            selected_date = datetime.strptime(selected_month, '%Y-%m')
+        except ValueError:
+            selected_date = datetime.today()
+    else:
+        selected_date = datetime.today()
 
-    # ✅ Calculate counts
-    total_targets = targets.count()
-    total_target_amount = targets.aggregate(total=models.Sum('target_amount'))['total'] or 0
+    # Targets for the selected month (existing)
+    targets = Target.objects.filter(
+        staff=staff,
+        date__year=selected_date.year,
+        date__month=selected_date.month
+    )
 
-    if request.method == 'POST':
+    # ✅ Target achieved amount update (existing)
+    if request.method == 'POST' and 'target_id' in request.POST:
+        target_id = request.POST.get('target_id')
+        achieved_amount = request.POST.get('achieved_amount')
+        try:
+            target = Target.objects.get(id=target_id, staff=staff)
+            target.achieved_amount = achieved_amount
+            target.save()
+            messages.success(request, "Achieved amount updated.")
+            return redirect(f'{request.path}?month={selected_month or selected_date.strftime("%Y-%m")}')
+        except Target.DoesNotExist:
+            messages.error(request, "Target not found.")
+
+    # ✅ Leave request form submission (existing)
+    if request.method == 'POST' and 'start_date' in request.POST:
         leave_form = LeaveRequestForm(request.POST)
         if leave_form.is_valid():
             leave = leave_form.save(commit=False)
@@ -1348,24 +1490,43 @@ def staff_dashboard(request):
     else:
         leave_form = LeaveRequestForm()
 
+    # ✅ New: Filtering leaves by purpose and status (added safely)
+    purpose_filter = request.GET.get('purpose', '')
+    status_filter = request.GET.get('status', '')
+    leaves = LeaveRequest.objects.filter(staff=staff)
+    if purpose_filter:
+        leaves = leaves.filter(purpose=purpose_filter)
+    if status_filter:
+        leaves = leaves.filter(status=status_filter)
+
+    # ✅ All other data (untouched)
+    tasks = Task.objects.filter(staff=staff).prefetch_related('files')
+    approved_count = leaves.filter(status='Approved').count()
+    pending_count = leaves.filter(status='Pending').count()
+    rejected_count = leaves.filter(status='Rejected').count()
+    total_targets = targets.count()
+    total_target_amount = targets.aggregate(total=Sum('target_amount'))['total'] or 0
+
     return render(request, 'staff_dashboard.html', {
         'staff': staff,
         'tasks': tasks,
         'targets': targets,
-        'leaves': leaves,
+        'leaves': leaves.order_by('-requested_at'),
         'leave_form': leave_form,
-        'total_targets': total_targets,                # ✅ Pass total targets
-        'total_target_amount': total_target_amount     # ✅ Pass total target amount
+        'total_targets': total_targets,
+        'total_target_amount': total_target_amount,
+        'approved_count': approved_count,
+        'pending_count': pending_count,
+        'rejected_count': rejected_count,
+        'selected_month': selected_month,
+        'today': datetime.today(),
+        'purpose_filter': purpose_filter,
+        'status_filter': status_filter,
     })
 
 
 
 
-
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib import messages
-from .models import Task
 
 @login_required
 def mark_task_complete(request, task_id):
@@ -1375,11 +1536,50 @@ def mark_task_complete(request, task_id):
         task.save()
         messages.success(request, "Task marked as completed.")
     return redirect('staff_dashboard')
+from .models import MessageToAdmin
 
+# def admin_task_report(request):
+#     staff_members = Staff.objects.all()
+#     task_data = []
+
+#     for staff in staff_members:
+#         tasks = Task.objects.filter(staff=staff)
+#         total = tasks.count()
+#         completed = tasks.filter(status='Completed').count()
+#         pending = tasks.exclude(status='Completed').count()
+#         progress = int((completed / total) * 100) if total else 0
+
+#         task_data.append({
+#             'staff': staff,
+#             'total': total,
+#             'completed': completed,
+#             'pending': pending,
+#             'progress': progress,
+#         })
+
+#     leaves = LeaveRequest.objects.select_related('staff').order_by('-requested_at')
+#     staff_messages = MessageToAdmin.objects.select_related('staff').order_by('-sent_at')
+
+#     return render(request, 'admin_task_report.html', {
+#         'task_data': task_data,
+#         'leaves': leaves,
+#         'staff_messages': staff_messages
+#     })
+
+
+from django.shortcuts import render
+from django.db.models import Sum
+from app1.models import Staff, Task, Target, LeaveRequest, MessageToAdmin
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.db.models import Sum
+from app1.models import Staff, Task, Target, LeaveRequest, MessageToAdmin
 
 def admin_task_report(request):
     staff_members = Staff.objects.all()
     task_data = []
+    target_data = []
 
     for staff in staff_members:
         tasks = Task.objects.filter(staff=staff)
@@ -1396,12 +1596,33 @@ def admin_task_report(request):
             'progress': progress,
         })
 
+        targets = Target.objects.filter(staff=staff)
+        total_target = targets.aggregate(Sum('target_amount'))['target_amount__sum'] or 0
+        total_achieved = targets.aggregate(Sum('achieved_amount'))['achieved_amount__sum'] or 0
+        target_met = total_target > 0 and total_target == total_achieved
+        daily_targets = Target.objects.filter(staff=staff).order_by('date')
+
+        target_data.append({
+            'staff': staff,
+            'target_total': total_target,
+            'achieved_total': total_achieved,
+            'target_met': target_met,
+            'daily_targets': daily_targets,
+        })
+
+    # ✅ Leave requests and messages
     leaves = LeaveRequest.objects.select_related('staff').order_by('-requested_at')
+    staff_messages = MessageToAdmin.objects.select_related('staff').order_by('-sent_at')
+
     return render(request, 'admin_task_report.html', {
         'task_data': task_data,
-        'leaves': leaves
+        'target_data': target_data,
+        'leaves': leaves,
+        'staff_messages': staff_messages,
     })
 
+
+# ✅ Leave Status Update View
 def update_leave_status(request, leave_id, status):
     leave = get_object_or_404(LeaveRequest, id=leave_id)
     if status in ['Approved', 'Rejected']:
@@ -1409,5 +1630,27 @@ def update_leave_status(request, leave_id, status):
         leave.save()
         messages.success(request, f"Leave marked as {status}.")
     return redirect('admin_task_report')
+
+
+
+from app1.models import MessageToAdmin
+
+
+def send_message_to_admin(request):
+    if request.method == 'POST':
+        staff = get_object_or_404(Staff, user=request.user)
+        subject = request.POST.get('subject')
+        message = request.POST.get('message')
+        voice_file = request.FILES.get('voice_message')  # Optional
+
+        MessageToAdmin.objects.create(
+            staff=staff,
+            subject=subject,
+            message=message,
+            voice_message=voice_file  # Save the file
+        )
+        messages.success(request, "Your message (including voice, if any) was sent to the admin.")
+        return redirect('staff_dashboard')
+    return redirect('staff_dashboard')
 
 

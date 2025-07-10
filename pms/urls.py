@@ -102,6 +102,7 @@ urlpatterns = [
 
     path('task/complete/<int:task_id>/', views.mark_task_complete, name='mark_task_complete'),
     path('task-report/', views.admin_task_report, name='admin_task_report'),
+    path('send_message_to_admin', views.send_message_to_admin, name='send_message_to_admin'),
 
     path('leave-requests/<int:leave_id>/<str:status>/', views.update_leave_status, name='update_leave_status'),
 

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <style>
-   @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap');
   
   * {
     font-family: 'Roboto', sans-serif;
@@ -17,6 +17,139 @@
     max-width: 1400px;
   }
   
+  /* Navigation Tabs Styling */
+  .admin-nav {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+    padding: 8px;
+    border: 2px solid #e2e8f0;
+  }
+  
+  .nav-tabs {
+    border: none;
+    gap: 8px;
+  }
+  
+  .nav-tabs .nav-link {
+    background: transparent;
+    border: 2px solid transparent;
+    color: #64748b;
+    font-weight: 500;
+    font-size: 13px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .nav-tabs .nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+    transition: left 0.5s;
+  }
+  
+  .nav-tabs .nav-link:hover::before {
+    left: 100%;
+  }
+  
+  .nav-tabs .nav-link:hover {
+    color: #3b82f6;
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    border-color: #bfdbfe;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
+  }
+  
+  .nav-tabs .nav-link.active {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: #ffffff;
+    border-color: #1d4ed8;
+    font-weight: 600;
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.4);
+  }
+  
+  .nav-tabs .nav-link.active:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    transform: translateY(-2px);
+  }
+  
+  .nav-icon {
+    font-size: 16px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+  }
+  
+  /* Tab Content Styling */
+  .tab-content {
+    animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .tab-pane {
+    display: none;
+  }
+  
+  .tab-pane.active {
+    display: block;
+    animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Section Headers */
+  .section-header {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    padding: 20px 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+    border-left: 4px solid #3b82f6;
+  }
+  
+  .section-title {
+    font-weight: 600;
+    font-size: 24px;
+    color: #1e40af;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .section-subtitle {
+    color: #64748b;
+    font-size: 14px;
+    margin-top: 4px;
+    margin-bottom: 0;
+  }
+  
+  .section-icon {
+    font-size: 24px;
+    color: #3b82f6;
+    padding: 8px;
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    border-radius: 50%;
+  }
+  
+  /* Existing styles continue... */
   .page-title {
     font-weight: 600;
     font-size: 28px;
@@ -289,8 +422,6 @@
     border-left: 4px solid #3b82f6;
   }
   
-
-  
   @keyframes fadeIn {
     0% {
       opacity: 0;
@@ -351,417 +482,385 @@
   .fas {
     font-size: 20px;
   }
-
-  /* 3D Modal Styling */
-.modal {
-  backdrop-filter: blur(10px);
-  background: rgba(30, 58, 138, 0.1);
-}
-
-.modal-backdrop {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(29, 78, 216, 0.4) 100%);
-  backdrop-filter: blur(8px);
-}
-
-.modal-dialog {
-  transform: perspective(1000px) rotateX(0deg);
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  margin: 2rem auto;
-}
-
-.modal.show .modal-dialog {
-  animation: modal3DEntrance 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-@keyframes modal3DEntrance {
-  0% {
-    opacity: 0;
-    transform: perspective(1000px) rotateX(-15deg) translateY(-50px) scale(0.9);
-  }
-  50% {
-    opacity: 0.8;
-    transform: perspective(1000px) rotateX(5deg) translateY(-10px) scale(1.02);
-  }
-  100% {
-    opacity: 1;
-    transform: perspective(1000px) rotateX(0deg) translateY(0px) scale(1);
-  }
-}
-
-.modal-content {
-  border: none;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 
-    0 25px 50px -12px rgba(0, 0, 0, 0.25),
-    0 0 0 1px rgba(255, 255, 255, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-  position: relative;
-  transform-style: preserve-3d;
-}
-
-.modal-content::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(147, 51, 234, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 40% 60%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
-  border-radius: 20px;
-  pointer-events: none;
-}
-
-.modal-header {
-  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #6366f1 100%);
-  color: white;
-  border-radius: 20px 20px 0 0;
-  padding: 24px 28px;
-  border-bottom: none;
-  position: relative;
-  overflow: hidden;
-}
-
-.modal-header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%),
-    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
-  pointer-events: none;
-}
-
-.modal-header::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
-}
-
-.modal-title {
-  font-weight: 600;
-  font-size: 18px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  position: relative;
-  z-index: 1;
-}
-
-.modal-title i {
-  font-size: 20px;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
-}
-
-.btn-close {
-  filter: brightness(0) invert(1);
-  opacity: 0.8;
-  transition: all 0.3s ease;
-  position: relative;
-  z-index: 1;
-}
-
-.btn-close:hover {
-  opacity: 1;
-  transform: scale(1.1);
-}
-
-.modal-body {
-  padding: 32px 28px;
-  background: 
-    linear-gradient(145deg, #fafbfc 0%, #ffffff 100%);
-  position: relative;
-}
-
-.modal-body::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 4px;
-  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-  border-radius: 2px;
-  opacity: 0.6;
-}
-
-.modal-footer {
-  background: linear-gradient(145deg, #f8fafc 0%, #ffffff 100%);
-  border-top: 1px solid rgba(226, 232, 240, 0.8);
-  border-radius: 0 0 20px 20px;
-  padding: 20px 28px;
-  position: relative;
-}
-
-.modal-footer::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent 0%, rgba(59, 130, 246, 0.2) 50%, transparent 100%);
-}
-
-/* Enhanced Form Styling */
-.form-label {
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 8px;
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.form-control, .form-select {
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 12px 16px;
-  font-size: 12px;
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  background: linear-gradient(145deg, #ffffff 0%, #f9fafb 100%);
-  box-shadow: 
-    inset 0 1px 3px rgba(0, 0, 0, 0.1),
-    0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.form-control:focus, .form-select:focus {
-  border-color: #3b82f6;
-  box-shadow: 
-    0 0 0 4px rgba(59, 130, 246, 0.1),
-    inset 0 1px 3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  outline: none;
-  transform: translateY(-1px);
-  background: #ffffff;
-}
-
-.form-control::placeholder {
-  color: #9ca3af;
-  font-style: italic;
-}
-
-/* Enhanced Button Styling */
-.btn-primary {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%);
-  border: none;
-  border-radius: 12px;
-  padding: 12px 24px;
-  font-weight: 600;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  box-shadow: 
-    0 4px 6px -1px rgba(59, 130, 246, 0.3),
-    0 2px 4px -1px rgba(59, 130, 246, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  position: relative;
-  overflow: hidden;
-}
-
-.btn-primary::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
-
-.btn-primary:hover {
-  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 50%, #1e3a8a 100%);
-  transform: translateY(-2px);
-  box-shadow: 
-    0 8px 15px -3px rgba(59, 130, 246, 0.4),
-    0 4px 6px -2px rgba(59, 130, 246, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-}
-
-.btn-primary:hover::before {
-  left: 100%;
-}
-
-.btn-secondary {
-  background: linear-gradient(145deg, #f8fafc 0%, #e2e8f0 100%);
-  border: 2px solid #cbd5e1;
-  color: #64748b;
-  border-radius: 12px;
-  padding: 10px 22px;
-  font-weight: 600;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  box-shadow: 
-    0 2px 4px -1px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
-}
-
-.btn-secondary:hover {
-  background: linear-gradient(145deg, #e2e8f0 0%, #cbd5e1 100%);
-  border-color: #94a3b8;
-  color: #475569;
-  transform: translateY(-1px);
-  box-shadow: 
-    0 4px 6px -1px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
-}
-
-/* Form Group Styling */
-.mb-3 {
-  margin-bottom: 24px;
-  position: relative;
-}
-
-.mb-3:last-child {
-  margin-bottom: 0;
-}
-
-/* Icon Styling */
-.bi {
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
-}
-
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-  .modal-dialog {
-    margin: 1rem;
+  
+  .bg-purple {
+    background-color: #6f42c1 !important;
+    color: white;
   }
   
-  .modal-header,
-  .modal-body,
-  .modal-footer {
-    padding-left: 20px;
-    padding-right: 20px;
+  .clickable-row {
+    cursor: pointer;
   }
   
-  .modal-title {
-    font-size: 16px;
+  /* Card styling for better organization */
+  .report-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
   }
-}
-
-/* Loading Animation for Form Submission */
-.btn-primary:disabled {
-  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
-  cursor: not-allowed;
-  transform: none;
-}
-
-.btn-primary:disabled::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 16px;
-  height: 16px;
-  border: 2px solid transparent;
-  border-top: 2px solid #ffffff;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: translate(-50%, -50%) rotate(0deg); }
-  100% { transform: translate(-50%, -50%) rotate(360deg); }
-}
+  
+  .card-header {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-bottom: 2px solid #e2e8f0;
+    padding: 16px 20px;
+  }
+  
+  .card-body {
+    padding: 0;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .nav-tabs {
+      flex-direction: column;
+    }
+    
+    .nav-tabs .nav-link {
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    
+    .section-title {
+      font-size: 20px;
+    }
+    
+    .table-responsive {
+      font-size: 11px;
+    }
+  }
 </style>
+
 <div class="container py-4">
-  <h2 class="mb-4">Staff Task Report</h2>
-  <div class="table-responsive shadow rounded bg-white">
-    <table class="table table-hover align-middle">
-      <thead class="table-light">
-        <tr>
-          <th>Staff</th>
-          <th>Total Tasks</th>
-          <th>Completed</th>
-          <th>Pending</th>
-          <th>Progress</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for entry in task_data %}
-        <tr>
-          <td>{{ entry.staff.name }}</td>
-          <td><span class="badge bg-primary">{{ entry.total }}</span></td>
-          <td><span class="badge bg-success">{{ entry.completed }}</span></td>
-          <td><span class="badge bg-warning text-dark">{{ entry.pending }}</span></td>
-          <td style="min-width: 150px;">
-            <div class="progress" style="height: 20px;">
-              <div class="progress-bar bg-success" role="progressbar" style="width: {{ entry.progress }}%;" aria-valuenow="{{ entry.progress }}" aria-valuemin="0" aria-valuemax="100">
-                {{ entry.progress }}%
-              </div>
-            </div>
-          </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="5" class="text-center text-muted">No staff data available.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <!-- Navigation Tabs -->
+  <div class="admin-nav">
+    <ul class="nav nav-tabs" id="adminTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="task-report-tab" data-bs-toggle="tab" data-bs-target="#task-report" type="button" role="tab">
+          <i class="fas fa-tasks nav-icon"></i>
+          Task Reports
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="requests-tab" data-bs-toggle="tab" data-bs-target="#requests" type="button" role="tab">
+          <i class="fas fa-calendar-alt nav-icon"></i>
+          Leave Requests
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="messages-tab" data-bs-toggle="tab" data-bs-target="#messages" type="button" role="tab">
+          <i class="fas fa-envelope nav-icon"></i>
+          Staff Messages
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="targets-tab" data-bs-toggle="tab" data-bs-target="#targets" type="button" role="tab">
+          <i class="fas fa-bullseye nav-icon"></i>
+          Target Summary
+        </button>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Tab Content -->
+  <div class="tab-content" id="adminTabContent">
+    
+    <!-- Task Report Tab -->
+    <div class="tab-pane fade show active" id="task-report" role="tabpanel">
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="fas fa-tasks section-icon"></i>
+          Staff Task Report
+        </h2>
+        <p class="section-subtitle">Overview of task completion progress for all staff members</p>
+      </div>
+      
+      <div class="report-card">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Staff</th>
+                <th>Total Tasks</th>
+                <th>Completed</th>
+                <th>Pending</th>
+                <th>Progress</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for entry in task_data %}
+              <tr>
+                <td>{{ entry.staff.name }}</td>
+                <td><span class="badge bg-primary">{{ entry.total }}</span></td>
+                <td><span class="badge bg-success">{{ entry.completed }}</span></td>
+                <td><span class="badge bg-warning text-dark">{{ entry.pending }}</span></td>
+                <td style="min-width: 150px;">
+                  <div class="progress" style="height: 20px;">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ entry.progress }}%;" aria-valuenow="{{ entry.progress }}" aria-valuemin="0" aria-valuemax="100">
+                      {{ entry.progress }}%
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="5" class="text-center text-muted">No staff data available.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Requests Tab -->
+    <div class="tab-pane fade" id="requests" role="tabpanel">
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="fas fa-calendar-alt section-icon"></i>
+          Leave Requests Management
+        </h2>
+        <p class="section-subtitle">Review and manage staff leave requests</p>
+      </div>
+      
+      <div class="report-card">
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>SI.No</th>
+                <th>Staff</th>
+                <th>Purpose</th>
+                <th>Date Range</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th>Requested At</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for leave in leaves %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ leave.staff.name }}</td>
+                <td>{{ leave.purpose }}</td>
+                <td>{{ leave.start_date }} to {{ leave.end_date }}</td>
+                <td>{{ leave.reason|truncatechars:40 }}</td>
+                <td>
+                  <span class="badge 
+                    {% if leave.status == 'Approved' %}bg-success
+                    {% elif leave.status == 'Rejected' %}bg-danger
+                    {% else %}bg-warning text-dark{% endif %}">
+                    {{ leave.status }}
+                  </span>
+                </td>
+                <td>{{ leave.requested_at|date:"M d, Y H:i" }}</td>
+                <td>
+                  {% if leave.status == "Pending" %}
+                  <a href="{% url 'update_leave_status' leave.id 'Approved' %}" class="btn btn-sm btn-success">Approve</a>
+                  <a href="{% url 'update_leave_status' leave.id 'Rejected' %}" class="btn btn-sm btn-danger">Reject</a>
+                  {% else %}
+                  <span class="text-muted">No Action Needed</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="8" class="text-center">No leave requests found.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages Tab -->
+    <div class="tab-pane fade" id="messages" role="tabpanel">
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="fas fa-envelope section-icon"></i>
+          Staff Messages
+        </h2>
+        <p class="section-subtitle">Messages received from staff members</p>
+      </div>
+      
+      <div class="report-card">
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Staff</th>
+                <th>Task</th>
+                <th>Subject</th>
+                <th>Message</th>
+                <th>Voice</th>
+                <th>Sent At</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for msg in staff_messages %}
+              <tr>
+                <td>{{ msg.staff.name }}</td>
+                <td>{{ msg.task.description }}</td>
+                <td>{{ msg.subject }}</td>
+                <td>{{ msg.message }}</td>
+                <td>
+                  {% if msg.voice_message %}
+                    <audio controls>
+                      <source src="{{ msg.voice_message.url }}" type="audio/webm">
+                      Your browser does not support the audio element.
+                    </audio>
+                  {% else %}
+                    <span class="text-muted">No voice</span>
+                  {% endif %}
+                </td>
+                <td>{{ msg.sent_at|date:"M d, Y H:i" }}</td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="6" class="text-center text-muted">No messages received.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Targets Tab -->
+    <div class="tab-pane fade" id="targets" role="tabpanel">
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="fas fa-bullseye section-icon"></i>
+          Target Achievement Summary
+        </h2>
+        <p class="section-subtitle">Track staff performance against set targets</p>
+      </div>
+      
+      <div class="report-card">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Staff</th>
+                <th>Total Target (₹)</th>
+                <th>Achieved (₹)</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for entry in target_data %}
+              <!-- Main Row (Clickable) -->
+              <tr data-bs-toggle="collapse" data-bs-target="#collapseTargets{{ forloop.counter }}" aria-expanded="false" class="clickable-row {% if not entry.target_met %}table-warning{% endif %}">
+                <td>{{ entry.staff.name }}</td>
+                <td><span class="badge bg-purple">{{ entry.target_total }}</span></td>
+                <td><span class="badge bg-info">{{ entry.achieved_total }}</span></td>
+                <td>
+                  {% if entry.target_met %}
+                    <span class="badge bg-success">Achieved</span>
+                  {% else %}
+                    <span class="badge bg-danger">Pending</span>
+                  {% endif %}
+                </td>
+              </tr>
+              <!-- Collapsible Row with Per-Day Targets -->
+              <tr class="collapse bg-light" id="collapseTargets{{ forloop.counter }}">
+                <td colspan="4">
+                  <div class="p-3">
+                    <h6 class="text-primary mb-3">Per-Day Targets for {{ entry.staff.name }}</h6>
+                    <table class="table table-bordered table-sm mb-0">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Date</th>
+                          <th>Project</th>
+                          <th>Target (₹)</th>
+                          <th>Achieved (₹)</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for target in entry.daily_targets %}
+                        <tr>
+                          <td>{{ target.date|date:"d M Y" }}</td>
+                          <td>{{ target.project.name }}</td>
+                          <td>{{ target.target_amount }}</td>
+                          <td>{{ target.achieved_amount|default:"-" }}</td>
+                          <td>
+                            {% if target.achieved_amount == target.target_amount %}
+                              <span class="badge bg-success">Achieved</span>
+                            {% elif target.achieved_amount %}
+                              <span class="badge bg-danger">Not Achieved</span>
+                            {% else %}
+                              <span class="badge bg-secondary">Pending</span>
+                            {% endif %}
+                          </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-muted text-center">No targets available.</td></tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- Leave Requests Section -->
-<div class="card mt-5">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <h5 class="mb-0"><i class="fas fa-calendar-check me-2"></i>Pending Leave Requests</h5>
-  </div>
-  <div class="card-body table-responsive">
-    <table class="table table-bordered align-middle">
-      <thead class="table-light">
-        <tr>
-          <th>Staff</th>
-          <th>From</th>
-          <th>To</th>
-          <th>Reason</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for leave in leaves %}
-        <tr>
-          <td>{{ leave.staff.name }}</td>
-          <td>{{ leave.start_date }}</td>
-          <td>{{ leave.end_date }}</td>
-          <td>{{ leave.reason }}</td>
-          <td>
-            <span class="badge 
-              {% if leave.status == 'Approved' %}bg-success
-              {% elif leave.status == 'Rejected' %}bg-danger
-              {% else %}bg-warning text-dark{% endif %}">
-              {{ leave.status }}
-            </span>
-          </td>
-          <td>
-            {% if leave.status == "Pending" %}
-              <a href="{% url 'update_leave_status' leave.id 'Approved' %}" class="btn btn-sm btn-success">Approve</a>
-              <a href="{% url 'update_leave_status' leave.id 'Rejected' %}" class="btn btn-sm btn-danger">Reject</a>
-            {% else %}
-              <span class="text-muted">No Action Needed</span>
-            {% endif %}
-          </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="6" class="text-center text-muted">No leave requests found.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize Bootstrap tabs
+  const triggerTabList = [].slice.call(document.querySelectorAll('#adminTabs button'))
+  triggerTabList.forEach(function (triggerEl) {
+    const tabTrigger = new bootstrap.Tab(triggerEl)
+    
+    triggerEl.addEventListener('click', function (event) {
+      event.preventDefault()
+      tabTrigger.show()
+    })
+  })
+  
+  // Add smooth transitions
+  const tabPanes = document.querySelectorAll('.tab-pane')
+  tabPanes.forEach(pane => {
+    pane.addEventListener('show.bs.tab', function() {
+      this.style.opacity = '0'
+      this.style.transform = 'translateY(20px)'
+    })
+    
+    pane.addEventListener('shown.bs.tab', function() {
+      this.style.transition = 'all 0.3s ease'
+      this.style.opacity = '1'
+      this.style.transform = 'translateY(0)'
+    })
+  })
+  
+  // Enhanced hover effects for clickable rows
+  const clickableRows = document.querySelectorAll('.clickable-row')
+  clickableRows.forEach(row => {
+    row.addEventListener('mouseenter', function() {
+      this.style.transform = 'scale(1.02)'
+      this.style.boxShadow = '0 4px 8px rgba(59, 130, 246, 0.15)'
+    })
+    
+    row.addEventListener('mouseleave', function() {
+      this.style.transform = 'scale(1)'
+      this.style.boxShadow = 'none'
+    })
+  })
+  
+  // Add loading states to action buttons
+  const actionButtons = document.querySelectorAll('.btn-success, .btn-danger')
+  actionButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...'
+      this.disabled = true
+    })
+  })
+})
+</script>
 
 {% endblock %}

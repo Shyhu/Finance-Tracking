@@ -168,13 +168,20 @@ class Target(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     target_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    achieved_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     notes = models.TextField(blank=True)
+
+
+    def is_achieved(self):
+        return self.achieved_amount == self.target_amount
 
     def __str__(self):
         return f"{self.staff.name} - {self.date}"
     
 
 
+
+from django.db import models
 
 class LeaveRequest(models.Model):
     STATUS_CHOICES = [
@@ -183,7 +190,15 @@ class LeaveRequest(models.Model):
         ('Rejected', 'Rejected'),
     ]
 
+    PURPOSE_CHOICES = [
+        ('Leave', 'Leave'),
+        ('Break', 'Break'),
+        ('Payment Request', 'Payment Request'),
+        ('Other', 'Other'),
+    ]
+
     staff = models.ForeignKey('Staff', on_delete=models.CASCADE)
+    purpose = models.CharField(max_length=50, choices=PURPOSE_CHOICES)
     start_date = models.DateField()
     end_date = models.DateField()
     reason = models.TextField()
@@ -191,6 +206,18 @@ class LeaveRequest(models.Model):
     requested_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.staff.name} - {self.status}"
+        return f"{self.staff.name} - {self.purpose} - {self.status}"
+
+
+class MessageToAdmin(models.Model):
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+    subject = models.CharField(max_length=200)
+    message = models.TextField(blank=True)
+    voice_message = models.FileField(upload_to='voice_messages/', blank=True, null=True)
+    sent_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"From {self.staff} - {self.subject}"
+    
 
 

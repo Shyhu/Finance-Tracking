@@ -308,14 +308,30 @@ class LoginForm(forms.Form):
 
 from .models import LeaveRequest
 
+from django import forms
+from app1.models import LeaveRequest
+
 class LeaveRequestForm(forms.ModelForm):
     class Meta:
         model = LeaveRequest
-        fields = ['start_date', 'end_date', 'reason']
+        fields = ['purpose', 'start_date', 'end_date', 'reason']
         widgets = {
+            'purpose': forms.Select(attrs={'class': 'form-select'}),
             'start_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'end_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'reason': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'reason': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
         }
 
 
+
+# forms.py
+from django import forms
+from .models import Target
+
+class TargetAchievementForm(forms.ModelForm):
+    class Meta:
+        model = Target
+        fields = ['achieved_amount']
+        widgets = {
+            'achieved_amount': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter achievement amount'}),
+        }

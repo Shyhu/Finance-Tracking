@@ -785,6 +785,8 @@
     .loading {
       animation: pulse 2s infinite;
     }
+
+    
   </style>
 </head>
 <body>
@@ -793,7 +795,7 @@
     <div class="container-fluid">
       <a class="navbar-brand" href="#">
         <i class="fas fa-chart-line me-2"></i>
-        FinanceTrack
+        WAYONE SYNDICATE
       </a>
       
       <!-- Navigation Links -->
@@ -820,7 +822,7 @@
           <li class="nav-item">
             <a class="nav-link" href="#" data-section="leave">
               <i class="fas fa-calendar-alt me-1"></i>
-              Leave
+              Send a Request To Admin
             </a>
           </li>
         </ul>
@@ -975,53 +977,13 @@
         <!-- Dashboard Sidebar -->
         <div class="dashboard-sidebar">
           <!-- Quick Leave Request -->
-          <div class="leave-form-container">
-            <div class="leave-form-header">
-              <h3 class="leave-form-title">
-                <i class="fas fa-calendar-plus me-2"></i>
-                Quick Leave Request
-              </h3>
-              <p class="leave-form-subtitle">Submit your leave request quickly</p>
-            </div>
-
-            <form method="post">
-              {% csrf_token %}
-              <div class="form-group">
-                <label class="form-label">
-                  <i class="fas fa-calendar-day"></i>
-                  Start Date
-                </label>
-                <input type="date" class="form-control" name="start_date" required>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">
-                  <i class="fas fa-calendar-check"></i>
-                  End Date
-                </label>
-                <input type="date" class="form-control" name="end_date" required>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">
-                  <i class="fas fa-comment-alt"></i>
-                  Reason
-                </label>
-                <textarea class="form-control" name="reason" rows="3" placeholder="Enter reason for leave..." required></textarea>
-              </div>
-
-              <button type="submit" class="btn-submit-leave">
-                <i class="fas fa-paper-plane me-2"></i>
-                Submit Request
-              </button>
-            </form>
-          </div>
+          
         </div>
       </div>
     </div>
 
     <!-- Targets Only Section -->
-    <div class="content-section" id="targets-section">
+    {% comment %} <div class="content-section" id="targets-section">
       <div class="section-header">
         <i class="fas fa-bullseye section-icon"></i>
         <h2 class="section-title">Your Targets</h2>
@@ -1074,229 +1036,370 @@
           <p class="empty-subtitle">You don't have any targets assigned at the moment. Check back later!</p>
         </div>
       {% endif %}
-    </div>
+    </div> {% endcomment %}
 
-    <!-- Tasks Only Section -->
-    <div class="content-section" id="tasks-section">
-      <div class="section-header">
-        <i class="fas fa-tasks section-icon"></i>
-        <h2 class="section-title">Your Tasks</h2>
-      </div>
+<div class="content-section" id="targets-section">
+  <div class="section-header">
+    <i class="fas fa-bullseye section-icon"></i>
+    <h2 class="section-title">My Targets for <span id="selectedMonthLabel">July 2025</span></h2>
+  </div>
 
-      {% if tasks %}
-        <div class="card-grid">
-          {% for task in tasks %}
-            <div class="task-card">
-              <div class="card-header">
-                <div class="task-id">{{ task.task_id }}</div>
-                <div class="status-badge status-{{ task.status|lower|cut:' ' }}">
-                  {{ task.status }}
-                </div>
-              </div>
+  <!-- Month Filter -->
+  <form method="get" class="mb-4 d-flex align-items-center gap-2">
+    <label for="month" class="form-label mb-0">Select Month:</label>
+   <input type="month" name="month" class="form-control"
+       value="{{ selected_month|default:today|date:'Y-m' }}"
+       onchange="this.form.submit()">
 
-              <h3 class="card-title">{{ task.project.name }}</h3>
+  </form>
 
-              <div class="card-meta">
-                <div class="meta-item">
-                  <div class="meta-icon">
-                    <i class="fas fa-calendar"></i>
-                  </div>
-                  <span><strong>Due:</strong> {{ task.due_date|date:"M d, Y" }}</span>
-                </div>
-                <div class="meta-item">
-                  <div class="meta-icon">
-                    <i class="fas fa-clock"></i>
-                  </div>
-                  <span><strong>Priority:</strong> High</span>
-                </div>
-              </div>
-
-              {% if task.description %}
-                <div class="card-description">
-                  <i class="fas fa-info-circle me-2"></i>
-                  {{ task.description }}
-                </div>
-              {% endif %}
-              
-              <!-- Attachments -->
-              {% if task.voice_memo or task.files.all %}
-                <div class="card-attachments">
-                  {% if task.voice_memo %}
-                    <div class="attachment-section">
-                      <div class="attachment-title">
-                        <i class="fas fa-microphone"></i>
-                        Voice Memo
-                      </div>
-                      <a href="{{ task.voice_memo.url }}" class="download-btn voice-memo" download>
-                        <i class="fas fa-download"></i>
-                        Download Audio
-                      </a>
-                    </div>
-                  {% endif %}
-
-                  {% if task.files.all %}
-                    <div class="attachment-section">
-                      <div class="attachment-title">
-                        <i class="fas fa-paperclip"></i>
-                        Attached Files ({{ task.files.all|length }})
-                      </div>
-                      {% for f in task.files.all %}
-                        <a href="{{ f.file.url }}" download class="download-btn">
-                          <i class="fas fa-file-download"></i>
-                          File {{ forloop.counter }}
-                        </a>
-                      {% endfor %}
-                    </div>
-                  {% endif %}
-                </div>
-              {% endif %}
-
-              <!-- Completion Button -->
-              <form method="post" action="{% url 'mark_task_complete' task.id %}">
-                {% csrf_token %}
-                {% if task.status != 'Completed' %}
-                  <button class="btn btn-complete" type="submit">
-                    <i class="fas fa-check-circle me-1"></i>
-                    Mark as Completed
-                  </button>
-                {% else %}
-                  <span class="completed-badge">
-                    <i class="fas fa-check-circle"></i>
-                    Completed
-                  </span>
-                {% endif %}
-              </form>
-            </div>
-          {% endfor %}
+  {% if targets %}
+    {% for target in targets %}
+      <div class="target-card mb-3">
+        <div class="card-header">
+          <div class="target-id">{{ target.date|date:"D, d M" }}
+</div>
         </div>
-      {% else %}
-        <!-- Empty State for Tasks -->
-        <div class="empty-state">
-          <div class="empty-icon">
-            <i class="fas fa-tasks"></i>
-          </div>
-          <h3 class="empty-title">No Tasks Assigned</h3>
-          <p class="empty-subtitle">You don't have any tasks assigned at the moment. Check back later!</p>
+
+        <div class="target-amount">
+          <span class="amount-value">${{ target.target_amount }}</span>
+          <div class="amount-label">Target</div>
         </div>
-      {% endif %}
-    </div>
 
-    <!-- Leave Section -->
-    <div class="content-section" id="leave-section">
-      <div class="section-header">
-        <i class="fas fa-calendar-alt section-icon"></i>
-        <h2 class="section-title">Leave Management</h2>
-      </div>
-
-      <div class="row">
-        <div class="col-lg-6">
-          <!-- Beautiful Leave Request Form -->
-          <div class="leave-form-container">
-            <div class="leave-form-header">
-              <h3 class="leave-form-title">
-                <i class="fas fa-calendar-plus me-2"></i>
-                Request Leave
-              </h3>
-              <p class="leave-form-subtitle">Submit your leave request with all necessary details</p>
+        {% if target.achieved_amount is not None %}
+          {% if target.achieved_amount == target.target_amount %}
+            <div class="alert alert-success mb-2">
+              ✅ Achieved: ${{ target.achieved_amount }}<br>
+              <small>Your progress for this day has been recorded.</small>
             </div>
+          {% else %}
+            <div class="alert alert-danger mb-2 text-center">
+              <strong>LOSS</strong><br>
+              Achieved: ${{ target.achieved_amount }}
+            </div>
+          {% endif %}
+        {% else %}
+          <!-- Achievement Form -->
+          <form method="post" class="d-flex gap-2 align-items-center">
+            {% csrf_token %}
+            <input type="hidden" name="target_id" value="{{ target.id }}">
+            <input type="number" step="0.01" name="achieved_amount" class="form-control" placeholder="Enter achievement amount" required>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </form>
+        {% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="text-muted">No targets available for this month.</p>
+  {% endif %}
+</div>
 
-            <form method="post">
+
+
+<!-- Tasks Only Section -->
+<div class="content-section" id="tasks-section">
+  <div class="section-header">
+    <i class="fas fa-tasks section-icon"></i>
+    <h2 class="section-title">Your Tasks</h2>
+  </div>
+
+  {% if tasks %}
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Task</th>
+          <th>Project</th>
+          <th>Due Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for task in tasks %}
+        <tr>
+          <td>{{ task.description }}</td>
+          <td>{{ task.project.name }}</td>
+          <td>{{ task.due_date }}</td>
+          <td>
+            <span class="badge {% if task.status == 'Completed' %}bg-success{% elif task.status == 'Pending' %}bg-warning text-dark{% else %}bg-primary{% endif %}">
+              {{ task.status }}
+            </span>
+          </td>
+          <td>
+            <!-- View Modal Trigger -->
+            <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal{{ task.id }}">
+              <i class="fas fa-eye"></i>
+            </button>
+            <!-- Message Modal Trigger -->
+            <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#messageModal{{ task.id }}">
+              <i class="fas fa-comment"></i>
+            </button>
+            <form method="post" action="{% url 'mark_task_complete' task.id %}" style="display:inline;">
               {% csrf_token %}
-              <div class="form-group">
-                <label class="form-label">
-                  <i class="fas fa-calendar-day"></i>
-                  Start Date
-                </label>
-                <input type="date" class="form-control" name="start_date" required>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">
-                  <i class="fas fa-calendar-check"></i>
-                  End Date
-                </label>
-                <input type="date" class="form-control" name="end_date" required>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">
-                  <i class="fas fa-list-alt"></i>
-                  Leave Type
-                </label>
-                <select class="form-control" name="leave_type" required>
-                  <option value="">Select leave type...</option>
-                  <option value="vacation">Vacation</option>
-                  <option value="sick">Sick Leave</option>
-                  <option value="personal">Personal</option>
-                  <option value="emergency">Emergency</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">
-                  <i class="fas fa-comment-alt"></i>
-                  Reason
-                </label>
-                <textarea class="form-control" name="reason" rows="4" placeholder="Please provide detailed reason for your leave request..." required></textarea>
-              </div>
-
-              <button type="submit" class="btn-submit-leave">
-                <i class="fas fa-paper-plane me-2"></i>
-                Submit Leave Request
-              </button>
+              <button type="submit" class="btn btn-primary btn-sm">Mark Complete</button>
             </form>
-          </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ✅ Move modals outside the table -->
+  {% for task in tasks %}
+  <!-- View Modal -->
+  <div class="modal fade" id="viewModal{{ task.id }}" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ task.description }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
+        <div class="modal-body">
+          <p><strong>Task ID:</strong> {{ task.task_id }}</p>
+          <p><strong>Status:</strong> {{ task.status }}</p>
+          <p><strong>Project:</strong> {{ task.project.name }}</p>
+          <p><strong>Due Date:</strong> {{ task.due_date }}</p>
+          <p><strong>Description:</strong> {{ task.description }}</p>
 
-        <div class="col-lg-6">
-          <!-- Leave History -->
-          <div class="leave-history-container">
-            <h3 class="leave-history-title">
-              <i class="fas fa-history"></i>
-              Your Leave History
-            </h3>
+          {% if task.voice_memo %}
+          <hr>
+          <p><strong>Voice Memo:</strong></p>
+          <audio controls>
+            <source src="{{ task.voice_memo.url }}" type="audio/mpeg">
+            Your browser does not support the audio element.
+          </audio>
+          {% endif %}
 
-            {% if leaves %}
-              <div class="table-responsive">
-                <table class="table table-striped">
-                  <thead>
-                    <tr>
-                      <th>From</th>
-                      <th>To</th>
-                      <th>Reason</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for leave in leaves %}
-                    <tr>
-                      <td>{{ leave.start_date|date:"M d, Y" }}</td>
-                      <td>{{ leave.end_date|date:"M d, Y" }}</td>
-                      <td>{{ leave.reason|truncatechars:30 }}</td>
-                      <td>
-                        <span class="badge 
-                          {% if leave.status == 'Approved' %}bg-success
-                          {% elif leave.status == 'Rejected' %}bg-danger
-                          {% else %}bg-warning text-dark{% endif %}">
-                          {{ leave.status }}
-                        </span>
-                      </td>
-                    </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
-            {% else %}
-              <div class="text-center py-4">
-                <i class="fas fa-calendar-times" style="font-size: 3rem; color: var(--gray-300); margin-bottom: 1rem;"></i>
-                <p style="color: var(--gray-500);">No leave requests yet.</p>
-              </div>
-            {% endif %}
-          </div>
+          {% if task.files.all %}
+          <hr>
+          <p><strong>Attached Files:</strong></p>
+          <ul>
+            {% for f in task.files.all %}
+            <li>
+              <a href="{{ f.file.url }}" target="_blank">
+                <i class="fas fa-file-alt me-1"></i> Download File {{ forloop.counter }}
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+          {% endif %}
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Message Modal -->
+  <div class="modal fade" id="messageModal{{ task.id }}" tabindex="-1" aria-labelledby="messageModalLabel{{ task.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <form method="POST" action="{% url 'send_message_to_admin' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="messageModalLabel{{ task.id }}">Send Message to Admin</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" name="staff_id" value="{{ staff.id }}">
+            <input type="hidden" name="task_id" value="{{ task.id }}">
+
+            <div class="mb-3">
+              <label for="subject" class="form-label">Subject</label>
+              <input type="text" class="form-control" name="subject" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="message" class="form-label">Text Message</label>
+              <textarea class="form-control" name="message" rows="3"></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Voice Message</label><br>
+              <button type="button" class="btn btn-secondary" id="recordBtn{{ task.id }}">🎙️ Start Recording</button>
+              <button type="button" class="btn btn-danger" id="stopBtn{{ task.id }}" disabled>🛑 Stop</button>
+              <audio id="audioPlayback{{ task.id }}" controls style="display:none; margin-top: 10px;"></audio>
+              <input type="file" name="voice_message" id="voiceBlobInput{{ task.id }}" style="display:none;">
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Send</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+
+  {% else %}
+  <p class="text-muted">No tasks assigned.</p>
+  {% endif %}
+</div>
+<!-- Leave/Request Section -->
+<div class="content-section active" id="leave-section">
+  <div class="section-header mb-4">
+    <i class="fas fa-calendar-alt section-icon"></i>
+    <h2 class="section-title">My Requests</h2>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="stat-card border border-primary">
+        <span class="stat-number">{{ leaves|length }}</span>
+        <div class="stat-label">Total Requests</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card border border-success">
+        <span class="stat-number">{{ approved_count }}</span>
+        <div class="stat-label text-success">Approved</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card border border-danger">
+        <span class="stat-number">{{ rejected_count }}</span>
+        <div class="stat-label text-danger">Rejected</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card border border-warning">
+        <span class="stat-number">{{ pending_count }}</span>
+        <div class="stat-label text-warning">Pending</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Form -->
+  <form method="get" class="row mb-4">
+    <div class="col-md-4">
+      <label class="form-label">Filter by Purpose</label>
+      <select name="purpose" class="form-select">
+        <option value="">All</option>
+        <option value="Leave" {% if purpose_filter == "Leave" %}selected{% endif %}>Leave</option>
+        <option value="Break" {% if purpose_filter == "Break" %}selected{% endif %}>Break</option>
+        <option value="Payment Request" {% if purpose_filter == "Payment Request" %}selected{% endif %}>Payment Request</option>
+        <option value="Other" {% if purpose_filter == "Other" %}selected{% endif %}>Other</option>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Filter by Status</label>
+      <select name="status" class="form-select">
+        <option value="">All</option>
+        <option value="Pending" {% if status_filter == "Pending" %}selected{% endif %}>Pending</option>
+        <option value="Approved" {% if status_filter == "Approved" %}selected{% endif %}>Approved</option>
+        <option value="Rejected" {% if status_filter == "Rejected" %}selected{% endif %}>Rejected</option>
+      </select>
+    </div>
+    <div class="col-md-4 d-flex align-items-end">
+      <button type="submit" class="btn btn-outline-primary me-2">Apply</button>
+      <a href="{% url 'staff_dashboard' %}" class="btn btn-outline-secondary">Reset</a>
+    </div>
+  </form>
+
+  <!-- New Request Button -->
+  <div class="mb-3 text-end">
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newRequestModal">
+      <i class="fas fa-plus-circle me-1"></i> New Request
+    </button>
+  </div>
+
+  <!-- Requests Grid -->
+  <div class="card-grid">
+    {% for leave in leaves %}
+    <div class="task-card mb-3">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">{{ leave.purpose }}</h5>
+        <span class="badge 
+          {% if leave.status == 'Approved' %}bg-success
+          {% elif leave.status == 'Rejected' %}bg-danger
+          {% else %}bg-warning text-dark{% endif %}">
+          {{ leave.status }}
+        </span>
+      </div>
+      <div class="text-muted mb-2">{{ leave.start_date|date:"M d, Y" }} - {{ leave.end_date|date:"M d, Y" }}</div>
+      <p>{{ leave.reason|truncatechars:80 }}</p>
+      <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#leaveModal{{ leave.id }}">
+        View Details
+      </button>
+    </div>
+    {% empty %}
+    <p class="text-muted">No requests found for selected filters.</p>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- 🔽 View Details Modals Rendered Outside the Loop -->
+{% for leave in leaves %}
+<div class="modal fade" id="leaveModal{{ leave.id }}" tabindex="-1" aria-labelledby="leaveModalLabel{{ leave.id }}" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="leaveModalLabel{{ leave.id }}">Request Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Purpose:</strong> {{ leave.purpose }}</p>
+        <p><strong>Status:</strong>
+          <span class="badge 
+            {% if leave.status == 'Approved' %}bg-success
+            {% elif leave.status == 'Rejected' %}bg-danger
+            {% else %}bg-warning text-dark{% endif %}">
+            {{ leave.status }}
+          </span>
+        </p>
+        <p><strong>Start Date:</strong> {{ leave.start_date|date:"M d, Y" }}</p>
+        <p><strong>End Date:</strong> {{ leave.end_date|date:"M d, Y" }}</p>
+        <p><strong>Reason:</strong></p>
+        <div class="bg-light p-2 rounded border">{{ leave.reason }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+<!-- ➕ New Request Modal -->
+<div class="modal fade" id="newRequestModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Submit a New Request</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group mb-3">
+            <label>Purpose</label>
+            <select name="purpose" class="form-select" required>
+              <option value="">Select purpose</option>
+              <option value="Leave">Leave</option>
+              <option value="Break">Break</option>
+              <option value="Payment Request">Payment Request</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group mb-3">
+            <label>Reason</label>
+            <textarea name="reason" class="form-control" rows="3" required></textarea>
+          </div>
+          <div class="form-group mb-3">
+            <label>Start Date</label>
+            <input type="date" name="start_date" class="form-control" required>
+          </div>
+          <div class="form-group mb-3">
+            <label>End Date</label>
+            <input type="date" name="end_date" class="form-control" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Submit Request</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
   <!-- Floating Action Button -->
   <button class="fab" title="Refresh Dashboard" onclick="location.reload()">
@@ -1384,6 +1487,59 @@
       })
     })
   </script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  {% for task in tasks %}
+    let mediaRecorder{{ task.id }};
+    let recordedChunks{{ task.id }} = [];
+
+    const recordBtn{{ task.id }} = document.getElementById("recordBtn{{ task.id }}");
+    const stopBtn{{ task.id }} = document.getElementById("stopBtn{{ task.id }}");
+    const audioPlayback{{ task.id }} = document.getElementById("audioPlayback{{ task.id }}");
+    const voiceInput{{ task.id }} = document.getElementById("voiceBlobInput{{ task.id }}");
+
+    if (recordBtn{{ task.id }}) {
+      recordBtn{{ task.id }}.addEventListener("click", async () => {
+        recordedChunks{{ task.id }} = [];
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder{{ task.id }} = new MediaRecorder(stream);
+        mediaRecorder{{ task.id }}.start();
+
+        recordBtn{{ task.id }}.disabled = true;
+        stopBtn{{ task.id }}.disabled = false;
+
+        mediaRecorder{{ task.id }}.ondataavailable = (e) => {
+          if (e.data.size > 0) {
+            recordedChunks{{ task.id }}.push(e.data);
+          }
+        };
+
+        mediaRecorder{{ task.id }}.onstop = () => {
+          const blob = new Blob(recordedChunks{{ task.id }}, { type: 'audio/webm' });
+          const url = URL.createObjectURL(blob);
+          audioPlayback{{ task.id }}.src = url;
+          audioPlayback{{ task.id }}.style.display = "block";
+
+          const file = new File([blob], "voice_message.webm", { type: 'audio/webm' });
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+          voiceInput{{ task.id }}.files = dataTransfer.files;
+
+          recordBtn{{ task.id }}.disabled = false;
+          stopBtn{{ task.id }}.disabled = true;
+        };
+      });
+
+      stopBtn{{ task.id }}.addEventListener("click", () => {
+        mediaRecorder{{ task.id }}.stop();
+      });
+    }
+  {% endfor %}
+});
+</script>
+
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
